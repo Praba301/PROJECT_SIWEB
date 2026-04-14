@@ -74,7 +74,7 @@ export default function Navbar() {
           background: hoveredBtn ? NEON_PURPLE : 'transparent',
           color: '#fff',
           padding: '8px 20px',
-          // halo gnhgf
+          // halo gnh
           borderRadius: '6px',
           cursor: 'pointer',
           fontSize: '14px',
