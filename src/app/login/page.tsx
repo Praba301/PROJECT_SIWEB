@@ -20,7 +20,7 @@ export default function LoginPage() {
     if (emailBersih === "fleet@praketrio.com") {
       router.push("/fleet-shipper");
     } else if (emailBersih === "admin@praketrio.com") {
-      router.push("/dashboard/admin");
+      router.push("/admin/dashboard");
     } else {
       router.push("/customer/dashboard");
     }
