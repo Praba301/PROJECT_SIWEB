@@ -3,9 +3,16 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const [isLogin, setIsLogin] = useState(true);
+  const router = useRouter();
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    router.push("/customer/dashboard");
+  };
 
   return (
     <main className="min-h-screen bg-[#0D0D14] flex items-center justify-center px-4">
@@ -19,18 +26,20 @@ export default function LoginPage() {
         >
           {isLogin ? (
             /* Form Login */
-            <div className="w-full flex flex-col items-center gap-5">
+            <form onSubmit={handleLogin} className="w-full flex flex-col items-center gap-5">
               <h2 className="text-white font-bold text-2xl italic font-mono">
                 Login here
               </h2>
               <input
                 type="email"
                 placeholder="Email"
+                required
                 className="w-full bg-transparent border border-[#A855F7] text-white placeholder-white/60 rounded-full px-5 py-3 text-sm focus:outline-none focus:border-[#C084FC]"
               />
               <input
                 type="password"
                 placeholder="Password"
+                required
                 className="w-full bg-transparent border border-[#A855F7] text-white placeholder-white/60 rounded-full px-5 py-3 text-sm focus:outline-none focus:border-[#C084FC]"
               />
               <div className="flex items-center gap-2 w-full">
@@ -39,7 +48,10 @@ export default function LoginPage() {
                   Remember me
                 </label>
               </div>
-              <button className="w-full bg-[#A855F7] hover:bg-[#7C3AED] text-white font-semibold rounded-full py-3 text-sm transition-colors duration-200">
+              <button
+                type="submit"
+                className="w-full bg-[#A855F7] hover:bg-[#7C3AED] text-white font-semibold rounded-full py-3 text-sm transition-colors duration-200"
+              >
                 Login
               </button>
               <Link
@@ -48,7 +60,7 @@ export default function LoginPage() {
               >
                 Kembali Ke Beranda
               </Link>
-            </div>
+            </form>
           ) : (
             /* Panel Hello Friends */
             <div className="w-full flex flex-col items-center gap-6 text-center">
@@ -134,7 +146,10 @@ export default function LoginPage() {
                 placeholder="Ulangi Password"
                 className="w-full bg-transparent border border-[#A855F7] text-white placeholder-white/60 rounded-full px-5 py-3 text-sm focus:outline-none focus:border-[#C084FC]"
               />
-              <button className="w-full bg-[#A855F7] hover:bg-[#7C3AED] text-white font-semibold rounded-full py-3 text-sm transition-colors duration-200 mt-1">
+              <button
+                type="submit"
+                className="w-full bg-[#A855F7] hover:bg-[#7C3AED] text-white font-semibold rounded-full py-3 text-sm transition-colors duration-200 mt-1"
+              >
                 Register
               </button>
             </div>
