@@ -3,7 +3,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 
 export default function FleetSuperintendentDashboard() {
-  const [activeTab, setActiveTab] = useState('armada');
+  const [activeTab, setActiveTab] = useState('peta');
 
   // STATE UNTUK ARMADA (INTERAKTIF BARU)
   const [selectedArmadaShip, setSelectedArmadaShip] = useState<string | null>(null);
@@ -33,24 +33,29 @@ export default function FleetSuperintendentDashboard() {
     setSelesaiCount(prev => prev + 1);
   };
 
-  // FUNGSI DOWNLOAD PDF MOCKUP
+  // FUNGSI DOWNLOAD PDF MOCKUP (YANG BARU & AMAN)
   const handleDownloadPDF = () => {
-    const isConfirmed = window.confirm("Mempersiapkan Laporan PDF. Lanjutkan pengunduhan?");
-    if (isConfirmed) {
-      const element = document.createElement("a");
-      const file = new Blob(["Laporan Analisis Fleet Praketrio\n\nTanggal: 21 April 2026\nData performa kapal dan konsumsi bahan bakar..."], {type: 'text/plain'});
-      element.href = URL.createObjectURL(file);
-      element.download = "Laporan_Analisis_Praketrio.pdf";
-      document.body.appendChild(element);
-      element.click();
-      document.body.removeChild(element);
-    }
+    const element = document.createElement("a");
+    const file = new Blob([
+      "LAPORAN OPERASIONAL PRAKETRIO\n" +
+      "----------------------------\n" +
+      "Tanggal: 21 April 2026\n" +
+      "Status Fleet: Optimal\n" +
+      "Total Kapal Aktif: 24/28\n\n" +
+      "Catatan: Laporan analisis bahan bakar dan rute perjalanan."
+    ], {type: 'text/plain'});
+    
+    element.href = URL.createObjectURL(file);
+    element.download = "Laporan_Analisis_Praketrio.pdf";
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
   };
 
   return (
     <div className="min-h-screen bg-[#0a0813] text-[#f3f4f6] font-mono relative">
       
-      {/* MODAL TRANSMISI LOG ARMADA (BARU) */}
+      {/* MODAL TRANSMISI LOG ARMADA */}
       {selectedLog && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm animate-fade-in">
             <div className="bg-[#100e23] border border-[#b562ff] p-8 rounded-2xl w-full max-w-lg shadow-[0_0_40px_rgba(181,98,255,0.3)]">
@@ -119,7 +124,7 @@ export default function FleetSuperintendentDashboard() {
       {/* NAVBAR ATAS */}
       <nav className="border-b border-[#2a244d] flex justify-between items-center px-8 py-4 bg-[#0a0813]">
         <div className="flex items-center gap-3">
-          <img src="/logo.png" alt="Logo" className="w-10" />
+          <img src="/logo-mercusuar.png" alt="Logo" className="w-10" />
           <span className="text-xl font-bold tracking-widest text-white">Praketrio</span>
         </div>
         <div className="text-lg font-bold">Fleet Superintendent</div>
