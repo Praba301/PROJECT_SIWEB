@@ -10,8 +10,7 @@ export default function FleetSuperintendentDashboard() {
       {/* NAVBAR ATAS */}
       <nav className="border-b border-[#2a244d] flex justify-between items-center px-8 py-4 bg-[#0a0813]">
         <div className="flex items-center gap-3">
-          {/* Pastikan file logo-mercusuar.png ada di folder public */}
-          <img src="/logo-mercusuar.png" alt="Logo" className="w-10" />
+          <img src="/logo.png" alt="Logo" className="w-10" />
           <span className="text-xl font-bold tracking-widest text-white">Praketrio</span>
         </div>
         <div className="text-lg font-bold">Fleet Superintendent</div>

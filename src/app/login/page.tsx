@@ -7,11 +7,23 @@ import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const [isLogin, setIsLogin] = useState(true);
+  // Tambahan state untuk menangkap input email
+  const [email, setEmail] = useState(""); 
   const router = useRouter();
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    router.push("/customer/dashboard");
+    
+    // Bersihkan email dari spasi berlebih dan ubah ke huruf kecil semua
+    const emailBersih = email.trim().toLowerCase();
+    
+    if (emailBersih === "fleet@praketrio.com") {
+      router.push("/fleet-shipper");
+    } else if (emailBersih === "admin@praketrio.com") {
+      router.push("/dashboard/admin");
+    } else {
+      router.push("/customer/dashboard");
+    }
   };
 
   return (
@@ -32,8 +44,10 @@ export default function LoginPage() {
               </h2>
               <input
                 type="email"
-                placeholder="Email"
+                placeholder="Email Anda"
                 required
+                value={email} // Hubungkan ke state email
+                onChange={(e) => setEmail(e.target.value)} // Tangkap ketikan user
                 className="w-full bg-transparent border border-[#A855F7] text-white placeholder-white/60 rounded-full px-5 py-3 text-sm focus:outline-none focus:border-[#C084FC]"
               />
               <input
