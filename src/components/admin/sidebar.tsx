@@ -17,9 +17,9 @@ export default function Sidebar() {
   return (
     <aside className="w-64 bg-[#0d0e1f] border-r border-slate-800 flex flex-col justify-between h-full p-6 shrink-0">
       <div>
-        {/* Area Logo - Diperbaiki src-nya menjadi "/logo.png" */}
+        
         <div className="flex items-center gap-3 mb-12">
-          {/* Container logo disesuaikan agar tidak memotong gambar */}
+          
           <div className="w-12 h-12 flex items-center justify-center">
             <Image 
               src="/logo.png" 
@@ -27,13 +27,13 @@ export default function Sidebar() {
               width={48} 
               height={48} 
               className="object-contain"
-              priority // Tambahkan ini agar logo langsung dimuat pertama kali
+              priority 
             />
           </div>
           <h1 className="text-white font-bold text-xl tracking-wider">Praketrio</h1>
         </div>
 
-        {/* Navigasi */}
+       
         <nav className="flex flex-col gap-4">
           {menuItems.map((item) => {
             const isActive = pathname.startsWith(item.href);
