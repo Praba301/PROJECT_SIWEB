@@ -20,6 +20,8 @@ export default function CustomerDashboard() {
     catatan: "",
   });
 
+  const [showModal, setShowModal] = useState(false);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -38,7 +40,7 @@ export default function CustomerDashboard() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    alert("Paket berhasil didaftarkan!");
+    setShowModal(true);
     handleReset();
   };
 
@@ -46,16 +48,46 @@ export default function CustomerDashboard() {
     <div className={`${poppins.className} flex min-h-screen bg-[#0D0D2B]`}>
       <CustomerSidebar />
 
+      {/* Custom Modal */}
+      {showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="bg-[#13133A] border border-[#A855F7]/50 rounded-2xl p-8 max-w-sm w-full mx-4 shadow-[0_0_40px_rgba(168,85,247,0.3)] flex flex-col items-center gap-5">
+
+            {/* Icon */}
+            <div className="w-16 h-16 rounded-full bg-[#A855F7]/15 border border-[#A855F7]/40 flex items-center justify-center shadow-[0_0_20px_rgba(168,85,247,0.3)]">
+              <svg className="w-8 h-8 text-[#A855F7]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+
+            {/* Text */}
+            <div className="text-center flex flex-col gap-1">
+              <h2 className="text-white font-bold text-lg">Paket Berhasil Didaftarkan!</h2>
+              <p className="text-[#A0A0B0] text-sm">
+                Data pengirimanmu telah kami terima dan sedang diproses.
+              </p>
+            </div>
+
+            {/* Button */}
+            <button
+              onClick={() => setShowModal(false)}
+              className="w-full bg-[#A855F7]/10 border border-[#A855F7] hover:bg-[#A855F7]/25 hover:shadow-[0_0_20px_rgba(168,85,247,0.4)] text-white font-semibold py-3 rounded-lg text-sm transition-all duration-200"
+            >
+              Oke, Mengerti!
+            </button>
+
+          </div>
+        </div>
+      )}
+
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
 
         {/* Header */}
         <header className="flex items-center justify-between px-10 py-5 border-b border-[#2D1B69] shadow-[0_1px_20px_rgba(168,85,247,0.08)]">
-          <div className="flex items-center gap-3">
-            <span className="text-white font-bold text-lg tracking-widest uppercase">
-              Praketrio
-            </span>
-          </div>
+          <span className="text-white font-bold text-lg tracking-widest uppercase">
+            Praketrio
+          </span>
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-full bg-[#A855F7]/20 border border-[#A855F7]/40 flex items-center justify-center text-[#A855F7] text-xs font-bold">
               P
@@ -83,7 +115,6 @@ export default function CustomerDashboard() {
             onSubmit={handleSubmit}
             className="bg-[#13133A] border border-[#A855F7]/40 rounded-2xl p-8 max-w-3xl mx-auto shadow-[0_0_30px_rgba(168,85,247,0.15)]"
           >
-
             {/* Row 1 */}
             <div className="grid grid-cols-2 gap-6 mb-6">
               <div className="flex flex-col gap-2">

@@ -9,33 +9,79 @@ const poppins = Poppins({
   weight: ["400", "500", "600", "700"],
 });
 
-const statusSteps = [
-  { label: "Paket Diterima", date: "18 April 2026", time: "08.00" },
-  { label: "Dimuat ke Kapal", date: "18 April 2026", time: "14.30" },
-  { label: "Dalam Perjalanan", date: "19 April 2026", time: "06.00" },
-  { label: "Tiba di Pelabuhan", date: "", time: "" },
-  { label: "Siap Ambil", date: "", time: "" },
+// Data sinkron dengan riwayat/page.tsx
+const dataRiwayat = [
+  {
+    noResi: "SWB-20240001",
+    rute: "Surabaya → Makassar",
+    tanggal: "18 Apr 2026",
+    estTiba: "22 Apr 2026",
+    status: "Dalam perjalanan",
+    activeStep: 2,
+  },
+  {
+    noResi: "SWB-20240002",
+    rute: "Jakarta → Balikpapan",
+    tanggal: "18 Apr 2026",
+    estTiba: "23 Apr 2026",
+    status: "Dimuat ke kapal",
+    activeStep: 1,
+  },
+  {
+    noResi: "SWB-20240003",
+    rute: "Makassar → Sorong",
+    tanggal: "10 Apr 2026",
+    estTiba: "14 Apr 2026",
+    status: "Terkirim",
+    activeStep: 4,
+  },
+  {
+    noResi: "SWB-20240004",
+    rute: "Surabaya → Kupang",
+    tanggal: "11 Apr 2026",
+    estTiba: "15 Apr 2026",
+    status: "Terkirim",
+    activeStep: 4,
+  },
+  {
+    noResi: "SWB-20240005",
+    rute: "Surabaya → Makassar",
+    tanggal: "13 Apr 2026",
+    estTiba: "17 Apr 2026",
+    status: "Terkirim",
+    activeStep: 4,
+  },
 ];
 
-const dummyResult = {
-  resi: "PRKT-000001572",
-  rute: "Surabaya → Lombok",
-  estTiba: "23 April",
-  activeStep: 2,
+const statusSteps = [
+  { label: "Paket Diterima" },
+  { label: "Dimuat ke Kapal" },
+  { label: "Dalam Perjalanan" },
+  { label: "Tiba di Pelabuhan" },
+  { label: "Terkirim" },
+];
+
+const statusConfig = (status: string) => {
+  if (status === "Terkirim")
+    return { color: "text-[#22C55E]", bg: "bg-[#22C55E]/10", border: "border-[#22C55E]/30", dot: "bg-[#22C55E]" };
+  if (status === "Dalam perjalanan")
+    return { color: "text-[#A855F7]", bg: "bg-[#A855F7]/10", border: "border-[#A855F7]/30", dot: "bg-[#A855F7]" };
+  if (status === "Dimuat ke kapal")
+    return { color: "text-[#F97316]", bg: "bg-[#F97316]/10", border: "border-[#F97316]/30", dot: "bg-[#F97316]" };
+  return { color: "text-white", bg: "bg-white/10", border: "border-white/20", dot: "bg-white" };
 };
 
 export default function LacakPaket() {
   const [noResi, setNoResi] = useState("");
-  const [hasil, setHasil] = useState<typeof dummyResult | null>(null);
+  const [hasil, setHasil] = useState<(typeof dataRiwayat)[0] | null>(null);
   const [sudahCari, setSudahCari] = useState(false);
 
   const handleLacak = () => {
     setSudahCari(true);
-    if (noResi.trim() !== "") {
-      setHasil(dummyResult);
-    } else {
-      setHasil(null);
-    }
+    const found = dataRiwayat.find(
+      (item) => item.noResi.toLowerCase() === noResi.trim().toLowerCase()
+    );
+    setHasil(found ?? null);
   };
 
   return (
@@ -81,8 +127,12 @@ export default function LacakPaket() {
               <input
                 type="text"
                 value={noResi}
-                onChange={(e) => setNoResi(e.target.value)}
-                placeholder="Contoh: PRKT-000001572"
+                onChange={(e) => {
+                  setNoResi(e.target.value);
+                  setSudahCari(false);
+                  setHasil(null);
+                }}
+                placeholder="Contoh: SWB-20240001"
                 onKeyDown={(e) => e.key === "Enter" && handleLacak()}
                 className="flex-1 bg-[#0D0D2B] border border-[#4B2D8A] rounded-lg px-4 py-3 text-white text-sm placeholder:text-white/20 focus:outline-none focus:border-[#A855F7] focus:shadow-[0_0_12px_rgba(168,85,247,0.3)] transition-all duration-200"
               />
@@ -101,13 +151,13 @@ export default function LacakPaket() {
               <div className="flex flex-col gap-6">
 
                 {/* Info Resi */}
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-4 gap-4">
                   <div className="bg-[#0D0D2B] border border-[#A855F7]/30 rounded-xl p-4 shadow-[0_0_12px_rgba(168,85,247,0.1)]">
                     <p className="text-[#C084FC] text-xs uppercase tracking-widest mb-2 font-semibold">
                       Resi
                     </p>
                     <p className="text-[#A855F7] text-sm font-mono font-semibold">
-                      {hasil.resi}
+                      {hasil.noResi}
                     </p>
                   </div>
                   <div className="bg-[#0D0D2B] border border-[#A855F7]/30 rounded-xl p-4 shadow-[0_0_12px_rgba(168,85,247,0.1)]">
@@ -120,9 +170,23 @@ export default function LacakPaket() {
                     <p className="text-[#C084FC] text-xs uppercase tracking-widest mb-2 font-semibold">
                       EST. Tiba
                     </p>
-                    <p className="text-[#22C55E] text-sm font-semibold">
-                      {hasil.estTiba}
+                    <p className="text-[#22C55E] text-sm font-semibold">{hasil.estTiba}</p>
+                  </div>
+                  <div className="bg-[#0D0D2B] border border-[#A855F7]/30 rounded-xl p-4 shadow-[0_0_12px_rgba(168,85,247,0.1)]">
+                    <p className="text-[#C084FC] text-xs uppercase tracking-widest mb-2 font-semibold">
+                      Status
                     </p>
+                    <div>
+                      {(() => {
+                        const s = statusConfig(hasil.status);
+                        return (
+                          <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2 py-1 rounded-full border ${s.color} ${s.bg} ${s.border}`}>
+                            <span className={`w-1.5 h-1.5 rounded-full ${s.dot}`} />
+                            {hasil.status}
+                          </span>
+                        );
+                      })()}
+                    </div>
                   </div>
                 </div>
 
@@ -171,16 +235,6 @@ export default function LacakPaket() {
                           <p className={`text-xs text-center leading-tight font-medium ${isDone ? "text-white" : "text-white/40"}`}>
                             {step.label}
                           </p>
-                          {step.date && (
-                            <p className="text-[#A0A0B0] text-xs text-center leading-tight">
-                              {step.date}
-                            </p>
-                          )}
-                          {step.time && (
-                            <p className="text-[#A855F7] text-xs text-center font-mono">
-                              {step.time}
-                            </p>
-                          )}
                         </div>
                       );
                     })}
