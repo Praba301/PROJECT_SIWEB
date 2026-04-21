@@ -6,19 +6,20 @@ export default function DashboardPage() {
     { label: "Armada Aktif", value: "8" },
   ];
 
+  // Data resi sudah diperbarui sesuai format SWB dan berjumlah 5
   const tableData = [
-    { resi: "PRKT-000001572", rute: "Madura → Banyuwangi", kapal: "KM Nusantara", status: "Berlayar", badge: "bg-blue-900/50 text-blue-400" },
-    { resi: "PRKT-000001573", rute: "Banyuwangi → Lombok", kapal: "KM Bahtera Jaya", status: "Dimuat", badge: "bg-amber-900/50 text-amber-400" },
-    { resi: "PRKT-000001574", rute: "Benoa → Lombok", kapal: "KM Nusantara", status: "Terkirim", badge: "bg-emerald-900/50 text-emerald-400" },
-    { resi: "PRKT-000001575", rute: "Madura → Benoa", kapal: "KM Garuda", status: "Berlayar", badge: "bg-blue-900/50 text-blue-400" },
-    { resi: "PRKT-000001576", rute: "Gilimanuk → Benoa", kapal: "KM Tujuh Laut", status: "Dimuat", badge: "bg-amber-900/50 text-amber-400" },
+    { resi: "SWB-20240001", rute: "Madura → Banyuwangi", kapal: "KM Nusantara", status: "Berlayar", badge: "bg-blue-900/50 text-blue-400" },
+    { resi: "SWB-20240002", rute: "Banyuwangi → Lombok", kapal: "KM Bahtera Jaya", status: "Dimuat", badge: "bg-amber-900/50 text-amber-400" },
+    { resi: "SWB-20240003", rute: "Benoa → Lombok", kapal: "KM Nusantara", status: "Terkirim", badge: "bg-emerald-900/50 text-emerald-400" },
+    { resi: "SWB-20240004", rute: "Madura → Benoa", kapal: "KM Garuda", status: "Berlayar", badge: "bg-blue-900/50 text-blue-400" },
+    { resi: "SWB-20240005", rute: "Gilimanuk → Benoa", kapal: "KM Tujuh Laut", status: "Dimuat", badge: "bg-amber-900/50 text-amber-400" },
   ];
 
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold text-white mb-6">Dashboard Monitor</h1>
 
-      
+      {/* Kartu Statistik Atas */}
       <div className="grid grid-cols-4 gap-6">
         {stats.map((stat, idx) => (
           <div key={idx} className="bg-[#15162c] border border-slate-700 p-6 rounded-xl shadow-lg">
@@ -29,7 +30,7 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-2 gap-6">
-        
+        {/* Grafik Volume per Bulan */}
         <div className="bg-[#15162c] border border-cyan-500 shadow-[0_0_15px_rgba(34,211,238,0.15)] p-6 rounded-xl flex flex-col">
           <h3 className="text-white font-semibold mb-2">Volume per bulan</h3>
           <div className="flex items-end justify-between h-48 gap-4 mt-auto">
@@ -49,7 +50,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
-       
+        {/* Status Saat Ini */}
         <div className="bg-[#15162c] border border-slate-700 p-6 rounded-xl">
           <h3 className="text-white font-semibold mb-6">Status saat ini</h3>
           <div className="space-y-4">
@@ -71,7 +72,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      
+      {/* Tabel Volume per Bulan */}
       <div className="bg-[#15162c] border border-slate-700 rounded-xl p-6 mt-6">
         <h3 className="text-white font-semibold mb-6">Volume per bulan</h3>
         <table className="w-full text-left text-sm text-slate-300">

@@ -1,10 +1,11 @@
 export default function PengirimanPage() {
+  // Data resi sudah diperbarui sesuai format SWB dan ditambahkan menjadi 5 baris
   const data = [
-    { resi: "PRKT-000001572", pengirim: "PT. Lancar Jaya", berat: "125 KG", eta: "22 April", status: "Berlayar", badge: "bg-blue-900/50 text-blue-400" },
-    { resi: "PRKT-000001573", pengirim: "PT. MajuMundur", berat: "100 KG", eta: "25 April", status: "Berlayar", badge: "bg-amber-900/50 text-amber-400" },
-    // Baris ini sebelumnya "aktif", sekarang sudah seragam seperti yang lain.
-    { resi: "PRKT-000001574", pengirim: "PT. Batu Zamrud", berat: "120 KG", eta: "14 April", status: "Diproses", badge: "bg-slate-700 text-slate-300" },
-    { resi: "PRKT-000001575", pengirim: "PT. Tokopedia", berat: "200 KG", eta: "8 April", status: "Terkirim", badge: "bg-emerald-900/50 text-emerald-400" },
+    { resi: "SWB-20240001", pengirim: "PT. Lancar Jaya", berat: "125 KG", eta: "22 April", status: "Berlayar", badge: "bg-blue-900/50 text-blue-400" },
+    { resi: "SWB-20240002", pengirim: "PT. MajuMundur", berat: "100 KG", eta: "25 April", status: "Berlayar", badge: "bg-amber-900/50 text-amber-400" },
+    { resi: "SWB-20240003", pengirim: "PT. Batu Zamrud", berat: "120 KG", eta: "14 April", status: "Diproses", badge: "bg-slate-700 text-slate-300" },
+    { resi: "SWB-20240004", pengirim: "PT. Tokopedia", berat: "200 KG", eta: "8 April", status: "Terkirim", badge: "bg-emerald-900/50 text-emerald-400" },
+    { resi: "SWB-20240005", pengirim: "PT. Barokah", berat: "150 KG", eta: "10 April", status: "Diproses", badge: "bg-slate-700 text-slate-300" },
   ];
 
   return (
@@ -24,7 +25,7 @@ export default function PengirimanPage() {
             <div className="w-24 text-right">Status</div>
           </div>
 
-          {/* Baris Data - Sudah Seragam Tanpa Border Glow Aktif */}
+          {/* Baris Data */}
           {data.map((item, idx) => (
             <div 
               key={idx} 
