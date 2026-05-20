@@ -38,8 +38,8 @@ export default function Navbar() {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-[#0D0D14]/90 backdrop-blur-md border-b border-white/5">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
 
-        {/* Logo */}
-        <Link href="/" className="text-white font-black text-lg tracking-widest uppercase">
+        {/* Logo - Efek hover teks ungu dan membesar sedikit */}
+        <Link href="/" className="text-white font-black text-lg tracking-widest uppercase transition-all duration-300 hover:text-[#A855F7] hover:scale-105 active:scale-95">
           PRAKETRIO
         </Link>
 
@@ -51,7 +51,8 @@ export default function Navbar() {
             <button
               onMouseEnter={() => setMenuOpen(true)}
               onClick={() => setMenuOpen(!menuOpen)}
-              className="flex items-center gap-1 text-white/80 hover:text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-white/5 transition-all duration-200"
+              // Ditambahkan active:scale-95 agar responsif saat diklik
+              className="flex items-center gap-1 text-white/80 hover:text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-white/5 active:scale-95 transition-all duration-200"
             >
               Menu
               <svg
@@ -83,9 +84,11 @@ export default function Navbar() {
                     href={item.href}
                     onMouseEnter={() => handleHoverItem(item.href)}
                     onClick={() => setMenuOpen(false)}
-                    className="flex items-center gap-3 px-5 py-3 text-white/70 hover:text-white hover:bg-[#A855F7]/10 text-sm transition-all duration-200 border-b border-white/5 last:border-none"
+                    // Ditambahkan group, hover:translate-x-2, dan active:scale-95
+                    className="group flex items-center gap-3 px-5 py-3 text-white/70 hover:text-white hover:bg-[#A855F7]/10 hover:translate-x-2 active:scale-95 text-sm transition-all duration-200 border-b border-white/5 last:border-none"
                   >
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#A855F7]" />
+                    {/* Titik kecil ini juga diberi animasi saat barisnya di-hover */}
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#A855F7] transition-transform duration-300 group-hover:scale-150 group-hover:bg-white" />
                     {item.label}
                   </Link>
                 ))}
@@ -93,10 +96,10 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* Tombol Masuk */}
+          {/* Tombol Masuk - Jadi tombol penuh warna ungu saat di-hover */}
           <Link
             href="/login"
-            className="border border-[#A855F7] text-white text-sm font-semibold px-6 py-2 rounded-lg hover:bg-[#A855F7]/10 transition-all duration-200"
+            className="border border-[#A855F7] text-white text-sm font-semibold px-6 py-2 rounded-lg hover:bg-[#A855F7] hover:shadow-[0_0_15px_rgba(168,85,247,0.5)] hover:-translate-y-1 active:scale-95 active:translate-y-0 transition-all duration-200"
           >
             Masuk
           </Link>

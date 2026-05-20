@@ -45,204 +45,203 @@ export default function CustomerDashboard() {
   };
 
   return (
-    <div className={`${poppins.className} flex min-h-screen bg-[#0D0D2B]`}>
+    <div className={`${poppins.className} flex min-h-screen bg-[#0A0A12] relative overflow-hidden`}>
       <CustomerSidebar />
 
-      {/* Custom Modal */}
+      {/* Custom Modal - Animasi Zoom In Membal */}
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="bg-[#13133A] border border-[#A855F7]/50 rounded-2xl p-8 max-w-sm w-full mx-4 shadow-[0_0_40px_rgba(168,85,247,0.3)] flex flex-col items-center gap-5">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm transition-all duration-300">
+          <div className="bg-[#13131F] border border-[#A855F7]/50 rounded-2xl p-8 max-w-sm w-full mx-4 shadow-[0_0_40px_rgba(168,85,247,0.3)] flex flex-col items-center gap-5 opacity-0 animate-zoom-in">
 
-            {/* Icon */}
-            <div className="w-16 h-16 rounded-full bg-[#A855F7]/15 border border-[#A855F7]/40 flex items-center justify-center shadow-[0_0_20px_rgba(168,85,247,0.3)]">
-              <svg className="w-8 h-8 text-[#A855F7]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            {/* Icon dengan efek Pulse Glow */}
+            <div className="w-16 h-16 rounded-full bg-[#A855F7]/10 border border-[#A855F7]/40 flex items-center justify-center shadow-[0_0_20px_rgba(168,85,247,0.3)] animate-pulse-glow">
+              <svg className="w-8 h-8 text-[#C084FC]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
               </svg>
             </div>
 
             {/* Text */}
-            <div className="text-center flex flex-col gap-1">
-              <h2 className="text-white font-bold text-lg">Paket Berhasil Didaftarkan!</h2>
-              <p className="text-[#A0A0B0] text-sm">
-                Data pengirimanmu telah kami terima dan sedang diproses.
+            <div className="text-center flex flex-col gap-2">
+              <h2 className="text-white font-bold text-xl">Paket Terdaftar!</h2>
+              <p className="text-[#A0A0B0] text-sm leading-relaxed">
+                Data pengirimanmu telah kami terima dan akan segera diproses oleh tim operasional.
               </p>
             </div>
 
             {/* Button */}
             <button
               onClick={() => setShowModal(false)}
-              className="w-full bg-[#A855F7]/10 border border-[#A855F7] hover:bg-[#A855F7]/25 hover:shadow-[0_0_20px_rgba(168,85,247,0.4)] text-white font-semibold py-3 rounded-lg text-sm transition-all duration-200"
+              className="w-full bg-[#A855F7] hover:bg-[#9333EA] text-white font-bold py-3.5 rounded-xl text-sm transition-all duration-300 shadow-[0_0_15px_rgba(168,85,247,0.4)] hover:shadow-[0_0_25px_rgba(168,85,247,0.6)] active:scale-95"
             >
               Oke, Mengerti!
             </button>
-
           </div>
         </div>
       )}
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col relative z-10">
+        
+        {/* Background Glow */}
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#A855F7]/5 blur-[150px] rounded-full pointer-events-none" />
 
-        {/* Header */}
-        <header className="flex items-center justify-between px-10 py-5 border-b border-[#2D1B69] shadow-[0_1px_20px_rgba(168,85,247,0.08)]">
-          <span className="text-white font-bold text-lg tracking-widest uppercase">
-            Praketrio
+        {/* Header - Masuk dari bawah */}
+        <header className="flex items-center justify-between px-10 py-6 border-b border-[#1E1E2E] bg-[#0A0A12]/80 backdrop-blur-md sticky top-0 z-20 opacity-0 animate-fade-in-up" style={{ animationDelay: "0.1s" }}>
+          <span className="text-[#A855F7] font-bold text-lg tracking-widest uppercase font-mono">
+            Dashboard
           </span>
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-[#A855F7]/20 border border-[#A855F7]/40 flex items-center justify-center text-[#A855F7] text-xs font-bold">
+          <div className="flex items-center gap-3 group cursor-pointer">
+            <div className="flex flex-col items-end">
+              <span className="text-white font-bold text-sm transition-colors group-hover:text-[#C084FC]">Praba</span>
+              <span className="text-[#6B6B80] text-xs">Customer</span>
+            </div>
+            <div className="w-10 h-10 rounded-full bg-[#1E1E2E] border border-[#A855F7]/40 flex items-center justify-center text-[#A855F7] text-sm font-bold shadow-[0_0_10px_rgba(168,85,247,0.2)] transition-transform duration-300 group-hover:scale-110">
               P
             </div>
-            <span className="text-white/80 font-medium text-sm">Halo, Praba</span>
           </div>
         </header>
 
         {/* Content */}
-        <main className="flex-1 px-10 py-8">
+        <main className="flex-1 px-10 py-10 overflow-y-auto">
 
           {/* Title */}
-          <div className="text-center mb-8">
-            <h1 className="text-white font-bold text-2xl tracking-wide">
+          <div className="text-center mb-10 opacity-0 animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
+            <h1 className="text-white font-bold text-3xl tracking-wide">
               Form Input Barang
             </h1>
-            <p className="text-[#A0A0B0] text-sm mt-1">
-              Isi data pengiriman kamu dengan lengkap
+            <p className="text-[#A0A0B0] text-sm mt-2">
+              Isi kelengkapan data kargo Anda untuk mulai membuat nomor resi pelacakan.
             </p>
-            <div className="w-10 h-1 bg-[#A855F7] mx-auto mt-3 rounded-full" />
+            <div className="w-12 h-1.5 bg-gradient-to-r from-[#A855F7] to-[#C084FC] mx-auto mt-4 rounded-full" />
           </div>
 
-          {/* Form Card */}
+          {/* Form Card - Animasi Membal */}
           <form
             onSubmit={handleSubmit}
-            className="bg-[#13133A] border border-[#A855F7]/40 rounded-2xl p-8 max-w-3xl mx-auto shadow-[0_0_30px_rgba(168,85,247,0.15)]"
+            className="bg-[#13131F] border border-[#1E1E2E] rounded-2xl p-8 md:p-10 max-w-3xl mx-auto shadow-2xl opacity-0 animate-zoom-in relative"
+            style={{ animationDelay: "0.3s" }}
           >
-            {/* Row 1 */}
-            <div className="grid grid-cols-2 gap-6 mb-6">
-              <div className="flex flex-col gap-2">
-                <label className="text-[#C084FC] text-xs font-semibold uppercase tracking-widest">
-                  Nama Pengirim
+            {/* Dekorasi Sudut Form */}
+            <div className="absolute top-0 left-0 w-24 h-24 bg-gradient-to-br from-[#A855F7]/10 to-transparent rounded-tl-2xl pointer-events-none" />
+
+            <div className="relative z-10">
+              {/* Row 1 */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div className="flex flex-col gap-2.5">
+                  <label className="text-[#C084FC] text-[11px] font-bold uppercase tracking-widest">Nama Pengirim</label>
+                  <input
+                    type="text"
+                    name="namaPengirim"
+                    value={form.namaPengirim}
+                    onChange={handleChange}
+                    placeholder="Masukkan nama pengirim"
+                    required
+                    className="bg-[#0A0A12] border border-[#1E1E2E] rounded-xl px-4 py-3.5 text-white text-sm placeholder:text-[#6B6B80] focus:outline-none focus:border-[#A855F7] focus:ring-1 focus:ring-[#A855F7] focus:shadow-[0_0_15px_rgba(168,85,247,0.15)] transition-all duration-300 hover:border-[#A855F7]/50"
+                  />
+                </div>
+                <div className="flex flex-col gap-2.5">
+                  <label className="text-[#C084FC] text-[11px] font-bold uppercase tracking-widest">Nama Penerima</label>
+                  <input
+                    type="text"
+                    name="namaPenerima"
+                    value={form.namaPenerima}
+                    onChange={handleChange}
+                    placeholder="Masukkan nama penerima"
+                    required
+                    className="bg-[#0A0A12] border border-[#1E1E2E] rounded-xl px-4 py-3.5 text-white text-sm placeholder:text-[#6B6B80] focus:outline-none focus:border-[#A855F7] focus:ring-1 focus:ring-[#A855F7] focus:shadow-[0_0_15px_rgba(168,85,247,0.15)] transition-all duration-300 hover:border-[#A855F7]/50"
+                  />
+                </div>
+              </div>
+
+              {/* Row 2 */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div className="flex flex-col gap-2.5">
+                  <label className="text-[#C084FC] text-[11px] font-bold uppercase tracking-widest">Kota Asal</label>
+                  <input
+                    type="text"
+                    name="kotaAsal"
+                    value={form.kotaAsal}
+                    onChange={handleChange}
+                    placeholder="Masukkan kota asal"
+                    required
+                    className="bg-[#0A0A12] border border-[#1E1E2E] rounded-xl px-4 py-3.5 text-white text-sm placeholder:text-[#6B6B80] focus:outline-none focus:border-[#A855F7] focus:ring-1 focus:ring-[#A855F7] focus:shadow-[0_0_15px_rgba(168,85,247,0.15)] transition-all duration-300 hover:border-[#A855F7]/50"
+                  />
+                </div>
+                <div className="flex flex-col gap-2.5">
+                  <label className="text-[#C084FC] text-[11px] font-bold uppercase tracking-widest">Kota Tujuan</label>
+                  <input
+                    type="text"
+                    name="kotaTujuan"
+                    value={form.kotaTujuan}
+                    onChange={handleChange}
+                    placeholder="Masukkan kota tujuan"
+                    required
+                    className="bg-[#0A0A12] border border-[#1E1E2E] rounded-xl px-4 py-3.5 text-white text-sm placeholder:text-[#6B6B80] focus:outline-none focus:border-[#A855F7] focus:ring-1 focus:ring-[#A855F7] focus:shadow-[0_0_15px_rgba(168,85,247,0.15)] transition-all duration-300 hover:border-[#A855F7]/50"
+                  />
+                </div>
+              </div>
+
+              {/* Row 3 */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div className="flex flex-col gap-2.5">
+                  <label className="text-[#C084FC] text-[11px] font-bold uppercase tracking-widest">Berat (kg)</label>
+                  <input
+                    type="number"
+                    name="berat"
+                    value={form.berat}
+                    onChange={handleChange}
+                    placeholder="Contoh: 150"
+                    required
+                    className="bg-[#0A0A12] border border-[#1E1E2E] rounded-xl px-4 py-3.5 text-white text-sm placeholder:text-[#6B6B80] focus:outline-none focus:border-[#A855F7] focus:ring-1 focus:ring-[#A855F7] focus:shadow-[0_0_15px_rgba(168,85,247,0.15)] transition-all duration-300 hover:border-[#A855F7]/50 font-mono"
+                  />
+                </div>
+                <div className="flex flex-col gap-2.5">
+                  <label className="text-[#C084FC] text-[11px] font-bold uppercase tracking-widest">Jenis Barang</label>
+                  <input
+                    type="text"
+                    name="jenisBarang"
+                    value={form.jenisBarang}
+                    onChange={handleChange}
+                    placeholder="Contoh: Elektronik / Garment"
+                    required
+                    className="bg-[#0A0A12] border border-[#1E1E2E] rounded-xl px-4 py-3.5 text-white text-sm placeholder:text-[#6B6B80] focus:outline-none focus:border-[#A855F7] focus:ring-1 focus:ring-[#A855F7] focus:shadow-[0_0_15px_rgba(168,85,247,0.15)] transition-all duration-300 hover:border-[#A855F7]/50"
+                  />
+                </div>
+              </div>
+
+              {/* Row 4 */}
+              <div className="flex flex-col gap-2.5 mb-10">
+                <label className="text-[#C084FC] text-[11px] font-bold uppercase tracking-widest flex items-center gap-2">
+                  Catatan Tambahan <span className="text-[#6B6B80] normal-case tracking-normal font-normal bg-[#1E1E2E] px-2 py-0.5 rounded-full text-[10px]">Opsional</span>
                 </label>
-                <input
-                  type="text"
-                  name="namaPengirim"
-                  value={form.namaPengirim}
+                <textarea
+                  name="catatan"
+                  value={form.catatan}
                   onChange={handleChange}
-                  placeholder="Masukkan nama pengirim"
-                  className="bg-[#0D0D2B] border border-[#4B2D8A] rounded-lg px-4 py-3 text-white text-sm placeholder:text-white/20 focus:outline-none focus:border-[#A855F7] focus:shadow-[0_0_12px_rgba(168,85,247,0.3)] transition-all duration-200"
+                  placeholder="Tambahkan instruksi khusus untuk penanganan paket (contoh: Jangan dibanting)"
+                  rows={3}
+                  className="bg-[#0A0A12] border border-[#1E1E2E] rounded-xl px-4 py-3.5 text-white text-sm placeholder:text-[#6B6B80] focus:outline-none focus:border-[#A855F7] focus:ring-1 focus:ring-[#A855F7] focus:shadow-[0_0_15px_rgba(168,85,247,0.15)] transition-all duration-300 hover:border-[#A855F7]/50 resize-none"
                 />
               </div>
-              <div className="flex flex-col gap-2">
-                <label className="text-[#C084FC] text-xs font-semibold uppercase tracking-widest">
-                  Nama Penerima
-                </label>
-                <input
-                  type="text"
-                  name="namaPenerima"
-                  value={form.namaPenerima}
-                  onChange={handleChange}
-                  placeholder="Masukkan nama penerima"
-                  className="bg-[#0D0D2B] border border-[#4B2D8A] rounded-lg px-4 py-3 text-white text-sm placeholder:text-white/20 focus:outline-none focus:border-[#A855F7] focus:shadow-[0_0_12px_rgba(168,85,247,0.3)] transition-all duration-200"
-                />
+
+              {/* Buttons */}
+              <div className="flex flex-col sm:flex-row justify-end gap-4 pt-6 border-t border-[#1E1E2E]">
+                <button
+                  type="button"
+                  onClick={handleReset}
+                  className="border border-[#1E1E2E] hover:border-[#A855F7]/50 hover:bg-[#1E1E2E] text-[#A0A0B0] hover:text-white font-bold px-8 py-3.5 rounded-xl text-sm transition-all duration-300 active:scale-95"
+                >
+                  Reset Form
+                </button>
+                <button
+                  type="submit"
+                  className="bg-[#A855F7] hover:bg-[#9333EA] text-white font-bold px-10 py-3.5 rounded-xl text-sm transition-all duration-300 shadow-[0_0_15px_rgba(168,85,247,0.3)] hover:shadow-[0_0_25px_rgba(168,85,247,0.5)] active:scale-95 flex items-center justify-center gap-2"
+                >
+                  Daftarkan Paket
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                </button>
               </div>
             </div>
-
-            {/* Row 2 */}
-            <div className="grid grid-cols-2 gap-6 mb-6">
-              <div className="flex flex-col gap-2">
-                <label className="text-[#C084FC] text-xs font-semibold uppercase tracking-widest">
-                  Kota Asal
-                </label>
-                <input
-                  type="text"
-                  name="kotaAsal"
-                  value={form.kotaAsal}
-                  onChange={handleChange}
-                  placeholder="Masukkan kota asal"
-                  className="bg-[#0D0D2B] border border-[#4B2D8A] rounded-lg px-4 py-3 text-white text-sm placeholder:text-white/20 focus:outline-none focus:border-[#A855F7] focus:shadow-[0_0_12px_rgba(168,85,247,0.3)] transition-all duration-200"
-                />
-              </div>
-              <div className="flex flex-col gap-2">
-                <label className="text-[#C084FC] text-xs font-semibold uppercase tracking-widest">
-                  Kota Tujuan
-                </label>
-                <input
-                  type="text"
-                  name="kotaTujuan"
-                  value={form.kotaTujuan}
-                  onChange={handleChange}
-                  placeholder="Masukkan kota tujuan"
-                  className="bg-[#0D0D2B] border border-[#4B2D8A] rounded-lg px-4 py-3 text-white text-sm placeholder:text-white/20 focus:outline-none focus:border-[#A855F7] focus:shadow-[0_0_12px_rgba(168,85,247,0.3)] transition-all duration-200"
-                />
-              </div>
-            </div>
-
-            {/* Row 3 */}
-            <div className="grid grid-cols-2 gap-6 mb-6">
-              <div className="flex flex-col gap-2">
-                <label className="text-[#C084FC] text-xs font-semibold uppercase tracking-widest">
-                  Berat (kg)
-                </label>
-                <input
-                  type="number"
-                  name="berat"
-                  value={form.berat}
-                  onChange={handleChange}
-                  placeholder="Contoh: 10"
-                  className="bg-[#0D0D2B] border border-[#4B2D8A] rounded-lg px-4 py-3 text-white text-sm placeholder:text-white/20 focus:outline-none focus:border-[#A855F7] focus:shadow-[0_0_12px_rgba(168,85,247,0.3)] transition-all duration-200"
-                />
-              </div>
-              <div className="flex flex-col gap-2">
-                <label className="text-[#C084FC] text-xs font-semibold uppercase tracking-widest">
-                  Jenis Barang
-                </label>
-                <input
-                  type="text"
-                  name="jenisBarang"
-                  value={form.jenisBarang}
-                  onChange={handleChange}
-                  placeholder="Contoh: Elektronik"
-                  className="bg-[#0D0D2B] border border-[#4B2D8A] rounded-lg px-4 py-3 text-white text-sm placeholder:text-white/20 focus:outline-none focus:border-[#A855F7] focus:shadow-[0_0_12px_rgba(168,85,247,0.3)] transition-all duration-200"
-                />
-              </div>
-            </div>
-
-            {/* Row 4 */}
-            <div className="flex flex-col gap-2 mb-8">
-              <label className="text-[#C084FC] text-xs font-semibold uppercase tracking-widest">
-                Catatan{" "}
-                <span className="text-white/30 normal-case tracking-normal font-normal">
-                  (opsional)
-                </span>
-              </label>
-              <input
-                type="text"
-                name="catatan"
-                value={form.catatan}
-                onChange={handleChange}
-                placeholder="Tambahkan catatan jika diperlukan"
-                className="bg-[#0D0D2B] border border-[#4B2D8A] rounded-lg px-4 py-3 text-white text-sm placeholder:text-white/20 focus:outline-none focus:border-[#A855F7] focus:shadow-[0_0_12px_rgba(168,85,247,0.3)] transition-all duration-200"
-              />
-            </div>
-
-            {/* Divider */}
-            <div className="w-full h-px bg-[#A855F7]/20 mb-8" />
-
-            {/* Buttons */}
-            <div className="flex justify-center gap-4">
-              <button
-                type="button"
-                onClick={handleReset}
-                className="border border-[#4B2D8A] hover:border-[#A855F7] hover:shadow-[0_0_12px_rgba(168,85,247,0.2)] text-white/70 hover:text-white font-semibold px-10 py-3 rounded-lg text-sm transition-all duration-200"
-              >
-                Reset
-              </button>
-              <button
-                type="submit"
-                className="bg-[#A855F7]/10 border border-[#A855F7] hover:bg-[#A855F7]/25 hover:shadow-[0_0_20px_rgba(168,85,247,0.4)] text-white font-semibold px-10 py-3 rounded-lg text-sm transition-all duration-200"
-              >
-                Daftarkan Paket
-              </button>
-            </div>
-
           </form>
         </main>
       </div>

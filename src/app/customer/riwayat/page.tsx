@@ -51,123 +51,162 @@ const statusConfig = (status: string) => {
     };
   if (status === "Dalam perjalanan")
     return {
-      color: "text-[#A855F7]",
-      bg: "bg-[#A855F7]/10",
-      border: "border-[#A855F7]/30",
-      dot: "bg-[#A855F7]",
+      color: "text-[#60A5FA]", // Biru muda
+      bg: "bg-[#3B82F6]/10",
+      border: "border-[#3B82F6]/30",
+      dot: "bg-[#60A5FA]",
     };
   if (status === "Dimuat ke kapal")
     return {
-      color: "text-[#F97316]",
-      bg: "bg-[#F97316]/10",
-      border: "border-[#F97316]/30",
-      dot: "bg-[#F97316]",
+      color: "text-[#FCD34D]", // Amber muda
+      bg: "bg-[#F59E0B]/10",
+      border: "border-[#F59E0B]/30",
+      dot: "bg-[#FCD34D]",
     };
   return {
     color: "text-white",
-    bg: "bg-white/10",
-    border: "border-white/20",
-    dot: "bg-white",
+    bg: "bg-[#1E1E2E]",
+    border: "border-[#1E1E2E]",
+    dot: "bg-[#6B6B80]",
   };
 };
 
 export default function RiwayatPage() {
   return (
-    <div className={`${poppins.className} flex min-h-screen bg-[#0D0D2B]`}>
+    <div className={`${poppins.className} flex min-h-screen bg-[#0A0A12] relative overflow-hidden`}>
       <CustomerSidebar />
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col relative z-10">
 
-        {/* Header */}
-        <header className="flex items-center justify-between px-10 py-5 border-b border-[#2D1B69] shadow-[0_1px_20px_rgba(168,85,247,0.08)]">
-          <span className="text-white font-bold text-lg tracking-widest uppercase">
+        {/* Background Glow */}
+        <div className="absolute top-1/2 -left-32 w-96 h-96 bg-[#A855F7]/10 blur-[150px] rounded-full pointer-events-none" />
+
+        {/* Header - Masuk dari bawah */}
+        <header className="flex items-center justify-between px-10 py-6 border-b border-[#1E1E2E] bg-[#0A0A12]/80 backdrop-blur-md sticky top-0 z-20 opacity-0 animate-fade-in-up" style={{ animationDelay: "0.1s" }}>
+          <span className="text-[#A855F7] font-bold text-lg tracking-widest uppercase font-mono">
             Praketrio
           </span>
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-[#A855F7]/20 border border-[#A855F7]/40 flex items-center justify-center text-[#A855F7] text-xs font-bold">
+          <div className="flex items-center gap-3 group cursor-pointer">
+            <div className="flex flex-col items-end">
+              <span className="text-white font-bold text-sm transition-colors group-hover:text-[#C084FC]">Praba</span>
+              <span className="text-[#6B6B80] text-xs">Customer</span>
+            </div>
+            <div className="w-10 h-10 rounded-full bg-[#1E1E2E] border border-[#A855F7]/40 flex items-center justify-center text-[#A855F7] text-sm font-bold shadow-[0_0_10px_rgba(168,85,247,0.2)] transition-transform duration-300 group-hover:scale-110">
               P
             </div>
-            <span className="text-white/80 font-medium text-sm">Halo, Praba</span>
           </div>
         </header>
 
         {/* Content */}
-        <main className="flex-1 px-10 py-8">
+        <main className="flex-1 px-10 py-10 overflow-y-auto">
 
           {/* Title */}
-          <div className="text-center mb-8">
-            <h1 className="text-white font-bold text-2xl tracking-wide">
+          <div className="text-center mb-10 opacity-0 animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
+            <h1 className="text-white font-bold text-3xl tracking-wide">
               Riwayat Pengiriman
             </h1>
-            <p className="text-[#A0A0B0] text-sm mt-1">
-              Daftar seluruh pengiriman yang pernah kamu lakukan
+            <p className="text-[#A0A0B0] text-sm mt-2">
+              Daftar seluruh rekam jejak paket dan pengiriman kargo Anda.
             </p>
-            <div className="w-10 h-1 bg-[#A855F7] mx-auto mt-3 rounded-full" />
+            <div className="w-12 h-1.5 bg-gradient-to-r from-[#A855F7] to-[#C084FC] mx-auto mt-4 rounded-full" />
           </div>
 
           {/* Summary Cards */}
-          <div className="grid grid-cols-3 gap-4 max-w-4xl mx-auto mb-6">
-            <div className="bg-[#13133A] border border-[#A855F7]/40 rounded-xl p-4 shadow-[0_0_20px_rgba(168,85,247,0.1)] flex flex-col gap-1">
-              <p className="text-[#C084FC] text-xs uppercase tracking-widest font-semibold">
-                Total Pengiriman
-              </p>
-              <p className="text-white font-bold text-2xl">{riwayat.length}</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto mb-10">
+            {/* Card 1 */}
+            <div 
+              className="group bg-[#13131F] border border-[#1E1E2E] rounded-2xl p-6 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:border-[#A855F7]/50 opacity-0 animate-zoom-in"
+              style={{ animationDelay: "0.3s" }}
+            >
+              <div className="flex justify-between items-start mb-2">
+                <p className="text-[#C084FC] text-[11px] uppercase tracking-widest font-bold">
+                  Total Pengiriman
+                </p>
+                <span className="text-2xl opacity-20 group-hover:scale-110 transition-transform">📦</span>
+              </div>
+              <p className="text-white font-bold text-4xl font-mono">{riwayat.length}</p>
             </div>
-            <div className="bg-[#13133A] border border-[#22C55E]/40 rounded-xl p-4 shadow-[0_0_20px_rgba(34,197,94,0.1)] flex flex-col gap-1">
-              <p className="text-[#22C55E] text-xs uppercase tracking-widest font-semibold">
-                Terkirim
-              </p>
-              <p className="text-white font-bold text-2xl">
+            
+            {/* Card 2 */}
+            <div 
+              className="group bg-[#13131F] border border-[#1E1E2E] rounded-2xl p-6 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:border-[#22C55E]/50 opacity-0 animate-zoom-in"
+              style={{ animationDelay: "0.4s" }}
+            >
+              <div className="flex justify-between items-start mb-2">
+                <p className="text-[#22C55E] text-[11px] uppercase tracking-widest font-bold">
+                  Sukses Terkirim
+                </p>
+                <span className="text-2xl opacity-20 group-hover:scale-110 transition-transform">✅</span>
+              </div>
+              <p className="text-white font-bold text-4xl font-mono">
                 {riwayat.filter((r) => r.status === "Terkirim").length}
               </p>
             </div>
-            <div className="bg-[#13133A] border border-[#F97316]/40 rounded-xl p-4 shadow-[0_0_20px_rgba(249,115,22,0.1)] flex flex-col gap-1">
-              <p className="text-[#F97316] text-xs uppercase tracking-widest font-semibold">
-                Dalam Proses
-              </p>
-              <p className="text-white font-bold text-2xl">
+            
+            {/* Card 3 */}
+            <div 
+              className="group bg-[#13131F] border border-[#1E1E2E] rounded-2xl p-6 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:border-[#F59E0B]/50 opacity-0 animate-zoom-in"
+              style={{ animationDelay: "0.5s" }}
+            >
+              <div className="flex justify-between items-start mb-2">
+                <p className="text-[#FCD34D] text-[11px] uppercase tracking-widest font-bold">
+                  Sedang Diproses
+                </p>
+                <span className="text-2xl opacity-20 group-hover:scale-110 transition-transform">⏳</span>
+              </div>
+              <p className="text-white font-bold text-4xl font-mono">
                 {riwayat.filter((r) => r.status !== "Terkirim").length}
               </p>
             </div>
           </div>
 
-          {/* Table */}
-          <div className="bg-[#13133A] border border-[#A855F7]/40 rounded-2xl overflow-hidden max-w-4xl mx-auto shadow-[0_0_30px_rgba(168,85,247,0.15)]">
-
+          {/* Table Container */}
+          <div 
+            className="bg-[#13131F] border border-[#1E1E2E] rounded-2xl overflow-hidden max-w-5xl mx-auto shadow-xl opacity-0 animate-fade-in-up relative z-10"
+            style={{ animationDelay: "0.6s" }}
+          >
             {/* Table Header */}
-            <div className="grid grid-cols-4 px-6 py-4 border-b border-[#A855F7]/20 bg-[#A855F7]/5">
-              <p className="text-[#C084FC] font-semibold text-xs uppercase tracking-widest">
+            <div className="grid grid-cols-1 md:grid-cols-4 px-6 py-4 border-b border-[#1E1E2E] bg-[#1A1A24]">
+              <p className="text-[#6B6B80] font-bold text-[11px] uppercase tracking-widest">
                 No Resi
               </p>
-              <p className="text-[#C084FC] font-semibold text-xs uppercase tracking-widest">
-                Rute
+              <p className="text-[#6B6B80] font-bold text-[11px] uppercase tracking-widest">
+                Rute Pengiriman
               </p>
-              <p className="text-[#C084FC] font-semibold text-xs uppercase tracking-widest">
-                Tanggal
+              <p className="text-[#6B6B80] font-bold text-[11px] uppercase tracking-widest">
+                Tanggal Input
               </p>
-              <p className="text-[#C084FC] font-semibold text-xs uppercase tracking-widest">
-                Status
+              <p className="text-[#6B6B80] font-bold text-[11px] uppercase tracking-widest md:text-center">
+                Status Saat Ini
               </p>
             </div>
 
             {/* Table Rows */}
-            <div className="flex flex-col divide-y divide-[#A855F7]/10">
+            <div className="flex flex-col divide-y divide-[#1E1E2E]">
               {riwayat.map((item, index) => {
                 const s = statusConfig(item.status);
                 return (
                   <div
                     key={index}
-                    className="grid grid-cols-4 px-6 py-4 hover:bg-[#A855F7]/5 transition-colors duration-200 items-center"
+                    className="group grid grid-cols-1 md:grid-cols-4 px-6 py-5 hover:bg-[#1A1A24] transition-colors duration-200 items-center cursor-default gap-y-3 md:gap-y-0"
                   >
-                    <p className="text-white text-sm font-mono">{item.noResi}</p>
-                    <p className="text-white/80 text-sm">{item.rute}</p>
-                    <p className="text-white/60 text-sm">{item.tanggal}</p>
-                    <div>
+                    <p className="text-white text-sm font-mono font-bold group-hover:text-[#C084FC] transition-colors">
+                      {item.noResi}
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[#A0A0B0] text-sm group-hover:text-white transition-colors">{item.rute.split(" → ")[0]}</span>
+                      <span className="text-[#6B6B80] text-xs">→</span>
+                      <span className="text-[#A0A0B0] text-sm group-hover:text-white transition-colors">{item.rute.split(" → ")[1]}</span>
+                    </div>
+                    <p className="text-[#6B6B80] text-sm font-medium group-hover:text-[#A0A0B0] transition-colors">
+                      {item.tanggal}
+                    </p>
+                    <div className="md:text-center">
                       <span
-                        className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full border ${s.color} ${s.bg} ${s.border}`}
+                        className={`inline-flex items-center gap-2 text-[11px] font-bold px-3 py-1.5 rounded-md border shadow-sm transition-transform group-hover:scale-105 ${s.color} ${s.bg} ${s.border}`}
                       >
-                        <span className={`w-1.5 h-1.5 rounded-full ${s.dot}`} />
+                        <span className={`w-1.5 h-1.5 rounded-full ${s.dot} ${item.status !== "Terkirim" ? "animate-pulse-glow" : ""}`} />
                         {item.status}
                       </span>
                     </div>
@@ -175,8 +214,8 @@ export default function RiwayatPage() {
                 );
               })}
             </div>
-
           </div>
+          
         </main>
       </div>
     </div>

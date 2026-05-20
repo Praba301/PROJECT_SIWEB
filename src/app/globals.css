@@ -47,7 +47,6 @@ body {
   background: var(--color-primary);
 }
 
-/* Font Mono Utility */
 .font-mono {
   font-family: var(--font-mono);
 }
