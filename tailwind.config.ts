@@ -2,9 +2,14 @@ import type { Config } from "tailwindcss";
 
 const config: Config = {
   content: [
+    // Membaca dari folder src (struktur aslimu)
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+    // Membaca dari luar folder src (sebagai cadangan)
+    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
     extend: {
