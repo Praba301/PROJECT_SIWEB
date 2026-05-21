@@ -1,6 +1,6 @@
 const team = [
   {
-    name: "Capt. Tristo Thomas",
+    name: "Tristo Thomas",
     role: "CEO & Founder",
     desc: "25+ tahun pengalaman di industri pelayaran Indonesia. Mantan Kapten Kapal niaga lintas Pasifik.",
   },
@@ -10,7 +10,7 @@ const team = [
     desc: "Arsitek sistem fleet tracking dan platform digital Paketrio. Lulusan ITB Teknik Informatika.",
   },
   {
-    name: "Kevin Melvern",
+    name: "Kevin Melvern Nugroho",
     role: "Head Of Seafty",
     desc: "Sertifikasi STCW internasional. Memimpin protokol keselamatan armada dan kepatuhan IMO.",
   },
