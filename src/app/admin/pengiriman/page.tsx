@@ -32,7 +32,8 @@ export default async function PengirimanPage(props: {
         tp.no_resi, 
         c.nama_customer, 
         dp.berat_total,
-        tp.tanggal_transaksi
+        tp.tanggal_transaksi,
+        tp.status
       FROM transaksi_pengiriman tp
       JOIN customers c ON tp.customer_id = c.id
       JOIN detail_pengiriman dp ON tp.id = dp.transaksi_id
@@ -43,7 +44,6 @@ export default async function PengirimanPage(props: {
     
     pengirimanRows = result.rows;
 
-   
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
   } catch (error) {
