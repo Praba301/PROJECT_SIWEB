@@ -43,7 +43,7 @@ export default async function PengirimanPage(props: {
     
     pengirimanRows = result.rows;
 
-    // 🔥 TRIK UGD: Menahan server 1 detik agar animasi Skeleton terlihat jelas oleh Asdos
+   
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
   } catch (error) {
