@@ -99,7 +99,7 @@ export default function PengirimanClient({
     const result = await hapusResiDatabase(resiDihapus);
     if (result.success) {
       setResiDihapus(null);
-      triggerPopup("Berhasil Dihapus", `Data resi ${resiDihapus} beserta seluruh data customer-nya telah dibersihkan total dari database Neon.`, "success");
+      triggerPopup("Berhasil Dihapus", `Data resi ${resiDihapus} beserta seluruh data customer-nya telah dibersihkan total.`, "success");
       router.refresh();
     } else {
       triggerPopup("Gagal Menghapus", "Sistem mendeteksi kendala pada koneksi tabel database.", "error");
