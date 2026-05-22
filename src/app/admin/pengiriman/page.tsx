@@ -16,17 +16,22 @@ export default async function PengirimanPage(props: {
   let totalPages = 1;
 
   try {
+    // Menghitung total data dengan 4 kriteria pencarian menggunakan LEFT JOIN agar sinkron
     const countResult = await db.query(`
       SELECT COUNT(*)
       FROM transaksi_pengiriman tp
-      JOIN customers c ON tp.customer_id = c.id
-      WHERE tp.no_resi ILIKE $1 OR c.nama_customer ILIKE $1
+      LEFT JOIN customers c ON tp.customer_id = c.id
+      LEFT JOIN detail_pengiriman dp ON tp.id = dp.transaksi_id
+      WHERE tp.no_resi ILIKE $1 
+         OR c.nama_customer ILIKE $1
+         OR c.nama_penerima ILIKE $1
+         OR dp.jenis_barang ILIKE $1
     `, [`%${query}%`]);
     
-    // Pengaman TypeScript agar tidak error merah
     const totalItems = Number(countResult.rows[0]?.count || 0);
     totalPages = Math.ceil(totalItems / itemsPerPage) || 1; 
 
+    // Menampilkan data tabel dengan query LEFT JOIN agar nama_customer terbaca sempurna ke client
     const result = await db.query(`
       SELECT 
         tp.no_resi, 
@@ -35,9 +40,12 @@ export default async function PengirimanPage(props: {
         tp.tanggal_transaksi,
         tp.status
       FROM transaksi_pengiriman tp
-      JOIN customers c ON tp.customer_id = c.id
-      JOIN detail_pengiriman dp ON tp.id = dp.transaksi_id
-      WHERE tp.no_resi ILIKE $1 OR c.nama_customer ILIKE $1
+      LEFT JOIN customers c ON tp.customer_id = c.id
+      LEFT JOIN detail_pengiriman dp ON tp.id = dp.transaksi_id
+      WHERE tp.no_resi ILIKE $1 
+         OR c.nama_customer ILIKE $1
+         OR c.nama_penerima ILIKE $1
+         OR dp.jenis_barang ILIKE $1
       ORDER BY tp.id ASC
       LIMIT $2 OFFSET $3
     `, [`%${query}%`, itemsPerPage, offset]);
@@ -68,7 +76,6 @@ export default async function PengirimanPage(props: {
         </div>
         
         <div className="space-y-4 mt-8">
-          {/* Membuat 5 baris kerangka kosong */}
           {[1, 2, 3, 4, 5].map((i) => (
             <div key={i} className="h-16 w-full bg-[#1A1A24] rounded-xl animate-pulse flex items-center px-4 gap-4">
               <div className="h-4 w-1/5 bg-[#1E1E2E] rounded" />
@@ -84,7 +91,6 @@ export default async function PengirimanPage(props: {
   );
 
   return (
-    // Membungkus Client Component dengan Skeleton buatan kita
     <Suspense fallback={<SkeletonTable />}>
       <PengirimanClient 
         dataDariDatabase={pengirimanRows} 
