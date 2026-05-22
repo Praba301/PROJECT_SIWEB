@@ -1,7 +1,8 @@
-import Link from "next/link";
+"use client";
 import Image from "next/image";
 
-export default function HeroSection() {
+// Menerima prop onTabChange dari page.tsx
+export default function HeroSection({ onTabChange }: { onTabChange: (tab: string) => void }) {
   return (
     <section className="min-h-screen bg-[#0D0D14] flex flex-col justify-center pt-20 px-6 relative overflow-hidden">
       
@@ -20,7 +21,7 @@ export default function HeroSection() {
             Praketrio Fleet Monitor
           </p>
 
-          {/* Judul: Muncul kedua (Delay 0.3s) - Efek hover pada 'Lebih Andal' DIHAPUS agar profesional */}
+          {/* Judul: Muncul kedua (Delay 0.3s) */}
           <h1 
             className="text-4xl md:text-6xl font-bold text-white leading-tight mb-6 opacity-0 animate-fade-in-up"
             style={{ animationDelay: "0.3s" }}
@@ -46,18 +47,21 @@ export default function HeroSection() {
             className="flex items-center gap-4 opacity-0 animate-fade-in-up"
             style={{ animationDelay: "0.7s" }}
           >
-            <Link
-              href="#pricing"
+            {/* Tombol Lihat Paket → pindah ke tab "paket" */}
+            <button
+              onClick={() => onTabChange("paket")}
               className="bg-[#A855F7] hover:bg-[#9333EA] text-white text-sm font-semibold px-6 py-3 rounded-full transition-all duration-300 hover:shadow-[0_0_25px_rgba(168,85,247,0.5)] hover:-translate-y-1 active:scale-95 active:translate-y-0"
             >
-              Minta Penawaran
-            </Link>
-            <Link
-              href="#layanan"
+              Lihat Paket
+            </button>
+
+            {/* Tombol Lihat Layanan → pindah ke tab "layanan" */}
+            <button
+              onClick={() => onTabChange("layanan")}
               className="border border-white/20 hover:border-white/80 hover:bg-white/5 text-white text-sm font-semibold px-6 py-3 rounded-full transition-all duration-300 hover:shadow-[0_0_15px_rgba(255,255,255,0.1)] hover:-translate-y-1 active:scale-95 active:translate-y-0"
             >
               Lihat Layanan
-            </Link>
+            </button>
           </div>
         </div>
 

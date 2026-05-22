@@ -72,7 +72,7 @@ export default function HomePage() {
         {activeTab === "beranda" && (
           <div className="animate-fade-in flex flex-col">
             <div className="mt-[-60px] md:mt-[-150px] lg:mt-[-180px]">
-              <HeroSection />
+              <HeroSection onTabChange={setActiveTab} />
             </div>
             
             <div className="mt-[-40px] md:mt-[-100px] lg:mt-[-120px] relative z-10">

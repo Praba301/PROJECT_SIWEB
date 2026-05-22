@@ -276,7 +276,7 @@ export default function FleetSuperintendentDashboard() {
                     { waktu: '2024-05-20 06:30:00', id: 'VSL-402-M', koor: "07°12'S 112°44'E", kejadian: 'Peringatan Sistem Radar', status: 'PERINGATAN', color: 'text-red-400', bg: 'bg-red-500/5 border border-red-500/20' },
                     { waktu: '2024-05-20 05:15:44', id: 'VSL-992-A', koor: "02°05'S 104°45'E", kejadian: 'Meninggalkan Perairan Kep. Riau', status: 'OPTIMAL', color: 'text-[#A0A0B0]' },
                   ].map((log, idx) => (
-                    <div 
+                    < div 
                       key={idx} 
                       onClick={() => setSelectedLog(log)}
                       className={`grid grid-cols-5 py-3.5 px-4 rounded-xl border border-transparent transition-all duration-300 cursor-pointer ${log.bg || ''} ${selectedArmadaShip && selectedArmadaShip !== log.id ? 'opacity-20 scale-[0.98] pointer-events-none' : 'hover:bg-[#1A1A24] hover:border-[#1E1E2E] hover:shadow-md hover:scale-[1.01]'}`}

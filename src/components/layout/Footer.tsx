@@ -1,75 +1,50 @@
 import Link from "next/link";
 
-const footerLinks = [
-  {
-    title: "Layanan",
-    links: [
-      { label: "Lacak Paket", href: "#" },
-      { label: "Pengiriman Domestik", href: "#" },
-      { label: "Pengiriman Internasional", href: "#" },
-      { label: "Same-Day Delivery", href: "#" },
-    ],
-  },
-  {
-    title: "Perusahaan",
-    links: [
-      { label: "Tentang Kami", href: "#tentang" },
-      { label: "Karir", href: "#" },
-      { label: "Blog", href: "#" },
-      { label: "Pers", href: "#" },
-    ],
-  },
-  {
-    title: "Bantuan",
-    links: [
-      { label: "Pusat Bantuan", href: "#" },
-      { label: "Dokumentasi API", href: "#" },
-      { label: "Status Sistem", href: "#" },
-      { label: "Kontak Kami", href: "#" },
-    ],
-  },
-];
-
 export default function Footer() {
   return (
-    <footer className="bg-[#0A0A12] border-t border-[#1E1E2E] py-16 px-6">
-      <div className="max-w-7xl mx-auto w-full">
+    <footer className="bg-[#0A0A12] border-t border-[#1E1E2E] py-16 px-6 relative overflow-hidden">
 
-        {/* Top: Brand + Links */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+      {/* Ornamen glow halus */}
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[200px] bg-[#A855F7]/5 blur-[100px] rounded-full pointer-events-none" />
 
-          {/* Brand */}
-          <div className="flex flex-col gap-4">
-            <h3 className="text-[#A855F7] font-bold text-xl font-mono tracking-widest uppercase">
-              Praketrio
-            </h3>
-            <p className="text-[#A0A0B0] text-sm leading-relaxed max-w-xs">
-              Platform pelacakan pengiriman terpercaya untuk bisnis Indonesia
-              dan global.
+      <div className="max-w-7xl mx-auto w-full relative z-10">
+
+        {/* Top: Brand + Deskripsi full width */}
+        <div className="mb-12">
+
+          <h3 className="text-[#A855F7] font-bold text-xl font-mono tracking-widest uppercase mb-6">
+            Praketrio
+          </h3>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+            {/* Kolom 1 */}
+            <p className="text-[#A0A0B0] text-base leading-relaxed">
+              Praketrio adalah platform pelacakan pengiriman maritim terpercaya yang melayani
+              bisnis Indonesia dan pasar global. Kami menghadirkan solusi logistik laut modern
+              dengan teknologi tracking realtime, armada
+              berkapasitas tinggi, dan jangkauan rute ke seluruh kepulauan Nusantara.
             </p>
+
+            {/* Kolom 2 */}
+            <p className="text-[#A0A0B0] text-base leading-relaxed">
+              Didirikan dengan misi menjembatani konektivitas antar pulau, Praketrio berkomitmen
+              menghadirkan pengiriman yang lebih cepat, lebih aman, dan lebih transparan untuk
+              semua pelaku bisnis — dari skala UMKM hingga korporasi besar di seluruh Indonesia.
+            </p>
+
+            {/* Kolom 3 */}
+            <p className="text-[#A0A0B0] text-base leading-relaxed">
+              Dengan armada lebih dari 150+ kapal dan
+              jaringan yang menjangkau 34 kota tujuan, kami memastikan setiap paket tiba tepat waktu
+              dengan tingkat keberhasilan pengiriman 97.6% — karena kepercayaan Anda adalah
+              prioritas utama kami.
+            </p>
+
           </div>
 
-          {/* Links */}
-          {footerLinks.map((section) => (
-            <div key={section.title} className="flex flex-col gap-4">
-              <h4 className="text-[#A855F7] font-semibold text-sm uppercase tracking-widest">
-                {section.title}
-              </h4>
-              <ul className="flex flex-col gap-3">
-                {section.links.map((link) => (
-                  <li key={link.label}>
-                    <Link
-                      href={link.href}
-                      className="text-[#A0A0B0] text-sm hover:text-white transition-colors duration-200"
-                    >
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-
+          {/* Divider dekoratif */}
+          <div className="w-16 h-0.5 bg-gradient-to-r from-[#A855F7] to-[#C084FC] rounded-full mt-8" />
         </div>
 
         {/* Bottom: Copyright */}
