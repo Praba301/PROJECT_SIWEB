@@ -263,7 +263,7 @@ useEffect(() => {
   const handleDownloadPDF = () => alert("Mengunduh Laporan Operasional...");
 
   return (
-    <div className={`min-h-screen bg-[#0A0A12] text-white font-mono relative overflow-x-hidden selection:bg-[#A855F7]/30 transition-opacity duration-1000 ${pageLoaded ? 'opacity-100' : 'opacity-0'}`}>
+    <div className={`min-h-screen bg-[#0A0A12] text-white font-sans relative overflow-x-hidden selection:bg-[#A855F7]/30 transition-opacity duration-1000 ${pageLoaded ? 'opacity-100' : 'opacity-0'}`}>
       
       {/* ================= MODAL LOG ARMADA ================= */}
       {selectedLog && (
@@ -278,7 +278,7 @@ useEffect(() => {
                 <div className="space-y-4 text-sm mb-8">
                     <div className="flex justify-between items-center border-b border-[#1E1E2E] pb-3 hover:bg-[#1A1A24] p-2 rounded transition-all duration-300 hover:pl-4">
                         <span className="text-[#6B6B80] tracking-widest text-[10px]">REGISTRASI IMO</span>
-                        <span className={`font-bold font-mono px-3 py-1 bg-[#0A0A12] rounded border border-[#1E1E2E] shadow-inner ${selectedLog.color}`}>{selectedLog.id}</span>
+                        <span className={`font-bold font-sans px-3 py-1 bg-[#0A0A12] rounded border border-[#1E1E2E] shadow-inner ${selectedLog.color}`}>{selectedLog.id}</span>
                     </div>
                     <div className="flex justify-between items-center border-b border-[#1E1E2E] pb-3 hover:bg-[#1A1A24] p-2 rounded transition-all duration-300 hover:pl-4">
                         <span className="text-[#6B6B80] tracking-widest text-[10px]">WAKTU TERCATAT</span>
@@ -286,7 +286,7 @@ useEffect(() => {
                     </div>
                     <div className="flex justify-between items-center border-b border-[#1E1E2E] pb-3 hover:bg-[#1A1A24] p-2 rounded transition-all duration-300 hover:pl-4">
                         <span className="text-[#6B6B80] tracking-widest text-[10px]">KOORDINAT MAP</span>
-                        <span className="text-blue-400 font-bold font-mono">{selectedLog.koor}</span>
+                        <span className="text-blue-400 font-bold font-sans">{selectedLog.koor}</span>
                     </div>
                     <div className="bg-[#0A0A12] p-5 rounded-xl border border-[#1E1E2E] mt-6 shadow-inner transition-colors hover:border-slate-700">
                         <span className="text-[#6B6B80] tracking-widest text-[10px] block mb-2 uppercase">Catatan Aktivitas Operasional</span>
@@ -313,7 +313,7 @@ useEffect(() => {
                     <div className="grid grid-cols-2 gap-4">
                         <div className="bg-[#0A0A12] p-5 rounded-xl border border-[#1E1E2E] transition-colors hover:border-slate-700">
                             <p className="text-[#6B6B80] text-[10px] mb-1 tracking-widest uppercase">Total Gangguan Terdeteksi</p>
-                            <p className="font-bold text-white text-2xl font-mono">{peringatanList.length} <span className="text-sm text-slate-500 font-sans font-normal">Kapal</span></p>
+                            <p className="font-bold text-white text-2xl font-sans">{peringatanList.length} <span className="text-sm text-slate-500 font-sans font-normal">Kapal</span></p>
                         </div>
                         <div className="bg-[#0A0A12] p-5 rounded-xl border border-[#1E1E2E] transition-colors hover:border-slate-700">
                             <p className="text-[#6B6B80] text-[10px] mb-1 tracking-widest uppercase">Prioritas Utama</p>
@@ -386,7 +386,7 @@ useEffect(() => {
                   <p className="text-[10px] text-[#C084FC] font-bold mb-4 tracking-widest uppercase">Status Satelit Navigasi</p>
                   <div className="flex justify-between items-end mb-3 border-b border-[#1E1E2E] pb-3">
                     <span className="text-xs text-[#A0A0B0] font-sans">Total Titik Terkoneksi</span>
-                    <span className="text-4xl text-white font-bold font-mono tracking-tighter">{dynamicShips.length}</span>
+                    <span className="text-4xl text-white font-bold font-sans tracking-tighter">{dynamicShips.length}</span>
                   </div>
                 </div>
 
@@ -416,7 +416,7 @@ useEffect(() => {
                       )}
                   </div>
                   {/* Nama kapal selalu tampil. Hover efek memberikan penekanan */}
-                  <div className={`mt-2 bg-[#0A0A12]/90 backdrop-blur-md border px-2.5 py-1 text-[9px] rounded-md font-bold font-mono whitespace-nowrap shadow-xl transition-all duration-300 ${selectedShip?.id === ship.id ? 'scale-110 border-white text-white' : 'border-[#1E1E2E] text-slate-300 group-hover/ship:border-slate-500 group-hover/ship:text-white group-hover/ship:-translate-y-1'}`}>
+                  <div className={`mt-2 bg-[#0A0A12]/90 backdrop-blur-md border px-2.5 py-1 text-[9px] rounded-md font-bold font-sans whitespace-nowrap shadow-xl transition-all duration-300 ${selectedShip?.id === ship.id ? 'scale-110 border-white text-white' : 'border-[#1E1E2E] text-slate-300 group-hover/ship:border-slate-500 group-hover/ship:text-white group-hover/ship:-translate-y-1'}`}>
                       {ship.name}
                   </div>
                 </div>
@@ -426,7 +426,7 @@ useEffect(() => {
               {selectedShip && (
                   <div className="absolute top-0 right-0 h-full w-[350px] bg-[#0A0A12]/95 border-l border-[#1E1E2E] backdrop-blur-xl p-8 shadow-2xl z-40 animate-in slide-in-from-right duration-500 flex flex-col overflow-y-auto">
                       <div className="flex justify-between items-center mb-6 shrink-0">
-                          <span className="bg-[#1E1E2E] text-[10px] px-3 py-1.5 rounded-md text-white font-mono tracking-widest border border-slate-700">{selectedShip.id}</span>
+                          <span className="bg-[#1E1E2E] text-[10px] px-3 py-1.5 rounded-md text-white font-sans tracking-widest border border-slate-700">{selectedShip.id}</span>
                           <button onClick={() => setSelectedShip(null)} className="text-[#6B6B80] hover:text-white hover:rotate-90 transition-all text-xl">✕</button>
                       </div>
                       
@@ -435,7 +435,7 @@ useEffect(() => {
 
                       <div className="bg-[#13131F] border border-[#1E1E2E] p-4 rounded-xl mb-4 transition-colors hover:border-slate-700">
                           <p className="text-[10px] text-[#6B6B80] mb-2 tracking-widest font-bold">INFO LOGISTIK</p>
-                          <p className="text-xs text-slate-300 mb-1">No. Resi: <span className="font-mono text-purple-400 font-bold">{selectedShip.resi}</span></p>
+                          <p className="text-xs text-slate-300 mb-1">No. Resi: <span className="font-sans text-purple-400 font-bold">{selectedShip.resi}</span></p>
                           <p className="text-xs text-slate-300 mb-1">Pengirim: <span className="text-white font-medium">{selectedShip.pengirim}</span></p>
                           <p className="text-xs text-slate-300">Total Berat: <span className="text-white font-medium">{selectedShip.berat}</span></p>
                       </div>
@@ -447,7 +447,7 @@ useEffect(() => {
                           </div>
                           <div className="bg-[#13131F] border border-[#1E1E2E] p-4 rounded-xl">
                               <p className="text-[10px] text-[#6B6B80] mb-1 tracking-widest font-bold">KECEPATAN</p>
-                              <p className="text-sm font-bold text-white font-mono">{selectedShip.speed} KTS</p>
+                              <p className="text-sm font-bold text-white font-sans">{selectedShip.speed} KTS</p>
                           </div>
                       </div>
 
@@ -494,7 +494,7 @@ useEffect(() => {
                     <h2 className="text-2xl font-bold text-white tracking-widest uppercase">Monitoring Armada Aktif</h2>
                   </div>
                   <div className="text-right transition-transform hover:scale-105 cursor-default">
-                      <p className="text-3xl font-bold text-white font-mono">{dynamicShips.length}</p>
+                      <p className="text-3xl font-bold text-white font-sans">{dynamicShips.length}</p>
                       <p className="text-[10px] text-slate-500 uppercase tracking-widest">Kapal Terdata</p>
                   </div>
                 </div>
@@ -513,7 +513,7 @@ useEffect(() => {
                       <div className="flex justify-between items-start mb-4">
                         <div>
                           <h3 className="text-lg font-bold text-white mb-0.5 truncate max-w-[150px] group-hover:text-purple-400 transition-colors">{ship.name}</h3>
-                          <p className="text-[10px] text-[#6B6B80] tracking-widest font-mono">{ship.id}</p>
+                          <p className="text-[10px] text-[#6B6B80] tracking-widest font-sans">{ship.id}</p>
                         </div>
                         <span className="text-[9px] px-2.5 py-1 rounded font-bold uppercase border transition-transform group-hover:scale-105" style={{ color: ship.color, backgroundColor: `${ship.color}15`, borderColor: `${ship.color}30`}}>
                           {ship.statusKargo}
@@ -526,7 +526,7 @@ useEffect(() => {
                         </div>
                         <div>
                           <p className="text-[#6B6B80] text-[10px] mb-0.5 tracking-widest">NO RESI</p>
-                          <p className="text-purple-400 font-bold font-mono text-[11px] truncate">{ship.resi}</p>
+                          <p className="text-purple-400 font-bold font-sans text-[11px] truncate">{ship.resi}</p>
                         </div>
                       </div>
                       <div className="bg-[#0A0A12] p-3 rounded-xl flex justify-between items-center text-xs border border-[#1E1E2E] transition-colors group-hover:border-slate-700">
@@ -536,7 +536,7 @@ useEffect(() => {
                         </div>
                         <div className="text-right">
                            <p className="text-[#6B6B80] text-[10px] mb-0.5 tracking-widest">BERAT</p>
-                           <p className="text-white font-bold text-[11px] font-mono">{ship.berat}</p>
+                           <p className="text-white font-bold text-[11px] font-sans">{ship.berat}</p>
                         </div>
                       </div>
                     </div>
@@ -558,12 +558,12 @@ useEffect(() => {
                   <div className="space-y-2 max-h-[40vh] overflow-y-auto pr-2 custom-scrollbar">
                     {logs.map((log, idx) => (
                       <div key={idx} onClick={() => setSelectedLog(log)} className="grid grid-cols-5 py-3.5 px-6 rounded-xl bg-[#1A1A24] transition-all duration-300 cursor-pointer items-center hover:-translate-y-0.5 hover:bg-[#202030] hover:shadow-lg border border-transparent hover:border-slate-700">
-                        <div className="text-[#A0A0B0] font-mono text-[11px] flex items-center gap-3">
+                        <div className="text-[#A0A0B0] font-sans text-[11px] flex items-center gap-3">
                           <div className={`w-1.5 h-1.5 rounded-full ${log.color === 'text-[#EF4444]' ? 'bg-red-500 animate-pulse' : log.color === 'text-[#10B981]' ? 'bg-green-500' : 'bg-blue-500'}`}></div>
                           {log.waktu}
                         </div>
-                        <div className="text-slate-300 font-bold font-mono text-[11px]">{log.id}</div>
-                        <div className="text-[#6B6B80] text-[11px] font-mono">{log.koor}</div>
+                        <div className="text-slate-300 font-bold font-sans text-[11px]">{log.id}</div>
+                        <div className="text-[#6B6B80] text-[11px] font-sans">{log.koor}</div>
                         <div className="text-white text-xs col-span-2 flex justify-between gap-4">
                           <span className="font-sans truncate text-slate-300">{log.kejadian}</span>
                           <span className={`text-[9px] font-bold tracking-widest whitespace-nowrap px-2 py-0.5 rounded border ${log.color.replace('text-','bg-')}/10 ${log.color.replace('text-','border-')}/30 ${log.color}`}>{log.status}</span>
@@ -593,7 +593,7 @@ useEffect(() => {
             </ScrollRevealBox>
 
             <ScrollRevealBox delay={200}>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 font-mono">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 font-sans">
                 {[
                     { label: 'TOTAL ARMADA AKTIF', val: dynamicShips.length, tag: 'OPS', color: 'text-slate-100 border-slate-700/50 bg-[#1A1A24]' },
                     { label: 'KAPAL SEDANG BERLAYAR', val: dynamicShips.filter(s => s.statusKargo === "BERLAYAR").length, tag: 'NAV', color: 'text-green-400 border-green-500/30 bg-green-950/10' },
@@ -612,7 +612,7 @@ useEffect(() => {
             </ScrollRevealBox>
 
             <ScrollRevealBox delay={400}>
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 font-mono">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 font-sans">
                     <div className="lg:col-span-2 bg-[#13131F] border border-[#1E1E2E] p-8 rounded-2xl shadow-lg transition-colors duration-500 hover:border-slate-800">
                         <h3 className="text-sm font-bold tracking-widest text-slate-300 uppercase border-b border-[#1E1E2E] pb-4">Distribusi Status Operasional (Visual Radar)</h3>
                         <div className="space-y-6 pt-6 font-sans">
@@ -627,8 +627,8 @@ useEffect(() => {
                                         <div className="flex justify-between text-xs mb-2 items-center">
                                             <span className="font-bold text-[#A0A0B0] tracking-widest uppercase transition-colors group-hover:text-white">{item.label}</span>
                                             <div className="flex items-baseline gap-2">
-                                                <span className="text-white font-bold text-lg font-mono">{item.count}</span>
-                                                <span className={`font-bold ml-2 font-mono ${item.color.replace('bg-','text-')}`}>{percentage}%</span>
+                                                <span className="text-white font-bold text-lg font-sans">{item.count}</span>
+                                                <span className={`font-bold ml-2 font-sans ${item.color.replace('bg-','text-')}`}>{percentage}%</span>
                                             </div>
                                         </div>
                                         <div className="w-full bg-[#0A0A12] h-2 rounded-full overflow-hidden border border-[#1E1E2E] shadow-inner">
@@ -683,7 +683,7 @@ useEffect(() => {
             </ScrollRevealBox>
 
             <ScrollRevealBox delay={200}>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 font-mono">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 font-sans">
                     {[
                         { label: 'PERINGATAN AKTIF SAAT INI', val: peringatanList.length, color: 'border-red-500/30 bg-red-950/20', textColor: 'text-red-400' },
                         { label: 'TERSELESAIKAN HARI INI', val: peringatanSelesaiHariIni, color: 'border-green-500/30 bg-green-950/20', textColor: 'text-green-400' },
@@ -718,7 +718,7 @@ useEffect(() => {
                                 <span className="bg-red-500/10 text-red-400 border border-red-500/30 px-2 py-0.5 rounded text-[9px] font-bold tracking-widest uppercase">{item.tingkat}</span>
                             </div>
                             <p className="text-xs text-slate-300 leading-relaxed font-sans max-w-3xl">{item.desc}</p>
-                            <p className="text-[10px] text-[#6B6B80] font-mono pt-2">Deteksi: {item.waktuPicu} | Info Resi: <span className="text-slate-300 font-bold">{item.resi}</span></p>
+                            <p className="text-[10px] text-[#6B6B80] font-sans pt-2">Deteksi: {item.waktuPicu} | Info Resi: <span className="text-slate-300 font-bold">{item.resi}</span></p>
                         </div>
                         </div>
                         <div className="shrink-0 w-full md:w-auto border-t md:border-t-0 border-[#1E1E2E] pt-4 md:pt-0">

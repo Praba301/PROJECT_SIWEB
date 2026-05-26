@@ -248,14 +248,16 @@ export default function PengirimanClient({
               <tbody>
                 {data.map((item, idx) => (
                   <tr key={idx} className="border-b border-[#1E1E2E]/50 hover:bg-[#1A1A24] transition-all duration-200 group">
-                    <td className="p-4 font-mono font-bold text-[#C084FC]">{item.resi}</td>
+                    <td className="p-4 font-sans
+ font-bold text-[#C084FC]">{item.resi}</td>
                     <td className="p-4 text-slate-200">
                       <div className="flex items-center gap-2">
                         <span className="w-6 h-6 rounded-md bg-[#1E1E2E] flex items-center justify-center text-[10px]">🏢</span>
                         {item.pengirim}
                       </div>
                     </td>
-                    <td className="p-4 text-slate-400 font-mono">{item.beratTampil}</td>
+                    <td className="p-4 text-slate-400 font-sans
+">{item.beratTampil}</td>
                     <td className="p-4 text-slate-400 font-medium">{item.eta}</td>
                     <td className="p-4 text-center">
                       <span className={`px-3 py-1 rounded-md text-[11px] font-bold tracking-wide ${item.badge}`}>{item.status}</span>
@@ -314,7 +316,8 @@ export default function PengirimanClient({
                 <svg className="w-6 h-6 text-[#EF4444]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
               </div>
               <h3 className="text-lg font-bold text-white mb-2">Hapus Manifes</h3>
-              <p className="text-sm text-[#A0A0B0] mb-6">Yakin menghapus resi kargo <span className="text-[#C084FC] font-mono font-bold">{resiDihapus}</span> beserta data customer-nya sampai bersih?</p>
+              <p className="text-sm text-[#A0A0B0] mb-6">Yakin menghapus resi kargo <span className="text-[#C084FC] font-sans
+ font-bold">{resiDihapus}</span> beserta data customer-nya sampai bersih?</p>
               <div className="flex gap-3">
                 <button type="button" onClick={() => setResiDihapus(null)} className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-[#A0A0B0] bg-[#1A1A24] border border-[#1E1E2E] hover:text-white transition-colors">Batal</button>
                 <button type="button" onClick={handleKonfirmasiHapus} className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white bg-[#EF4444] hover:bg-[#DC2626] transition-all shadow-lg shadow-red-500/20">Ya, Hapus</button>
@@ -335,7 +338,8 @@ export default function PengirimanClient({
             <form onSubmit={handleSimpanEdit} className="p-6 space-y-4">
               <div>
                 <label className="block text-xs font-semibold text-[#A0A0B0] mb-1.5">NOMOR RESI</label>
-                <input type="text" value={dataEdit.resi} disabled className="w-full bg-[#0A0A12] border border-[#1E1E2E] text-[#6B6B80] text-sm rounded-xl p-2.5 font-mono cursor-not-allowed" />
+                <input type="text" value={dataEdit.resi} disabled className="w-full bg-[#0A0A12] border border-[#1E1E2E] text-[#6B6B80] text-sm rounded-xl p-2.5 font-sans
+ cursor-not-allowed" />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-[#A0A0B0] mb-1.5">NAMA PENGIRIM</label>
@@ -382,7 +386,8 @@ export default function PengirimanClient({
                   <h4 className="text-[#C084FC] font-semibold text-sm border-b border-[#1E1E2E] pb-2">Informasi Customer & Logistik</h4>
                   <div>
                     <label className="block text-xs font-semibold text-[#A0A0B0] mb-1.5">Nomor Resi (Bisa Disesuaikan Manual)</label>
-                    <input type="text" name="noResiInput" placeholder="Contoh: SWB-20240011 (Kosongkan jika ingin otomatis urut)" className="w-full bg-[#0A0A12] border border-[#1E1E2E] text-white text-sm rounded-xl p-2.5 outline-none focus:border-[#A855F7] transition-all font-mono" />
+                    <input type="text" name="noResiInput" placeholder="Contoh: SWB-20240011 (Kosongkan jika ingin otomatis urut)" className="w-full bg-[#0A0A12] border border-[#1E1E2E] text-white text-sm rounded-xl p-2.5 outline-none focus:border-[#A855F7] transition-all font-sans
+" />
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-[#A0A0B0] mb-1.5">Nama Pengirim</label>
@@ -439,7 +444,8 @@ export default function PengirimanClient({
                         onChange={handleBeratChange}
                         placeholder="Ketik berat..."
                         required 
-                        className="w-full bg-[#0A0A12] border border-[#1E1E2E] text-white text-sm rounded-xl p-2.5 outline-none focus:border-[#A855F7] transition-all font-mono" 
+                        className="w-full bg-[#0A0A12] border border-[#1E1E2E] text-white text-sm rounded-xl p-2.5 outline-none focus:border-[#A855F7] transition-all font-sans
+" 
                       />
                     </div>
                     <div>
@@ -453,7 +459,8 @@ export default function PengirimanClient({
                           readOnly 
                           placeholder="Terhitung..."
                           required 
-                          className="w-full bg-[#161622] border border-[#1E1E2E] text-[#4ADE80] font-bold text-sm rounded-xl pl-9 p-2.5 cursor-not-allowed font-mono outline-none" 
+                          className="w-full bg-[#161622] border border-[#1E1E2E] text-[#4ADE80] font-bold text-sm rounded-xl pl-9 p-2.5 cursor-not-allowed font-sans
+ outline-none" 
                         />
                       </div>
                     </div>
@@ -519,7 +526,8 @@ export default function PengirimanClient({
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <label className="block text-xs font-semibold text-[#A0A0B0] mb-1.5">Kode Registrasi (IMO Auto)</label>
-                      <input type="text" name="kodeKapal" value={autoImo} readOnly className="w-full bg-[#161622] border border-[#1E1E2E] text-[#6B6B80] font-mono text-sm rounded-xl p-2.5 cursor-not-allowed outline-none" />
+                      <input type="text" name="kodeKapal" value={autoImo} readOnly className="w-full bg-[#161622] border border-[#1E1E2E] text-[#6B6B80] font-sans
+ text-sm rounded-xl p-2.5 cursor-not-allowed outline-none" />
                     </div>
                     <div>
                       <label className="block text-xs font-semibold text-[#A0A0B0] mb-1.5">Status Kelayakan Armada</label>

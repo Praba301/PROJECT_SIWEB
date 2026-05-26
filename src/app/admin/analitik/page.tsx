@@ -34,7 +34,7 @@ export default function AnalitikPage() {
             <p className="text-[#A0A0B0] text-sm font-medium tracking-wide">Total Muatan</p>
             <div className="w-8 h-8 rounded-lg bg-[#A855F7]/10 flex items-center justify-center text-lg shadow-inner">📦</div>
           </div>
-          <p className="text-4xl font-bold text-[#A855F7] font-mono transition-transform duration-300 origin-left group-hover:scale-105 group-hover:text-[#C084FC]">8.124</p>
+          <p className="text-4xl font-bold text-[#A855F7] font-sans transition-transform duration-300 origin-left group-hover:scale-105 group-hover:text-[#C084FC]">8.124</p>
           <p className="text-[#6B6B80] text-xs mt-2 flex items-center gap-1">
             <span className="text-[#22C55E]">↑ 12%</span> vs bulan lalu
           </p>
@@ -50,7 +50,7 @@ export default function AnalitikPage() {
             <p className="text-[#A0A0B0] text-sm font-medium tracking-wide">Persentase On-Time</p>
             <div className="w-8 h-8 rounded-lg bg-[#A855F7]/10 flex items-center justify-center text-lg shadow-inner">⏱️</div>
           </div>
-          <p className="text-4xl font-bold text-[#A855F7] font-mono transition-transform duration-300 origin-left group-hover:scale-105 group-hover:text-[#C084FC]">91%</p>
+          <p className="text-4xl font-bold text-[#A855F7] font-sans transition-transform duration-300 origin-left group-hover:scale-105 group-hover:text-[#C084FC]">91%</p>
           <p className="text-[#6B6B80] text-xs mt-2">Rata-rata dari total pengiriman</p>
         </div>
 
@@ -64,7 +64,7 @@ export default function AnalitikPage() {
             <p className="text-[#A0A0B0] text-sm font-medium tracking-wide">Rata - Rata Waktu</p>
             <div className="w-8 h-8 rounded-lg bg-[#A855F7]/10 flex items-center justify-center text-lg shadow-inner">🚢</div>
           </div>
-          <p className="text-4xl font-bold text-[#A855F7] font-mono transition-transform duration-300 origin-left group-hover:scale-105 group-hover:text-[#C084FC]">4.2</p>
+          <p className="text-4xl font-bold text-[#A855F7] font-sans transition-transform duration-300 origin-left group-hover:scale-105 group-hover:text-[#C084FC]">4.2</p>
           <p className="text-[#6B6B80] text-xs mt-2">Hari per pengiriman rute utama</p>
         </div>
       </div>
@@ -106,7 +106,7 @@ export default function AnalitikPage() {
                       {row.onTime}
                     </span>
                   </td>
-                  <td className="py-4 px-4 text-[#A0A0B0] font-mono group-hover:text-white transition-colors duration-200">{row.muatan}</td>
+                  <td className="py-4 px-4 text-[#A0A0B0] font-sans group-hover:text-white transition-colors duration-200">{row.muatan}</td>
                 </tr>
               ))}
             </tbody>

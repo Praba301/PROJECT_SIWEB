@@ -73,7 +73,7 @@ export default function ArmadaClient({ dataDariDatabase }: { dataDariDatabase: a
                   <h3 className={`font-bold text-xl transition-colors duration-300 ${isSelected ? "text-[#C084FC]" : "text-white group-hover:text-[#A855F7]"}`}>
                     {ship.name}
                   </h3>
-                  <p className="text-[#A0A0B0] text-xs font-mono uppercase tracking-wider mt-1">{ship.kode} - {ship.type}</p>
+                  <p className="text-[#A0A0B0] text-xs font-sans uppercase tracking-wider mt-1">{ship.kode} - {ship.type}</p>
                   <p className="text-[#6B6B80] text-sm mt-3 flex items-center gap-2">
                     <svg className="w-4 h-4 text-[#A855F7]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                     {ship.route}

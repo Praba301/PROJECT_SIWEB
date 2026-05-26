@@ -43,7 +43,8 @@ export default function DashboardClient({
             <div className="absolute top-0 right-0 p-4 opacity-10 text-6xl group-hover:text-[#A855F7] transition-all duration-500">{stat.icon}</div>
             <div className="relative z-10">
               <p className="text-[#A0A0B0] text-sm mb-2 font-medium">{stat.label}</p>
-              <p className="text-4xl font-bold text-white font-mono group-hover:text-[#C084FC] transition-colors">{stat.value}</p>
+              <p className="text-4xl font-bold text-white font-sans
+ group-hover:text-[#C084FC] transition-colors">{stat.value}</p>
             </div>
             <div className="absolute bottom-0 left-0 h-1 bg-gradient-to-r from-[#A855F7] to-[#C084FC] w-0 group-hover:w-full transition-all duration-500" />
           </div>
@@ -67,7 +68,8 @@ export default function DashboardClient({
               {dataDariDatabase.length > 0 ? (
                 dataDariDatabase.map((row, idx) => (
                   <tr key={idx} className="border-b border-[#1E1E2E]/50 hover:bg-[#1A1A24]">
-                    <td className="py-4 px-4 font-mono font-bold text-[#C084FC]">{row.no_resi}</td>
+                    <td className="py-4 px-4 font-sans
+ font-bold text-[#C084FC]">{row.no_resi}</td>
                     <td className="py-4 px-4">{row.kota_asal}</td>
                     <td className="py-4 px-4">{row.kota_tujuan}</td>
                     <td className="py-4 px-4">{row.nama_kapal || "N/A"}</td>

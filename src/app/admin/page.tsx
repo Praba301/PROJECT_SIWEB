@@ -33,7 +33,10 @@ export default function PengirimanPage() {
                   : "border border-transparent hover:bg-slate-800/30 border-b-slate-800"
               }`}
             >
-              <div className="flex-1 text-cyan-400 font-mono">{item.resi}</div>
+              <div className="flex-1 text-cyan-400 font-sans
+
+
+">{item.resi}</div>
               <div className="flex-1 text-slate-300">{item.pengirim}</div>
               <div className="w-32 text-slate-400">{item.berat}</div>
               <div className="w-32 text-slate-400">{item.eta}</div>
