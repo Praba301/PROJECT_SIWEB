@@ -1,4 +1,11 @@
 import Sidebar from "@/components/admin/sidebar";
+import type { Metadata } from "next";
+
+// Menambahkan MetaData sesuai instruksi tugas
+export const metadata: Metadata = {
+  title: "Administrator | Praketrio",
+  description: "Dashboard panel admin untuk manajemen pengiriman kargo laut Praketrio.",
+};
 
 export default function AdminLayout({
   children,
@@ -6,18 +13,13 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex h-screen bg-[#0b0c19] text-slate-200 font-sans overflow-hidden">
-      
+    <div className="flex flex-col h-screen bg-[#0b0c19] text-slate-200 font-sans overflow-hidden">
+      {/* Top Navbar */}
       <Sidebar />
       
-      <div className="flex-1 flex flex-col h-screen overflow-hidden">
-        
-        <header className="h-20 flex items-center justify-end px-10 border-b border-slate-800 bg-[#0d0e1f] shrink-0">
-          <h2 className="text-white font-bold tracking-widest uppercase">Administrator</h2>
-        </header>
-        
-        
-        <main className="p-8 flex-1 overflow-y-auto">
+      {/* Main Content Area */}
+      <div className="flex-1 overflow-hidden flex flex-col relative">
+        <main className="p-4 md:p-8 flex-1 overflow-y-auto">
           {children}
         </main>
       </div>

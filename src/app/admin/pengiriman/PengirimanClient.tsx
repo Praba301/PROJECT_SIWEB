@@ -35,6 +35,16 @@ export default function PengirimanClient({
   const [hargaOtomatis, setHargaOtomatis] = useState("");
   const [autoImo, setAutoImo] = useState("");
 
+  // State Custom Error Handling Form
+  const [formErrors, setFormErrors] = useState({
+    namaPengirim: "",
+    namaPenerima: "",
+    noTelepon: "",
+    tanggalKirim: "",
+    beratTotal: "",
+    namaKapal: "",
+  });
+
   // State Pop-up Box Notifikasi Tengah Layar Kustom Vercel Style
   const [popupNotif, setPopupNotif] = useState<PopupNotification>({
     show: false,
@@ -52,6 +62,15 @@ export default function PengirimanClient({
       setBeratInput("");
       setHargaOtomatis("");
       setAutoImo(`IMO-${Math.floor(1000000 + Math.random() * 9000000)}`);
+      // Reset error saat modal dibuka
+      setFormErrors({
+        namaPengirim: "",
+        namaPenerima: "",
+        noTelepon: "",
+        tanggalKirim: "",
+        beratTotal: "",
+        namaKapal: "",
+      });
     }
   }, [isCreateOpen]);
 
@@ -128,6 +147,28 @@ export default function PengirimanClient({
   const handleSimpanBaru = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
+
+    // Custom Error Validation
+    let errors = {
+      namaPengirim: "",
+      namaPenerima: "",
+      noTelepon: "",
+      tanggalKirim: "",
+      beratTotal: "",
+      namaKapal: "",
+    };
+    let hasError = false;
+
+    if (!formData.get("namaPengirim")) { errors.namaPengirim = "Kolom ini tidak boleh kosong."; hasError = true; }
+    if (!formData.get("namaPenerima")) { errors.namaPenerima = "Kolom ini tidak boleh kosong."; hasError = true; }
+    if (!formData.get("noTelepon")) { errors.noTelepon = "Kolom ini tidak boleh kosong."; hasError = true; }
+    if (!formData.get("tanggalKirim")) { errors.tanggalKirim = "Pilih tanggal pengiriman."; hasError = true; }
+    if (!formData.get("beratTotal")) { errors.beratTotal = "Masukkan estimasi berat kargo."; hasError = true; }
+    if (!formData.get("namaKapal")) { errors.namaKapal = "Tentukan nama armada kapal."; hasError = true; }
+
+    setFormErrors(errors);
+    if (hasError) return; // Hentikan proses jika ada error
+
     const result = await tambahResiDatabase(formData);
     if (result.success) {
       setIsCreateOpen(false);
@@ -142,11 +183,16 @@ export default function PengirimanClient({
   const handleBeratChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     setBeratInput(val);
+    setFormErrors((prev) => ({ ...prev, beratTotal: "" })); // Clear error saat ngetik
     if (val && !isNaN(Number(val))) {
       setHargaOtomatis(String(Number(val) * 25000));
     } else {
       setHargaOtomatis("");
     }
+  };
+
+  const clearError = (field: keyof typeof formErrors) => {
+    setFormErrors((prev) => ({ ...prev, [field]: "" }));
   };
 
   // ================= MAP RENDER DATA BINDING FROM JOIN QUERY =================
@@ -173,7 +219,7 @@ export default function PengirimanClient({
   return (
     <div className="space-y-8 pb-10 animate-fade-in relative">
       
-      {/* POP-UP BOX NOTIFIKASI KUSTOM TENGAH LAYAR PREMIUM */}
+      {/* POP-UP BOX NOTIFIKASI KUSTOM */}
       {popupNotif.show && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm animate-fade-in p-4">
           <div className="bg-[#13131F] border border-[#1E1E2E] rounded-2xl p-6 shadow-2xl max-w-sm w-full text-center animate-scale-up">
@@ -248,16 +294,14 @@ export default function PengirimanClient({
               <tbody>
                 {data.map((item, idx) => (
                   <tr key={idx} className="border-b border-[#1E1E2E]/50 hover:bg-[#1A1A24] transition-all duration-200 group">
-                    <td className="p-4 font-sans
- font-bold text-[#C084FC]">{item.resi}</td>
+                    <td className="p-4 font-sans font-bold text-[#C084FC]">{item.resi}</td>
                     <td className="p-4 text-slate-200">
                       <div className="flex items-center gap-2">
                         <span className="w-6 h-6 rounded-md bg-[#1E1E2E] flex items-center justify-center text-[10px]">🏢</span>
                         {item.pengirim}
                       </div>
                     </td>
-                    <td className="p-4 text-slate-400 font-sans
-">{item.beratTampil}</td>
+                    <td className="p-4 text-slate-400 font-sans">{item.beratTampil}</td>
                     <td className="p-4 text-slate-400 font-medium">{item.eta}</td>
                     <td className="p-4 text-center">
                       <span className={`px-3 py-1 rounded-md text-[11px] font-bold tracking-wide ${item.badge}`}>{item.status}</span>
@@ -316,8 +360,7 @@ export default function PengirimanClient({
                 <svg className="w-6 h-6 text-[#EF4444]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
               </div>
               <h3 className="text-lg font-bold text-white mb-2">Hapus Manifes</h3>
-              <p className="text-sm text-[#A0A0B0] mb-6">Yakin menghapus resi kargo <span className="text-[#C084FC] font-sans
- font-bold">{resiDihapus}</span> beserta data customer-nya sampai bersih?</p>
+              <p className="text-sm text-[#A0A0B0] mb-6">Yakin menghapus resi kargo <span className="text-[#C084FC] font-sans font-bold">{resiDihapus}</span> beserta data customer-nya sampai bersih?</p>
               <div className="flex gap-3">
                 <button type="button" onClick={() => setResiDihapus(null)} className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-[#A0A0B0] bg-[#1A1A24] border border-[#1E1E2E] hover:text-white transition-colors">Batal</button>
                 <button type="button" onClick={handleKonfirmasiHapus} className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white bg-[#EF4444] hover:bg-[#DC2626] transition-all shadow-lg shadow-red-500/20">Ya, Hapus</button>
@@ -338,8 +381,7 @@ export default function PengirimanClient({
             <form onSubmit={handleSimpanEdit} className="p-6 space-y-4">
               <div>
                 <label className="block text-xs font-semibold text-[#A0A0B0] mb-1.5">NOMOR RESI</label>
-                <input type="text" value={dataEdit.resi} disabled className="w-full bg-[#0A0A12] border border-[#1E1E2E] text-[#6B6B80] text-sm rounded-xl p-2.5 font-sans
- cursor-not-allowed" />
+                <input type="text" value={dataEdit.resi} disabled className="w-full bg-[#0A0A12] border border-[#1E1E2E] text-[#6B6B80] text-sm rounded-xl p-2.5 font-sans cursor-not-allowed" />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-[#A0A0B0] mb-1.5">NAMA PENGIRIM</label>
@@ -378,7 +420,8 @@ export default function PengirimanClient({
               <button type="button" onClick={() => setIsCreateOpen(false)} className="text-[#6B6B80] hover:text-white transition-colors">✕</button>
             </div>
             
-            <form onSubmit={handleSimpanBaru} className="p-6 overflow-y-auto space-y-6 custom-scrollbar">
+            {/* Tambahkan noValidate agar popup browser mati */}
+            <form onSubmit={handleSimpanBaru} noValidate className="p-6 overflow-y-auto space-y-6 custom-scrollbar">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 
                 {/* Informasi Kiri */}
@@ -386,25 +429,27 @@ export default function PengirimanClient({
                   <h4 className="text-[#C084FC] font-semibold text-sm border-b border-[#1E1E2E] pb-2">Informasi Customer & Logistik</h4>
                   <div>
                     <label className="block text-xs font-semibold text-[#A0A0B0] mb-1.5">Nomor Resi (Bisa Disesuaikan Manual)</label>
-                    <input type="text" name="noResiInput" placeholder="Contoh: SWB-20240011 (Kosongkan jika ingin otomatis urut)" className="w-full bg-[#0A0A12] border border-[#1E1E2E] text-white text-sm rounded-xl p-2.5 outline-none focus:border-[#A855F7] transition-all font-sans
-" />
+                    <input type="text" name="noResiInput" placeholder="Contoh: SWB-20240011 (Kosongkan jika ingin otomatis urut)" className="w-full bg-[#0A0A12] border border-[#1E1E2E] text-white text-sm rounded-xl p-2.5 outline-none focus:border-[#A855F7] transition-all font-sans" />
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-[#A0A0B0] mb-1.5">Nama Pengirim</label>
-                    <input type="text" name="namaPengirim" required className="w-full bg-[#0A0A12] border border-[#1E1E2E] text-white text-sm rounded-xl p-2.5 outline-none focus:border-[#A855F7] transition-all" />
+                    <input type="text" name="namaPengirim" onChange={() => clearError("namaPengirim")} className={`w-full bg-[#0A0A12] border ${formErrors.namaPengirim ? "border-red-500" : "border-[#1E1E2E] focus:border-[#A855F7]"} text-white text-sm rounded-xl p-2.5 outline-none transition-all`} />
+                    {formErrors.namaPengirim && <p className="text-red-400 text-xs mt-1.5 ml-2">{formErrors.namaPengirim}</p>}
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-[#A0A0B0] mb-1.5">Nama Penerima</label>
-                    <input type="text" name="namaPenerima" required className="w-full bg-[#0A0A12] border border-[#1E1E2E] text-white text-sm rounded-xl p-2.5 outline-none focus:border-[#A855F7] transition-all" />
+                    <input type="text" name="namaPenerima" onChange={() => clearError("namaPenerima")} className={`w-full bg-[#0A0A12] border ${formErrors.namaPenerima ? "border-red-500" : "border-[#1E1E2E] focus:border-[#A855F7]"} text-white text-sm rounded-xl p-2.5 outline-none transition-all`} />
+                    {formErrors.namaPenerima && <p className="text-red-400 text-xs mt-1.5 ml-2">{formErrors.namaPenerima}</p>}
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-[#A0A0B0] mb-1.5">Nomor Telepon</label>
-                    <input type="tel" name="noTelepon" required className="w-full bg-[#0A0A12] border border-[#1E1E2E] text-white text-sm rounded-xl p-2.5 outline-none focus:border-[#A855F7] transition-all" />
+                    <input type="tel" name="noTelepon" onChange={() => clearError("noTelepon")} className={`w-full bg-[#0A0A12] border ${formErrors.noTelepon ? "border-red-500" : "border-[#1E1E2E] focus:border-[#A855F7]"} text-white text-sm rounded-xl p-2.5 outline-none transition-all`} />
+                    {formErrors.noTelepon && <p className="text-red-400 text-xs mt-1.5 ml-2">{formErrors.noTelepon}</p>}
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <label className="block text-xs font-semibold text-[#A0A0B0] mb-1.5">Kota Asal</label>
-                      <select name="kotaAsal" required className="w-full bg-[#0A0A12] border border-[#1E1E2E] text-white text-sm rounded-xl p-2.5 outline-none focus:border-[#A855F7]">
+                      <select name="kotaAsal" className="w-full bg-[#0A0A12] border border-[#1E1E2E] text-white text-sm rounded-xl p-2.5 outline-none focus:border-[#A855F7]">
                         <option value="Jakarta (Tanjung Priok)">Jakarta (Tanjung Priok)</option>
                         <option value="Surabaya (Tanjung Perak)">Surabaya (Tanjung Perak)</option>
                         <option value="Semarang (Tanjung Emas)">Semarang (Tanjung Emas)</option>
@@ -414,7 +459,7 @@ export default function PengirimanClient({
                     </div>
                     <div>
                       <label className="block text-xs font-semibold text-[#A0A0B0] mb-1.5">Kota Tujuan</label>
-                      <select name="kotaTujuan" required className="w-full bg-[#0A0A12] border border-[#1E1E2E] text-white text-sm rounded-xl p-2.5 outline-none focus:border-[#A855F7]">
+                      <select name="kotaTujuan" className="w-full bg-[#0A0A12] border border-[#1E1E2E] text-white text-sm rounded-xl p-2.5 outline-none focus:border-[#A855F7]">
                         <option value="Surabaya (Tanjung Perak)">Surabaya (Tanjung Perak)</option>
                         <option value="Jakarta (Tanjung Priok)">Jakarta (Tanjung Priok)</option>
                         <option value="Semarang (Tanjung Emas)">Semarang (Tanjung Emas)</option>
@@ -430,7 +475,8 @@ export default function PengirimanClient({
                   <h4 className="text-[#C084FC] font-semibold text-sm border-b border-[#1E1E2E] pb-2">Spesifikasi Kargo & Armada Kapal</h4>
                   <div>
                     <label className="block text-xs font-semibold text-[#A0A0B0] mb-1.5">Tanggal Kirim</label>
-                    <input type="date" name="tanggalKirim" required className="w-full bg-[#0A0A12] border border-[#1E1E2E] text-white text-sm rounded-xl p-2.5 outline-none focus:border-[#A855F7]" />
+                    <input type="date" name="tanggalKirim" onChange={() => clearError("tanggalKirim")} className={`w-full bg-[#0A0A12] border ${formErrors.tanggalKirim ? "border-red-500" : "border-[#1E1E2E] focus:border-[#A855F7]"} text-white text-sm rounded-xl p-2.5 outline-none transition-all`} />
+                    {formErrors.tanggalKirim && <p className="text-red-400 text-xs mt-1.5 ml-2">{formErrors.tanggalKirim}</p>}
                   </div>
                   
                   {/* AUTOMATED SMART PRICE FIELDS */}
@@ -443,10 +489,9 @@ export default function PengirimanClient({
                         value={beratInput}
                         onChange={handleBeratChange}
                         placeholder="Ketik berat..."
-                        required 
-                        className="w-full bg-[#0A0A12] border border-[#1E1E2E] text-white text-sm rounded-xl p-2.5 outline-none focus:border-[#A855F7] transition-all font-sans
-" 
+                        className={`w-full bg-[#0A0A12] border ${formErrors.beratTotal ? "border-red-500" : "border-[#1E1E2E] focus:border-[#A855F7]"} text-white text-sm rounded-xl p-2.5 outline-none transition-all font-sans`} 
                       />
+                      {formErrors.beratTotal && <p className="text-red-400 text-xs mt-1.5 ml-2">{formErrors.beratTotal}</p>}
                     </div>
                     <div>
                       <label className="block text-xs font-semibold text-[#A0A0B0] mb-1.5">Harga Tarif (Auto)</label>
@@ -458,9 +503,7 @@ export default function PengirimanClient({
                           value={hargaOtomatis}
                           readOnly 
                           placeholder="Terhitung..."
-                          required 
-                          className="w-full bg-[#161622] border border-[#1E1E2E] text-[#4ADE80] font-bold text-sm rounded-xl pl-9 p-2.5 cursor-not-allowed font-sans
- outline-none" 
+                          className="w-full bg-[#161622] border border-[#1E1E2E] text-[#4ADE80] font-bold text-sm rounded-xl pl-9 p-2.5 cursor-not-allowed font-sans outline-none" 
                         />
                       </div>
                     </div>
@@ -469,7 +512,7 @@ export default function PengirimanClient({
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <label className="block text-xs font-semibold text-[#A0A0B0] mb-1.5">Jenis Barang</label>
-                      <select name="jenisBarang" required className="w-full bg-[#0A0A12] border border-[#1E1E2E] text-white text-sm rounded-xl p-2.5 outline-none focus:border-[#A855F7]">
+                      <select name="jenisBarang" className="w-full bg-[#0A0A12] border border-[#1E1E2E] text-white text-sm rounded-xl p-2.5 outline-none focus:border-[#A855F7]">
                         <option value="Peralatan Rumah Tangga">Peralatan Rumah Tangga</option>
                         <option value="Hasil Bumi & Agrikultur">Hasil Bumi & Agrikultur</option>
                         <option value="Barang Elektronik">Barang Elektronik</option>
@@ -497,7 +540,8 @@ export default function PengirimanClient({
                     </div>
                     <div>
                       <label className="block text-xs font-semibold text-[#A0A0B0] mb-1.5">Nama Kapal Pengangkut</label>
-                      <input type="text" name="namaKapal" placeholder="Contoh: KM Kelud" required className="w-full bg-[#0A0A12] border border-[#1E1E2E] text-white text-sm rounded-xl p-2.5 outline-none focus:border-[#A855F7]" />
+                      <input type="text" name="namaKapal" onChange={() => clearError("namaKapal")} placeholder="Contoh: KM Kelud" className={`w-full bg-[#0A0A12] border ${formErrors.namaKapal ? "border-red-500" : "border-[#1E1E2E] focus:border-[#A855F7]"} text-white text-sm rounded-xl p-2.5 outline-none transition-all`} />
+                      {formErrors.namaKapal && <p className="text-red-400 text-xs mt-1.5 ml-2">{formErrors.namaKapal}</p>}
                     </div>
                   </div>
 
@@ -508,16 +552,17 @@ export default function PengirimanClient({
                       <select name="jenisKapal" className="w-full bg-[#0A0A12] border border-[#1E1E2E] text-white text-sm rounded-xl p-2.5 outline-none">
                         <option value="Kapal Kargo Umum">Kapal Kargo Umum</option>
                         <option value="Kapal Ro-Ro">Kapal Ro-Ro</option>
+                        <option value="Kapal Kontainer">Kapal Kontainer</option>
                       </select>
                     </div>
                     <div>
                       <label className="block text-xs font-semibold text-[#A0A0B0] mb-1.5">Kapasitas</label>
                       <select name="kapasitasMuatan" className="w-full bg-[#0A0A12] border border-[#1E1E2E] text-white text-sm rounded-xl p-2.5 outline-none">
-                        <option value="1.000 TEUs">1.000 TEUs</option>
-                        <option value="5.000 TEUs">5.000 TEUs</option>
-                        <option value="10.000 TEUs">10.000 TEUs</option>
-                        <option value="20.000 TEUs">20.000 TEUs</option>
-                        <option value="50.000 GT">50.000 GT</option>
+                        <option value="100%">100% (Penuh)</option>
+                        <option value="80%">80%</option>
+                        <option value="50%">50%</option>
+                        <option value="25%">25%</option>
+                        <option value="0%">0% (Kosong)</option>
                       </select>
                     </div>
                   </div>
@@ -526,8 +571,7 @@ export default function PengirimanClient({
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <label className="block text-xs font-semibold text-[#A0A0B0] mb-1.5">Kode Registrasi (IMO Auto)</label>
-                      <input type="text" name="kodeKapal" value={autoImo} readOnly className="w-full bg-[#161622] border border-[#1E1E2E] text-[#6B6B80] font-sans
- text-sm rounded-xl p-2.5 cursor-not-allowed outline-none" />
+                      <input type="text" name="kodeKapal" value={autoImo} readOnly className="w-full bg-[#161622] border border-[#1E1E2E] text-[#6B6B80] font-sans text-sm rounded-xl p-2.5 cursor-not-allowed outline-none" />
                     </div>
                     <div>
                       <label className="block text-xs font-semibold text-[#A0A0B0] mb-1.5">Status Kelayakan Armada</label>

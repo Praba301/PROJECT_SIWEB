@@ -2,13 +2,17 @@ import { Suspense } from "react";
 import DashboardClient from "./dashboardclient";
 import { db } from "@/lib/db"; 
 
+export const metadata = {
+  title: "Dashboard Admin | Praketrio",
+};
+
 export default async function DashboardPage() {
   let dataPengiriman = [];
   let statsData = { Diproses: 0, Dimuat: 0, Berlayar: 0, Terkirim: 0 };
   let totalData = 0; 
   
   try {
-    // 1. Ambil 5 data terbaru (Menggunakan COALESCE agar kapal yang NULL otomatis terisi nama default)
+    // 1. URUTKAN BERDASARKAN ID DESC AGAR RESI TERBARU (SEPERTI RESI KE-12) PASTI MUNCUL DI DASHBOARD
     const queryResult = await db.query(`
       SELECT 
         tp.no_resi, 
@@ -17,7 +21,7 @@ export default async function DashboardPage() {
         COALESCE(k.nama_kapal, 'MV Nusantara Logistik') as nama_kapal
       FROM transaksi_pengiriman tp
       LEFT JOIN kapal_pengiriman k ON tp.id = k.transaksi_id
-      ORDER BY tp.tanggal_transaksi DESC LIMIT 5
+      ORDER BY tp.id DESC LIMIT 5
     `);
     dataPengiriman = queryResult.rows;
 

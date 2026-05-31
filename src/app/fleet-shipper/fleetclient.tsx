@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 // KOMPONEN CUSTOM SCROLL REVEAL (Animasi Elegan)
 const ScrollRevealBox = ({ children, delay = 0 }: { children: React.ReactNode, delay?: number }) => {
@@ -35,35 +36,33 @@ const ScrollRevealBox = ({ children, delay = 0 }: { children: React.ReactNode, d
   );
 };
 
-// KORDINAT PETA ANTI-NUMPUK & ANTI-KETUTUPAN UI
-// Titik diatur sedemikian rupa agar menjauhi pojok kanan bawah (Legenda) dan pojok kiri atas (Status)
+// ================= KORDINAT PETA ANTI-NUMPUK =================
+// Disesuaikan agar minimal left: 35% agar tidak pernah menyentuh panel UI kiri
 const safeRedCoords = [
-    { top: '40%', left: '35%' }, // Laut Natuna (Aman dari UI kiri)
-    { top: '45%', left: '60%' }  // Laut Banda / Seram (Aman dari UI Kanan Bawah)
+    { top: '65%', left: '45%' }, 
+    { top: '75%', left: '60%' }  
 ];
 
 const safeBlueCoords = [
-    { top: '65%', left: '30%' }, // Pesisir Jakarta
-    { top: '68%', left: '42%' }, // Pesisir Surabaya
-    { top: '35%', left: '15%' }, // Pesisir Medan
-    { top: '58%', left: '52%' }, // Pesisir Makassar
-    { top: '48%', left: '48%' }, // Pesisir Balikpapan
-    { top: '60%', left: '38%' }, // Pesisir Semarang
-    { top: '75%', left: '50%' }  // Pesisir Bali/Lombok
+    { top: '55%', left: '75%' }, 
+    { top: '58%', left: '42%' }, 
+    { top: '56%', left: '35%' }, // Digeser dari 15% ke 35% agar aman dari panel kiri
+    { top: '75%', left: '56%' }, 
+    { top: '68%', left: '48%' }, 
+    { top: '60%', left: '38%' }, 
+    { top: '75%', left: '50%' }  
 ];
 
 const safeGreenCoords = [
-    { top: '55%', left: '38%' }, // Laut Jawa
-    { top: '45%', left: '45%' }, // Selat Makassar
-    { top: '50%', left: '65%' }, // Laut Seram
-    { top: '25%', left: '25%' }, // Laut China Selatan
-    { top: '30%', left: '55%' }, // Laut Sulawesi
-    { top: '50%', left: '20%' }, // Samudra Hindia Barat
-    { top: '75%', left: '35%' }, // Samudra Hindia Selatan
-    { top: '35%', left: '75%' }  // Samudra Pasifik Maluku
+    { top: '15%', left: '38%' }, 
+    { top: '55%', left: '45%' }, 
+    { top: '50%', left: '65%' }, 
+    { top: '77%', left: '55%' }, // Digeser ke 35% agar aman
+    { top: '10%', left: '55%' }, 
+    { top: '16%', left: '68%' }, // Digeser ke 35% agar aman
+    { top: '75%', left: '35%' }, 
+    { top: '15%', left: '15%' }  
 ];
-
-// ================= REALTIME SHIP MOVEMENT =================
 
 export default function FleetClient({ dataDariDatabase }: { dataDariDatabase: any[] }) {
   const [activeTab, setActiveTab] = useState('peta');
@@ -80,7 +79,7 @@ export default function FleetClient({ dataDariDatabase }: { dataDariDatabase: an
   const [waktuJogja, setWaktuJogja] = useState("");
   const [tanggalJogja, setTanggalJogja] = useState("");
   const [peringatanList, setPeringatanList] = useState<any[]>([]);
-  const [peringatanSelesaiHariIni, setPeringatanSelesaiHariIni] = useState(0); // Mock 12 sudah diselesaikan
+  const [peringatanSelesaiHariIni, setPeringatanSelesaiHariIni] = useState(0);
   const [dynamicShips, setDynamicShips] = useState<any[]>([]);
 
   useEffect(() => {
@@ -108,19 +107,17 @@ export default function FleetClient({ dataDariDatabase }: { dataDariDatabase: an
       let isTrouble = false;
       let finalCoord = { top: '50%', left: '50%' };
 
-    // SINKRONISASI: Jika dari DB statusnya error, batasi maksimal 2 saja yang MERAH
     if (row.status_kargo === "Diproses" || row.status_kargo === "Dimuat") {
         if (countMerah < 2) {
             finalStatus = "GANGGUAN TEKNIS";
-            shipColor = "#EF4444"; // Merah
+            shipColor = "#EF4444"; 
             speedData = "2.1";
             isTrouble = true;
             finalCoord = safeRedCoords[countMerah % safeRedCoords.length];
             countMerah++;
         } else {
-            // Sisa kapal error disamarkan jadi Hijau, TIDAK dianggap Trouble lagi
             finalStatus = "BERLAYAR";
-            shipColor = "#10B981"; // Hijau
+            shipColor = "#10B981"; 
             speedData = "18.4";
             isTrouble = false; 
             finalCoord = safeGreenCoords[countHijau % safeGreenCoords.length];
@@ -128,15 +125,14 @@ export default function FleetClient({ dataDariDatabase }: { dataDariDatabase: an
         }
     } else if (row.status_kargo === "Terkirim") {
         finalStatus = "SELESAI";
-        shipColor = "#3B82F6"; // Biru
+        shipColor = "#3B82F6"; 
         speedData = "0.0";
         isTrouble = false;
         finalCoord = safeBlueCoords[countBiru % safeBlueCoords.length];
         countBiru++;
     } else {
-        // Berlayar Normal
         finalStatus = "BERLAYAR";
-        shipColor = "#10B981"; // Hijau
+        shipColor = "#10B981"; 
         speedData = "18.4";
         isTrouble = false;
         finalCoord = safeGreenCoords[countHijau % safeGreenCoords.length];
@@ -161,14 +157,13 @@ export default function FleetClient({ dataDariDatabase }: { dataDariDatabase: an
       left: finalCoord.left,
       color: shipColor,
       statusKargo: finalStatus,
-      isTrouble: isTrouble, // Flag ini yang menentukan masuk tab peringatan atau tidak
+      isTrouble: isTrouble, 
       resi: row.no_resi || "SWB-INTERNAL", 
       pengirim: row.nama_customer || "Data Tidak Tersedia",
       berat: `${row.berat_total || 0} KG`
     };
   });
 
-  // Ambil data yang BENAR-BENAR isTrouble (Dibatasi 2 dari logika di atas)
   const alertShips = dynamicShips.filter(s => s.isTrouble);
 
   // ================= INIT SHIPS =================
@@ -183,19 +178,16 @@ useEffect(() => {
   const interval = setInterval(() => {
     setDynamicShips(prevShips =>
       prevShips.map(ship => {
-        // kapal merah lebih lambat
         const moveAmount = ship.isTrouble ? 0.38: 0.55;
-
         let currentTop = parseFloat(ship.top);
         let currentLeft = parseFloat(ship.left);
 
-        // gerakan random natural
         currentTop += (Math.random() - 0.5) * moveAmount;
         currentLeft += (Math.random() - 0.5) * moveAmount;
 
-        // batas map
+        // PEMBATASAN AREA PETA (Batas Kiri diubah ke 32 agar kapal tidak masuk ke UI kiri)
         currentTop = Math.max(10, Math.min(85, currentTop));
-        currentLeft = Math.max(5, Math.min(90, currentLeft));
+        currentLeft = Math.max(32, Math.min(90, currentLeft));
 
         return {
           ...ship,
@@ -225,7 +217,7 @@ useEffect(() => {
     };
   });
 
-  // 3. EFFECT WAKTU JOGJA & DAFTAR PERINGATAN (Sudah tersinkronisasi)
+  // 3. EFFECT WAKTU JOGJA & DAFTAR PERINGATAN 
   useEffect(() => {
     const updateDateTime = () => {
         const now = new Date();
@@ -253,7 +245,7 @@ useEffect(() => {
     setPeringatanList(list);
 
     return () => clearInterval(timerId);
-  }, [dynamicShips]); // Dependensi dikembalikan normal
+  }, [dynamicShips]); 
 
   const handleTandaiSelesai = (id: string) => {
     setPeringatanList(prev => prev.filter(item => item.id !== id));
@@ -267,7 +259,7 @@ useEffect(() => {
       
       {/* ================= MODAL LOG ARMADA ================= */}
       {selectedLog && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md animate-in fade-in duration-300">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 backdrop-blur-md animate-in fade-in duration-300">
             <div className="bg-[#13131F] border border-[#1E1E2E] p-8 rounded-2xl w-full max-w-lg shadow-[0_0_50px_rgba(0,0,0,0.8)] animate-in zoom-in-95 slide-in-from-bottom-8 duration-500 ease-out">
                 <div className="flex justify-between items-center mb-6 border-b border-[#1E1E2E] pb-4">
                     <h3 className="text-lg font-bold text-white tracking-widest uppercase flex items-center gap-3">
@@ -301,7 +293,7 @@ useEffect(() => {
 
       {/* ================= MODAL INVESTIGASI TITIK MERAH ================= */}
       {showInvestigasi && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md animate-in fade-in duration-300">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 backdrop-blur-md animate-in fade-in duration-300">
             <div className="bg-[#13131F] border border-red-500/30 p-8 rounded-2xl w-full max-w-2xl shadow-[0_0_50px_rgba(239,68,68,0.1)] animate-in zoom-in-95 slide-in-from-bottom-8 duration-500 ease-out">
                 <div className="flex justify-between items-center mb-8 border-b border-[#1E1E2E] pb-4">
                     <h3 className="text-xl font-bold text-red-500 tracking-widest uppercase flex items-center gap-3">
@@ -330,10 +322,21 @@ useEffect(() => {
       )}
 
       {/* ================= NAVBAR & HEADER ================= */}
-      <nav className="border-b border-[#1E1E2E] flex justify-between items-center px-8 py-5 bg-[#0A0A12]/90 backdrop-blur-md sticky top-0 z-40">
-        <div className="flex items-center gap-4 group">
-          <span className="text-xl font-bold tracking-widest text-purple-400 uppercase drop-shadow-md group-hover:text-white transition-colors duration-500 cursor-pointer">Praketrio Radar</span>
+      <nav className="border-b border-[#1E1E2E] flex justify-between items-center px-8 py-5 bg-[#0A0A12]/90 backdrop-blur-md sticky top-0 z-50">
+        <div className="flex items-center gap-3 group cursor-pointer">
+          <div className="w-10 h-10 flex items-center justify-center transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6">
+            <Image 
+              src="/logo.png" 
+              alt="Praketrio Logo" 
+              width={40} 
+              height={40} 
+              className="object-contain drop-shadow-[0_0_10px_rgba(168,85,247,0.5)]"
+              priority 
+            />
+          </div>
+          <span className="text-xl font-bold tracking-widest text-white uppercase drop-shadow-md group-hover:text-[#C084FC] transition-colors duration-500">Praketrio Radar</span>
         </div>
+        
         <div className="flex items-center gap-4">
           <div className="flex flex-col items-end">
             <span className="text-sm font-bold text-white">Superintendent Dashboard</span>
@@ -381,8 +384,8 @@ useEffect(() => {
                 className="absolute inset-0 w-full h-full object-cover opacity-30 pointer-events-none transition-all duration-1000 group-hover:opacity-50 group-hover:scale-105"
               />
               
-              <div className="absolute top-6 left-6 space-y-4 z-10">
-                <div className="bg-[#0A0A12]/80 border border-[#1E1E2E] p-5 rounded-2xl backdrop-blur-md w-72 shadow-lg transition-all duration-300 hover:border-slate-700 hover:-translate-y-1">
+              <div className="absolute top-6 left-6 space-y-4 z-40 pointer-events-none">
+                <div className="bg-[#0A0A12]/80 border border-[#1E1E2E] p-5 rounded-2xl backdrop-blur-md w-72 shadow-lg transition-all duration-300 hover:border-slate-700 hover:-translate-y-1 pointer-events-auto">
                   <p className="text-[10px] text-[#C084FC] font-bold mb-4 tracking-widest uppercase">Status Satelit Navigasi</p>
                   <div className="flex justify-between items-end mb-3 border-b border-[#1E1E2E] pb-3">
                     <span className="text-xs text-[#A0A0B0] font-sans">Total Titik Terkoneksi</span>
@@ -391,7 +394,7 @@ useEffect(() => {
                 </div>
 
                 {peringatanList.length > 0 && (
-                  <div className="bg-[#13131F]/90 border border-red-500/40 p-5 rounded-2xl backdrop-blur-md w-72 shadow-lg transition-all duration-300 hover:border-red-500/80 hover:-translate-y-1 hover:shadow-[0_0_20px_rgba(239,68,68,0.15)] animate-in slide-in-from-left-4">
+                  <div className="bg-[#13131F]/90 border border-red-500/40 p-5 rounded-2xl backdrop-blur-md w-72 shadow-lg transition-all duration-300 hover:border-red-500/80 hover:-translate-y-1 hover:shadow-[0_0_20px_rgba(239,68,68,0.15)] animate-in slide-in-from-left-4 pointer-events-auto">
                     <p className="text-[10px] text-red-400 mb-3 tracking-widest font-bold flex items-center gap-2 uppercase">
                       <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" /> Peringatan Terdeteksi
                     </p>
@@ -424,7 +427,7 @@ useEffect(() => {
 
               {/* PANEL KANAN: DETAIL KAPAL (MUNCUL JIKA DIKLIK) */}
               {selectedShip && (
-                  <div className="absolute top-0 right-0 h-full w-[350px] bg-[#0A0A12]/95 border-l border-[#1E1E2E] backdrop-blur-xl p-8 shadow-2xl z-40 animate-in slide-in-from-right duration-500 flex flex-col overflow-y-auto">
+                  <div className="absolute top-0 right-0 h-full w-[350px] bg-[#0A0A12]/95 border-l border-[#1E1E2E] backdrop-blur-xl p-8 shadow-2xl z-50 animate-in slide-in-from-right duration-500 flex flex-col overflow-y-auto">
                       <div className="flex justify-between items-center mb-6 shrink-0">
                           <span className="bg-[#1E1E2E] text-[10px] px-3 py-1.5 rounded-md text-white font-sans tracking-widest border border-slate-700">{selectedShip.id}</span>
                           <button onClick={() => setSelectedShip(null)} className="text-[#6B6B80] hover:text-white hover:rotate-90 transition-all text-xl">✕</button>
@@ -472,7 +475,7 @@ useEffect(() => {
                   </div>
               )}
 
-              <div className="absolute bottom-6 right-6 bg-[#0A0A12]/90 border border-[#1E1E2E] p-5 rounded-2xl backdrop-blur-sm z-10 shadow-xl w-64 transition-all duration-500 hover:border-slate-700 hover:-translate-y-1">
+              <div className="absolute bottom-6 right-6 bg-[#0A0A12]/90 border border-[#1E1E2E] p-5 rounded-2xl backdrop-blur-sm z-40 shadow-xl w-64 transition-all duration-500 hover:border-slate-700 hover:-translate-y-1">
                   <p className="text-[11px] text-slate-400 font-bold mb-4 tracking-widest border-b border-[#1E1E2E] pb-2 uppercase">Keterangan Radar</p>
                   <div className="space-y-4 text-xs text-slate-300 font-sans">
                       <div className="flex items-center gap-3 group/leg"><div className="w-3 h-3 rounded-full bg-[#10B981] shadow-[0_0_10px_#10B981] transition-transform duration-300 group-hover/leg:scale-150"></div><span className="transition-colors group-hover/leg:text-white">Berlayar (Di Laut)</span></div>
@@ -736,4 +739,4 @@ useEffect(() => {
       </main>
     </div>
   );
-} 
+}

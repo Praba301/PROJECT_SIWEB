@@ -1,6 +1,13 @@
 import { Suspense } from "react";
 import { db } from "@/lib/db";
 import FleetClient from "./fleetclient"; 
+import type { Metadata } from "next";
+
+// Memenuhi syarat penugasan UAS: Menambahkan judul halaman menggunakan MetaData
+export const metadata: Metadata = {
+  title: "Radar Armada | Praketrio",
+  description: "Superintendent Dashboard untuk memantau pergerakan armada kapal Praketrio secara real-time.",
+};
 
 export default async function FleetSuperintendentDashboardPage() {
   let fleetRows = [];

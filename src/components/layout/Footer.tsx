@@ -30,14 +30,14 @@ export default function Footer() {
             <p className="text-[#A0A0B0] text-base leading-relaxed">
               Didirikan dengan misi menjembatani konektivitas antar pulau, Praketrio berkomitmen
               menghadirkan pengiriman yang lebih cepat, lebih aman, dan lebih transparan untuk
-              semua pelaku bisnis — dari skala UMKM hingga korporasi besar di seluruh Indonesia.
+              semua pelaku bisnis dari skala UMKM hingga korporasi besar di seluruh Indonesia.
             </p>
 
             {/* Kolom 3 */}
             <p className="text-[#A0A0B0] text-base leading-relaxed">
               Dengan armada lebih dari 150+ kapal dan
               jaringan yang menjangkau 34 kota tujuan, kami memastikan setiap paket tiba tepat waktu
-              dengan tingkat keberhasilan pengiriman 97.6% — karena kepercayaan Anda adalah
+              dengan tingkat keberhasilan pengiriman 97.6% karena kepercayaan Anda adalah
               prioritas utama kami.
             </p>
 

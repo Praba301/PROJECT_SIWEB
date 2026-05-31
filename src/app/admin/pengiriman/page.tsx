@@ -15,6 +15,8 @@ export default async function PengirimanPage(props: {
   let pengirimanRows = [];
   let totalPages = 1;
 
+  let queryClean = `%${query}%`;
+
   try {
     // Menghitung total data dengan 4 kriteria pencarian menggunakan LEFT JOIN agar sinkron
     const countResult = await db.query(`
@@ -26,12 +28,12 @@ export default async function PengirimanPage(props: {
          OR c.nama_customer ILIKE $1
          OR c.nama_penerima ILIKE $1
          OR dp.jenis_barang ILIKE $1
-    `, [`%${query}%`]);
+    `, [queryClean]);
     
     const totalItems = Number(countResult.rows[0]?.count || 0);
     totalPages = Math.ceil(totalItems / itemsPerPage) || 1; 
 
-    // Menampilkan data tabel dengan query LEFT JOIN agar nama_customer terbaca sempurna ke client
+    // MENAMPILKAN DATA DENGAN ID DESC AGAR DATA TERBARU MUNCUL DI HALAMAN 1 PALING ATAS
     const result = await db.query(`
       SELECT 
         tp.no_resi, 
@@ -46,9 +48,9 @@ export default async function PengirimanPage(props: {
          OR c.nama_customer ILIKE $1
          OR c.nama_penerima ILIKE $1
          OR dp.jenis_barang ILIKE $1
-      ORDER BY tp.id ASC
+      ORDER BY tp.id DESC
       LIMIT $2 OFFSET $3
-    `, [`%${query}%`, itemsPerPage, offset]);
+    `, [queryClean, itemsPerPage, offset]);
     
     pengirimanRows = result.rows;
 

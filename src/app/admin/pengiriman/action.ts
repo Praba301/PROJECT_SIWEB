@@ -40,6 +40,7 @@ export async function hapusResiDatabase(resi: string) {
 
     revalidatePath("/admin/pengiriman");
     revalidatePath("/admin/dashboard");
+    revalidatePath("/admin/armada"); // Sinkronisasi otomatis halaman armada setelah hapus
 
     return { success: true };
   } catch (error) {
@@ -97,6 +98,7 @@ export async function editResiDatabase(
 
     revalidatePath("/admin/pengiriman");
     revalidatePath("/admin/dashboard");
+    revalidatePath("/admin/armada"); // Sinkronisasi otomatis halaman armada setelah edit
 
     return { success: true };
   } catch (error) {
@@ -179,6 +181,7 @@ export async function tambahResiDatabase(formData: FormData) {
 
     revalidatePath("/admin/pengiriman");
     revalidatePath("/admin/dashboard");
+    revalidatePath("/admin/armada"); // MEMBERSIHKAN CACHE HALAMAN ARMADA AGAR KAPAL BARU LANGSUNG SINKRON INSTAN
 
     return { success: true };
   } catch (error) {
