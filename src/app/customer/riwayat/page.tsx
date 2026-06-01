@@ -1,7 +1,7 @@
 "use client";
 
 import { Poppins } from "next/font/google";
-import CustomerSidebar from "@/components/layout/CustomerSidebar";
+import CustomerNavbar from "@/components/layout/CustomerNavbar";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -73,8 +73,11 @@ const statusConfig = (status: string) => {
 
 export default function RiwayatPage() {
   return (
-    <div className={`${poppins.className} flex min-h-screen bg-[#0A0A12] relative overflow-hidden`}>
-      <CustomerSidebar />
+    // Tambahkan flex-col di sini
+    <div className={`${poppins.className} flex flex-col min-h-screen bg-[#0A0A12] relative overflow-hidden`}>
+      
+      {/* Panggil Navbar di paling atas */}
+      <CustomerNavbar />
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col relative z-10">
@@ -82,24 +85,8 @@ export default function RiwayatPage() {
         {/* Background Glow */}
         <div className="absolute top-1/2 -left-32 w-96 h-96 bg-[#A855F7]/10 blur-[150px] rounded-full pointer-events-none" />
 
-        {/* Header - Masuk dari bawah */}
-        <header className="flex items-center justify-between px-10 py-6 border-b border-[#1E1E2E] bg-[#0A0A12]/80 backdrop-blur-md sticky top-0 z-20 opacity-0 animate-fade-in-up" style={{ animationDelay: "0.1s" }}>
-          <span className="text-[#A855F7] font-bold text-lg tracking-widest uppercase font-mono">
-            Praketrio
-          </span>
-          <div className="flex items-center gap-3 group cursor-pointer">
-            <div className="flex flex-col items-end">
-              <span className="text-white font-bold text-sm transition-colors group-hover:text-[#C084FC]">Praba</span>
-              <span className="text-[#6B6B80] text-xs">Customer</span>
-            </div>
-            <div className="w-10 h-10 rounded-full bg-[#1E1E2E] border border-[#A855F7]/40 flex items-center justify-center text-[#A855F7] text-sm font-bold shadow-[0_0_10px_rgba(168,85,247,0.2)] transition-transform duration-300 group-hover:scale-110">
-              P
-            </div>
-          </div>
-        </header>
-
         {/* Content */}
-        <main className="flex-1 px-10 py-10 overflow-y-auto">
+        <main className="flex-1 px-10 py-12 overflow-y-auto">
 
           {/* Title */}
           <div className="text-center mb-10 opacity-0 animate-fade-in-up" style={{ animationDelay: "0.2s" }}>

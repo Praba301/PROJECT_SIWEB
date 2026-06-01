@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Poppins } from "next/font/google";
-import CustomerSidebar from "@/components/layout/CustomerSidebar";
+import CustomerNavbar from "@/components/layout/CustomerNavbar";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -20,10 +20,26 @@ export default function CustomerDashboard() {
     catatan: "",
   });
 
+  // State baru untuk menyimpan pesan error masing-masing field
+  const [errors, setErrors] = useState({
+    namaPengirim: "",
+    namaPenerima: "",
+    kotaAsal: "",
+    kotaTujuan: "",
+    berat: "",
+    jenisBarang: "",
+  });
+
   const [showModal, setShowModal] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: value });
+    
+    // Hilangkan pesan error secara realtime saat user mulai mengetik
+    if (errors[name as keyof typeof errors]) {
+      setErrors({ ...errors, [name]: "" });
+    }
   };
 
   const handleReset = () => {
@@ -36,31 +52,75 @@ export default function CustomerDashboard() {
       jenisBarang: "",
       catatan: "",
     });
+    setErrors({
+      namaPengirim: "",
+      namaPenerima: "",
+      kotaAsal: "",
+      kotaTujuan: "",
+      berat: "",
+      jenisBarang: "",
+    });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    let isValid = true;
+    let newErrors = { ...errors };
+
+    // Logika Validasi Custom
+    if (!form.namaPengirim.trim()) {
+      newErrors.namaPengirim = "Nama pengirim wajib diisi.";
+      isValid = false;
+    }
+    if (!form.namaPenerima.trim()) {
+      newErrors.namaPenerima = "Nama penerima wajib diisi.";
+      isValid = false;
+    }
+    if (!form.kotaAsal.trim()) {
+      newErrors.kotaAsal = "Kota asal keberangkatan wajib diisi.";
+      isValid = false;
+    }
+    if (!form.kotaTujuan.trim()) {
+      newErrors.kotaTujuan = "Kota tujuan pengiriman wajib diisi.";
+      isValid = false;
+    }
+    if (!form.berat || parseFloat(form.berat) <= 0) {
+      newErrors.berat = "Berat barang harus diisi dengan angka yang valid.";
+      isValid = false;
+    }
+    if (!form.jenisBarang.trim()) {
+      newErrors.jenisBarang = "Jenis barang wajib diisi.";
+      isValid = false;
+    }
+
+    // Jika tidak valid, set error dan hentikan pengiriman form
+    if (!isValid) {
+      setErrors(newErrors);
+      return;
+    }
+
+    // Jika valid, tampilkan modal sukses dan reset form
     setShowModal(true);
     handleReset();
   };
 
   return (
-    <div className={`${poppins.className} flex min-h-screen bg-[#0A0A12] relative overflow-hidden`}>
-      <CustomerSidebar />
+    <div className={`${poppins.className} flex flex-col min-h-screen bg-[#0A0A12] relative overflow-hidden`}>
+      
+      <CustomerNavbar />
 
-      {/* Custom Modal - Animasi Zoom In Membal */}
+      {/* Custom Modal Sukses */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm transition-all duration-300">
           <div className="bg-[#13131F] border border-[#A855F7]/50 rounded-2xl p-8 max-w-sm w-full mx-4 shadow-[0_0_40px_rgba(168,85,247,0.3)] flex flex-col items-center gap-5 opacity-0 animate-zoom-in">
 
-            {/* Icon dengan efek Pulse Glow */}
             <div className="w-16 h-16 rounded-full bg-[#A855F7]/10 border border-[#A855F7]/40 flex items-center justify-center shadow-[0_0_20px_rgba(168,85,247,0.3)] animate-pulse-glow">
               <svg className="w-8 h-8 text-[#C084FC]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
               </svg>
             </div>
 
-            {/* Text */}
             <div className="text-center flex flex-col gap-2">
               <h2 className="text-white font-bold text-xl">Paket Terdaftar!</h2>
               <p className="text-[#A0A0B0] text-sm leading-relaxed">
@@ -68,7 +128,6 @@ export default function CustomerDashboard() {
               </p>
             </div>
 
-            {/* Button */}
             <button
               onClick={() => setShowModal(false)}
               className="w-full bg-[#A855F7] hover:bg-[#9333EA] text-white font-bold py-3.5 rounded-xl text-sm transition-all duration-300 shadow-[0_0_15px_rgba(168,85,247,0.4)] hover:shadow-[0_0_25px_rgba(168,85,247,0.6)] active:scale-95"
@@ -85,24 +144,7 @@ export default function CustomerDashboard() {
         {/* Background Glow */}
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#A855F7]/5 blur-[150px] rounded-full pointer-events-none" />
 
-        {/* Header - Masuk dari bawah */}
-        <header className="flex items-center justify-between px-10 py-6 border-b border-[#1E1E2E] bg-[#0A0A12]/80 backdrop-blur-md sticky top-0 z-20 opacity-0 animate-fade-in-up" style={{ animationDelay: "0.1s" }}>
-          <span className="text-[#A855F7] font-bold text-lg tracking-widest uppercase font-mono">
-            Dashboard
-          </span>
-          <div className="flex items-center gap-3 group cursor-pointer">
-            <div className="flex flex-col items-end">
-              <span className="text-white font-bold text-sm transition-colors group-hover:text-[#C084FC]">Praba</span>
-              <span className="text-[#6B6B80] text-xs">Customer</span>
-            </div>
-            <div className="w-10 h-10 rounded-full bg-[#1E1E2E] border border-[#A855F7]/40 flex items-center justify-center text-[#A855F7] text-sm font-bold shadow-[0_0_10px_rgba(168,85,247,0.2)] transition-transform duration-300 group-hover:scale-110">
-              P
-            </div>
-          </div>
-        </header>
-
-        {/* Content */}
-        <main className="flex-1 px-10 py-10 overflow-y-auto">
+        <main className="flex-1 px-10 py-12 overflow-y-auto">
 
           {/* Title */}
           <div className="text-center mb-10 opacity-0 animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
@@ -115,13 +157,13 @@ export default function CustomerDashboard() {
             <div className="w-12 h-1.5 bg-gradient-to-r from-[#A855F7] to-[#C084FC] mx-auto mt-4 rounded-full" />
           </div>
 
-          {/* Form Card - Animasi Membal */}
+          {/* Form Card - Tambahkan noValidate agar popup browser hilang */}
           <form
             onSubmit={handleSubmit}
+            noValidate 
             className="bg-[#13131F] border border-[#1E1E2E] rounded-2xl p-8 md:p-10 max-w-3xl mx-auto shadow-2xl opacity-0 animate-zoom-in relative"
             style={{ animationDelay: "0.3s" }}
           >
-            {/* Dekorasi Sudut Form */}
             <div className="absolute top-0 left-0 w-24 h-24 bg-gradient-to-br from-[#A855F7]/10 to-transparent rounded-tl-2xl pointer-events-none" />
 
             <div className="relative z-10">
@@ -135,10 +177,15 @@ export default function CustomerDashboard() {
                     value={form.namaPengirim}
                     onChange={handleChange}
                     placeholder="Masukkan nama pengirim"
-                    required
-                    className="bg-[#0A0A12] border border-[#1E1E2E] rounded-xl px-4 py-3.5 text-white text-sm placeholder:text-[#6B6B80] focus:outline-none focus:border-[#A855F7] focus:ring-1 focus:ring-[#A855F7] focus:shadow-[0_0_15px_rgba(168,85,247,0.15)] transition-all duration-300 hover:border-[#A855F7]/50"
+                    className={`bg-[#0A0A12] border rounded-xl px-4 py-3.5 text-white text-sm placeholder:text-[#6B6B80] focus:outline-none focus:ring-1 transition-all duration-300 ${
+                      errors.namaPengirim 
+                        ? "border-red-500 focus:border-red-500 focus:ring-red-500/50" 
+                        : "border-[#1E1E2E] focus:border-[#A855F7] focus:ring-[#A855F7] hover:border-[#A855F7]/50"
+                    }`}
                   />
+                  {errors.namaPengirim && <span className="text-red-400 text-[10px] italic animate-fade-in-up mt-1">{errors.namaPengirim}</span>}
                 </div>
+                
                 <div className="flex flex-col gap-2.5">
                   <label className="text-[#C084FC] text-[11px] font-bold uppercase tracking-widest">Nama Penerima</label>
                   <input
@@ -147,9 +194,13 @@ export default function CustomerDashboard() {
                     value={form.namaPenerima}
                     onChange={handleChange}
                     placeholder="Masukkan nama penerima"
-                    required
-                    className="bg-[#0A0A12] border border-[#1E1E2E] rounded-xl px-4 py-3.5 text-white text-sm placeholder:text-[#6B6B80] focus:outline-none focus:border-[#A855F7] focus:ring-1 focus:ring-[#A855F7] focus:shadow-[0_0_15px_rgba(168,85,247,0.15)] transition-all duration-300 hover:border-[#A855F7]/50"
+                    className={`bg-[#0A0A12] border rounded-xl px-4 py-3.5 text-white text-sm placeholder:text-[#6B6B80] focus:outline-none focus:ring-1 transition-all duration-300 ${
+                      errors.namaPenerima 
+                        ? "border-red-500 focus:border-red-500 focus:ring-red-500/50" 
+                        : "border-[#1E1E2E] focus:border-[#A855F7] focus:ring-[#A855F7] hover:border-[#A855F7]/50"
+                    }`}
                   />
+                  {errors.namaPenerima && <span className="text-red-400 text-[10px] italic animate-fade-in-up mt-1">{errors.namaPenerima}</span>}
                 </div>
               </div>
 
@@ -163,10 +214,15 @@ export default function CustomerDashboard() {
                     value={form.kotaAsal}
                     onChange={handleChange}
                     placeholder="Masukkan kota asal"
-                    required
-                    className="bg-[#0A0A12] border border-[#1E1E2E] rounded-xl px-4 py-3.5 text-white text-sm placeholder:text-[#6B6B80] focus:outline-none focus:border-[#A855F7] focus:ring-1 focus:ring-[#A855F7] focus:shadow-[0_0_15px_rgba(168,85,247,0.15)] transition-all duration-300 hover:border-[#A855F7]/50"
+                    className={`bg-[#0A0A12] border rounded-xl px-4 py-3.5 text-white text-sm placeholder:text-[#6B6B80] focus:outline-none focus:ring-1 transition-all duration-300 ${
+                      errors.kotaAsal 
+                        ? "border-red-500 focus:border-red-500 focus:ring-red-500/50" 
+                        : "border-[#1E1E2E] focus:border-[#A855F7] focus:ring-[#A855F7] hover:border-[#A855F7]/50"
+                    }`}
                   />
+                  {errors.kotaAsal && <span className="text-red-400 text-[10px] italic animate-fade-in-up mt-1">{errors.kotaAsal}</span>}
                 </div>
+                
                 <div className="flex flex-col gap-2.5">
                   <label className="text-[#C084FC] text-[11px] font-bold uppercase tracking-widest">Kota Tujuan</label>
                   <input
@@ -175,9 +231,13 @@ export default function CustomerDashboard() {
                     value={form.kotaTujuan}
                     onChange={handleChange}
                     placeholder="Masukkan kota tujuan"
-                    required
-                    className="bg-[#0A0A12] border border-[#1E1E2E] rounded-xl px-4 py-3.5 text-white text-sm placeholder:text-[#6B6B80] focus:outline-none focus:border-[#A855F7] focus:ring-1 focus:ring-[#A855F7] focus:shadow-[0_0_15px_rgba(168,85,247,0.15)] transition-all duration-300 hover:border-[#A855F7]/50"
+                    className={`bg-[#0A0A12] border rounded-xl px-4 py-3.5 text-white text-sm placeholder:text-[#6B6B80] focus:outline-none focus:ring-1 transition-all duration-300 ${
+                      errors.kotaTujuan 
+                        ? "border-red-500 focus:border-red-500 focus:ring-red-500/50" 
+                        : "border-[#1E1E2E] focus:border-[#A855F7] focus:ring-[#A855F7] hover:border-[#A855F7]/50"
+                    }`}
                   />
+                  {errors.kotaTujuan && <span className="text-red-400 text-[10px] italic animate-fade-in-up mt-1">{errors.kotaTujuan}</span>}
                 </div>
               </div>
 
@@ -191,10 +251,15 @@ export default function CustomerDashboard() {
                     value={form.berat}
                     onChange={handleChange}
                     placeholder="Contoh: 150"
-                    required
-                    className="bg-[#0A0A12] border border-[#1E1E2E] rounded-xl px-4 py-3.5 text-white text-sm placeholder:text-[#6B6B80] focus:outline-none focus:border-[#A855F7] focus:ring-1 focus:ring-[#A855F7] focus:shadow-[0_0_15px_rgba(168,85,247,0.15)] transition-all duration-300 hover:border-[#A855F7]/50 font-mono"
+                    className={`bg-[#0A0A12] border rounded-xl px-4 py-3.5 text-white text-sm placeholder:text-[#6B6B80] focus:outline-none focus:ring-1 transition-all duration-300 font-mono ${
+                      errors.berat 
+                        ? "border-red-500 focus:border-red-500 focus:ring-red-500/50" 
+                        : "border-[#1E1E2E] focus:border-[#A855F7] focus:ring-[#A855F7] hover:border-[#A855F7]/50"
+                    }`}
                   />
+                  {errors.berat && <span className="text-red-400 text-[10px] italic animate-fade-in-up mt-1">{errors.berat}</span>}
                 </div>
+                
                 <div className="flex flex-col gap-2.5">
                   <label className="text-[#C084FC] text-[11px] font-bold uppercase tracking-widest">Jenis Barang</label>
                   <input
@@ -203,13 +268,17 @@ export default function CustomerDashboard() {
                     value={form.jenisBarang}
                     onChange={handleChange}
                     placeholder="Contoh: Elektronik / Garment"
-                    required
-                    className="bg-[#0A0A12] border border-[#1E1E2E] rounded-xl px-4 py-3.5 text-white text-sm placeholder:text-[#6B6B80] focus:outline-none focus:border-[#A855F7] focus:ring-1 focus:ring-[#A855F7] focus:shadow-[0_0_15px_rgba(168,85,247,0.15)] transition-all duration-300 hover:border-[#A855F7]/50"
+                    className={`bg-[#0A0A12] border rounded-xl px-4 py-3.5 text-white text-sm placeholder:text-[#6B6B80] focus:outline-none focus:ring-1 transition-all duration-300 ${
+                      errors.jenisBarang 
+                        ? "border-red-500 focus:border-red-500 focus:ring-red-500/50" 
+                        : "border-[#1E1E2E] focus:border-[#A855F7] focus:ring-[#A855F7] hover:border-[#A855F7]/50"
+                    }`}
                   />
+                  {errors.jenisBarang && <span className="text-red-400 text-[10px] italic animate-fade-in-up mt-1">{errors.jenisBarang}</span>}
                 </div>
               </div>
 
-              {/* Row 4 */}
+              {/* Row 4 (Catatan Tambahan - Tidak Perlu Validasi) */}
               <div className="flex flex-col gap-2.5 mb-10">
                 <label className="text-[#C084FC] text-[11px] font-bold uppercase tracking-widest flex items-center gap-2">
                   Catatan Tambahan <span className="text-[#6B6B80] normal-case tracking-normal font-normal bg-[#1E1E2E] px-2 py-0.5 rounded-full text-[10px]">Opsional</span>
