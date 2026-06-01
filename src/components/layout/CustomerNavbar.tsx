@@ -24,7 +24,10 @@ export default function CustomerNavbar() {
           <div className="w-8 h-8 flex items-center justify-center transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6">
             <Image src="/logo.png" alt="Praketrio" width={32} height={32} className="object-contain drop-shadow-[0_0_10px_rgba(168,85,247,0.5)]" />
           </div>
-          <span className="text-white font-bold text-lg font-mono tracking-wider transition-colors duration-300 group-hover:text-[#C084FC]">Praketrio</span>
+          {/* BAGIAN INI YANG DIUBAH AGAR SERAGAM DENGAN FLEET & ADMIN */}
+          <span className="text-xl font-bold tracking-widest text-white uppercase drop-shadow-md transition-colors duration-500 group-hover:text-[#C084FC]">
+            Praketrio
+          </span>
         </Link>
 
         {/* Navigasi Horizontal */}

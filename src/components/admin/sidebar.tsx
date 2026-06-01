@@ -32,7 +32,8 @@ export default function Sidebar() {
             priority 
           />
         </div>
-        <h1 className="hidden md:block text-white font-bold text-xl tracking-wider font-mono transition-colors duration-300 group-hover:text-[#C084FC]">
+        {/* BAGIAN INI YANG DIUBAH AGAR SERAGAM DENGAN FLEET & CUSTOMER */}
+        <h1 className="hidden md:block text-xl font-bold tracking-widest text-white uppercase drop-shadow-md transition-colors duration-500 group-hover:text-[#C084FC]">
           Praketrio
         </h1>
       </div>
