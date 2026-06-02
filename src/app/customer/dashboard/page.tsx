@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Poppins } from "next/font/google";
 import CustomerNavbar from "@/components/layout/CustomerNavbar";
 
+
 const poppins = Poppins({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],

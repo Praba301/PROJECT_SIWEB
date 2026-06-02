@@ -1,3 +1,9 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Analitik | Praketrio",
+};
+
 export default function AnalitikPage() {
   const dataLaporan = [
     { bulan: "Januari 2026", total: 45, terkirim: 45, onTime: "91%", onTimeColor: "text-[#22C55E] bg-[#22C55E]/10 border border-[#22C55E]/20", muatan: "4.281 Kg" },

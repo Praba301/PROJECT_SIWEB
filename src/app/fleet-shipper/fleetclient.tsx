@@ -83,6 +83,17 @@ export default function FleetClient({ dataDariDatabase }: { dataDariDatabase: an
   const [dynamicShips, setDynamicShips] = useState<any[]>([]);
 
   useEffect(() => {
+    const titles: Record<string, string> = {
+      'peta': 'Radar Armada | Praketrio',
+      'armada': 'Data Armada | Praketrio',
+      'analisis': 'Analisis | Praketrio',
+      'peringatan': 'Pusat Peringatan | Praketrio'
+    };
+    
+    document.title = titles[activeTab] || 'Fleet Shipper | Praketrio';
+  }, [activeTab]);
+
+  useEffect(() => {
     setPageLoaded(true);
   }, []);
 

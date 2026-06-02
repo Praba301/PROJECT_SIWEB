@@ -1,6 +1,11 @@
 import { Suspense } from "react";
 import PengirimanClient from "./PengirimanClient";
 import { db } from "@/lib/db"; 
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Pengiriman | Praketrio",
+};
 
 export default async function PengirimanPage(props: {
   searchParams?: Promise<{ query?: string; page?: string }>;
