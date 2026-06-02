@@ -279,76 +279,89 @@ export default function PengirimanClient({
         </div>
 
         <div className={`transition-opacity duration-200 ${isPending ? "opacity-40" : "opacity-100"}`}>
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-slate-300 whitespace-nowrap">
-              <thead>
-                <tr className="border-b border-[#1E1E2E] text-[#6B6B80] uppercase text-xs font-semibold tracking-wider">
-                  <th className="pb-4 px-4">Nomor Resi</th>
-                  <th className="pb-4 px-4">Nama Pengirim</th>
-                  <th className="pb-4 px-4">Total Berat</th>
-                  <th className="pb-4 px-4">Est. Tiba (ETA)</th>
-                  <th className="pb-4 px-4 text-center">Status</th>
-                  <th className="pb-4 px-4 text-center">Aksi</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.map((item, idx) => (
-                  <tr key={idx} className="border-b border-[#1E1E2E]/50 hover:bg-[#1A1A24] transition-all duration-200 group">
-                    <td className="p-4 font-sans font-bold text-[#C084FC]">{item.resi}</td>
-                    <td className="p-4 text-slate-200">
-                      <div className="flex items-center gap-2">
-                        <span className="w-6 h-6 rounded-md bg-[#1E1E2E] flex items-center justify-center text-[10px]">🏢</span>
-                        {item.pengirim}
-                      </div>
-                    </td>
-                    <td className="p-4 text-slate-400 font-sans">{item.beratTampil}</td>
-                    <td className="p-4 text-slate-400 font-medium">{item.eta}</td>
-                    <td className="p-4 text-center">
-                      <span className={`px-3 py-1 rounded-md text-[11px] font-bold tracking-wide ${item.badge}`}>{item.status}</span>
-                    </td>
-                    <td className="p-4">
-                      <div className="flex justify-center items-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-200 transform translate-x-2 group-hover:translate-x-0">
-                        <button onClick={() => setDataEdit(item)} className="p-1.5 rounded-lg text-slate-400 hover:text-[#60A5FA] hover:bg-[#60A5FA]/10 transition-colors">
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                        </button>
-                        <button onClick={() => setResiDihapus(item.resi)} className="p-1.5 rounded-lg text-slate-400 hover:text-[#EF4444] hover:bg-[#EF4444]/10 transition-colors">
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                        </button>
-                      </div>
-                    </td>
+          {/* LOGIKA PENAMBAHAN: JIKA DATA KOSONG TAMPILKAN INFO NOT FOUND */}
+          {data.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 text-center border border-dashed border-[#1E1E2E] rounded-xl bg-[#0A0A12]/50">
+              <div className="w-16 h-16 rounded-full bg-[#1A1A24] flex items-center justify-center mb-4">
+                <svg className="w-8 h-8 text-[#6B6B80]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              </div>
+              <h3 className="text-white font-bold text-lg mb-1">Data Tidak Ditemukan</h3>
+              <p className="text-[#A0A0B0] text-sm max-w-sm">Maaf, kami tidak menemukan manifes atau nomor resi yang sesuai dengan pencarian <span className="text-[#C084FC] font-semibold font-sans">"{searchParams.get("query")}"</span>.</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm text-slate-300 whitespace-nowrap">
+                <thead>
+                  <tr className="border-b border-[#1E1E2E] text-[#6B6B80] uppercase text-xs font-semibold tracking-wider">
+                    <th className="pb-4 px-4">Nomor Resi</th>
+                    <th className="pb-4 px-4">Nama Pengirim</th>
+                    <th className="pb-4 px-4">Total Berat</th>
+                    <th className="pb-4 px-4">Est. Tiba (ETA)</th>
+                    <th className="pb-4 px-4 text-center">Status</th>
+                    <th className="pb-4 px-4 text-center">Aksi</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {data.map((item, idx) => (
+                    <tr key={idx} className="border-b border-[#1E1E2E]/50 hover:bg-[#1A1A24] transition-all duration-200 group">
+                      <td className="p-4 font-sans font-bold text-[#C084FC]">{item.resi}</td>
+                      <td className="p-4 text-slate-200">
+                        <div className="flex items-center gap-2">
+                          <span className="w-6 h-6 rounded-md bg-[#1E1E2E] flex items-center justify-center text-[10px]">🏢</span>
+                          {item.pengirim}
+                        </div>
+                      </td>
+                      <td className="p-4 text-slate-400 font-sans">{item.beratTampil}</td>
+                      <td className="p-4 text-slate-400 font-medium">{item.eta}</td>
+                      <td className="p-4 text-center">
+                        <span className={`px-3 py-1 rounded-md text-[11px] font-bold tracking-wide ${item.badge}`}>{item.status}</span>
+                      </td>
+                      <td className="p-4">
+                        <div className="flex justify-center items-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-200 transform translate-x-2 group-hover:translate-x-0">
+                          <button onClick={() => setDataEdit(item)} className="p-1.5 rounded-lg text-slate-400 hover:text-[#60A5FA] hover:bg-[#60A5FA]/10 transition-colors">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                          </button>
+                          <button onClick={() => setResiDihapus(item.resi)} className="p-1.5 rounded-lg text-slate-400 hover:text-[#EF4444] hover:bg-[#EF4444]/10 transition-colors">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
 
-        {/* CONTROLS PAGINATION PANEL */}
-        <div className="flex justify-between items-center mt-8 pt-6 border-t border-[#1E1E2E]">
-          <button disabled={currentPage <= 1} onClick={() => goToPage(currentPage - 1)} className="flex items-center gap-1.5 px-4 py-2 text-sm text-[#A0A0B0] bg-[#1A1A24] rounded-xl border border-[#1E1E2E] hover:text-white transition-all disabled:opacity-30">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"></path></svg> Sebelumnya
-          </button>
-          <div className="flex items-center gap-1.5">
-            {generatePagination().map((page, idx) => (
-              page === "..." ? (
-                <span key={idx} className="px-3 py-1 text-slate-600">...</span>
-              ) : (
-                <button
-                  key={idx}
-                  onClick={() => goToPage(Number(page))}
-                  className={`w-9 h-9 rounded-xl text-xs font-bold transition-all ${
-                    currentPage === page ? "bg-[#A855F7] text-white shadow-[0_0_10px_rgba(168,85,247,0.4)]" : "bg-[#1A1A24] text-slate-400 border border-[#1E1E2E] hover:bg-[#252535] hover:text-white"
-                  }`}
-                >
-                  {page}
-                </button>
-              )
-            ))}
+        {/* CONTROLS PAGINATION PANEL - SEMBUNYIKAN JIKA DATA KOSONG */}
+        {data.length > 0 && (
+          <div className="flex justify-between items-center mt-8 pt-6 border-t border-[#1E1E2E]">
+            <button disabled={currentPage <= 1} onClick={() => goToPage(currentPage - 1)} className="flex items-center gap-1.5 px-4 py-2 text-sm text-[#A0A0B0] bg-[#1A1A24] rounded-xl border border-[#1E1E2E] hover:text-white transition-all disabled:opacity-30">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"></path></svg> Sebelumnya
+            </button>
+            <div className="flex items-center gap-1.5">
+              {generatePagination().map((page, idx) => (
+                page === "..." ? (
+                  <span key={idx} className="px-3 py-1 text-slate-600">...</span>
+                ) : (
+                  <button
+                    key={idx}
+                    onClick={() => goToPage(Number(page))}
+                    className={`w-9 h-9 rounded-xl text-xs font-bold transition-all ${
+                      currentPage === page ? "bg-[#A855F7] text-white shadow-[0_0_10px_rgba(168,85,247,0.4)]" : "bg-[#1A1A24] text-slate-400 border border-[#1E1E2E] hover:bg-[#252535] hover:text-white"
+                    }`}
+                  >
+                    {page}
+                  </button>
+                )
+              ))}
+            </div>
+            <button disabled={currentPage >= totalPages} onClick={() => goToPage(currentPage + 1)} className="flex items-center gap-1.5 px-4 py-2 text-sm text-[#A0A0B0] bg-[#1A1A24] rounded-xl border border-[#1E1E2E] hover:text-white transition-all disabled:opacity-30">
+              Selanjutnya <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path></svg>
+            </button>
           </div>
-          <button disabled={currentPage >= totalPages} onClick={() => goToPage(currentPage + 1)} className="flex items-center gap-1.5 px-4 py-2 text-sm text-[#A0A0B0] bg-[#1A1A24] rounded-xl border border-[#1E1E2E] hover:text-white transition-all disabled:opacity-30">
-            Selanjutnya <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path></svg>
-          </button>
-        </div>
+        )}
       </div>
 
       {/* MODAL CONFIRM DELETE */}
