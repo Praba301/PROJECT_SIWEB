@@ -64,12 +64,18 @@ export default function LoginPage() {
     formData.set("email", email);
     formData.set("password", password);
 
-    const result = await loginAction(formData);
+    // PENAMBAHAN: Dibungkus try-catch agar jika server action putus koneksi, web tidak error
+    try {
+      const result = await loginAction(formData);
 
-    setLoginLoading(false);
-
-    if (result?.error) {
-      showToast(result.error, true);
+      if (result?.error) {
+        showToast(result.error, true);
+      }
+    } catch (error) {
+      console.error("Gagal memanggil fungsi server:", error);
+      showToast("Koneksi ke database terputus. Pastikan file .env sudah benar.", true);
+    } finally {
+      setLoginLoading(false);
     }
   };
 
@@ -100,16 +106,22 @@ export default function LoginPage() {
     formData.set("email", regEmail);
     formData.set("password", regPass);
 
-    const result = await registerAction(formData);
+    // PENAMBAHAN: Dibungkus try-catch agar jika server action putus koneksi, web tidak error
+    try {
+      const result = await registerAction(formData);
 
-    setRegisterLoading(false);
-
-    if (result?.error) {
-      showToast(result.error, true);
-    } else {
-      showToast(`Registrasi berhasil! Halo ${regNama}, silakan masuk.`);
-      setRegNama(""); setRegEmail(""); setRegPass(""); setRegConfirmPass("");
-      setTimeout(() => setIsLogin(true), 3000);
+      if (result?.error) {
+        showToast(result.error, true);
+      } else {
+        showToast(`Registrasi berhasil! Halo ${regNama}, silakan masuk.`);
+        setRegNama(""); setRegEmail(""); setRegPass(""); setRegConfirmPass("");
+        setTimeout(() => setIsLogin(true), 3000);
+      }
+    } catch (error) {
+      console.error("Gagal memanggil fungsi server:", error);
+      showToast("Gagal menyimpan data. Pastikan Vercel berhasil membaca .env.", true);
+    } finally {
+      setRegisterLoading(false);
     }
   };
 

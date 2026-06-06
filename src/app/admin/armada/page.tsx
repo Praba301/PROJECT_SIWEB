@@ -2,17 +2,16 @@ import { Suspense } from "react";
 import ArmadaClient from "./ArmadaClient";
 import { db } from "@/lib/db"; 
 
-
 export const metadata = {
   title: "Data Armada | Praketrio",
 };
 
 export default async function ArmadaPage() {
-  let kapalRows = [];
+  // Perbaikan: Memberikan tipe data 'any[]' agar TypeScript tidak komplain
+  let kapalRows: any[] = [];
   
   try {
-    // Menarik seluruh data kapal dari tabel kapal_pengiriman yang aktif (Sinkron dengan input resi)
-    // Di-JOIN dengan tabel transaksi dan detail agar data rute & kargo muncul di detail panel
+    // Menarik seluruh data kapal dari tabel kapal_pengiriman yang aktif
     const result = await db.query(`
       SELECT 
         kp.id,
@@ -38,7 +37,11 @@ export default async function ArmadaPage() {
   }
 
   return (
-    <Suspense fallback={<div className="text-white p-8 font-bold animate-pulse text-[#C084FC]">Memuat Data Armada Kapal...</div>}>
+    <Suspense fallback={
+      <div className="flex items-center justify-center h-screen text-white p-8 font-bold animate-pulse text-[#C084FC]">
+        Memuat Data Armada Kapal...
+      </div>
+    }>
       <ArmadaClient dataDariDatabase={kapalRows} />
     </Suspense>
   );

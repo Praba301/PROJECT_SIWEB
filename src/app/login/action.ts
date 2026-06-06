@@ -6,7 +6,9 @@ import { SignJWT } from "jose";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-const SECRET = new TextEncoder().encode(process.env.JWT_SECRET!);
+// PENAMBAHAN: Memberikan nilai rahasia default jika .env gagal terbaca
+const jwtSecret = process.env.JWT_SECRET || "kunci_rahasia_praketrio_sangat_aman_12345";
+const SECRET = new TextEncoder().encode(jwtSecret);
 
 export async function loginAction(formData: FormData) {
   const email = (formData.get("email") as string).trim().toLowerCase();
@@ -56,13 +58,15 @@ export async function loginAction(formData: FormData) {
       path: "/",
     });
 
+    // Menangani perbedaan penulisan strip/underscore pada role fleet shipper
     if (user.role === "admin") redirectPath = "/admin/dashboard";
-    else if (user.role === "fleet_shipper") redirectPath = "/fleet-shipper";
+    else if (user.role === "fleet_shipper" || user.role === "fleet-shipper") redirectPath = "/fleet-shipper";
     else redirectPath = "/customer/dashboard";
 
-  } catch (err) {
+  } catch (err: any) {
     console.error("LOGIN ERROR:", err);
-    return { error: "Terjadi kesalahan server, coba lagi." };
+    // TAMPILKAN ERROR ASLI KE WEB AGAR KITA TAHU KENAPA
+    return { error: `Sistem Error: ${err.message || "Gagal menghubungi database Neon."}` };
   }
 
   redirect(redirectPath);
@@ -97,8 +101,8 @@ export async function registerAction(formData: FormData) {
 
     return { success: true };
 
-  } catch (err) {
+  } catch (err: any) {
     console.error("REGISTER ERROR:", err);
-    return { error: "Terjadi kesalahan server, coba lagi." };
+    return { error: `Sistem Error: ${err.message || "Gagal mendaftarkan akun."}` };
   }
 }
