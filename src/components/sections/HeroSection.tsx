@@ -18,7 +18,6 @@ export default function HeroSection({ onTabChange }: { onTabChange: (tab: string
             className="text-[#A855F7] text-sm font-mono mb-6 md:text-right opacity-0 animate-fade-in-up"
             style={{ animationDelay: "0.1s" }}
           >
-            Praketrio Fleet Monitor
           </p>
 
           {/* Judul: Muncul kedua (Delay 0.3s) */}

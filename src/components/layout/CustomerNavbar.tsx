@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 const navItems = [
   { label: "Input Barang", href: "/customer/dashboard" },
@@ -12,15 +12,6 @@ const navItems = [
 
 export default function CustomerNavbar() {
   const pathname = usePathname();
-  const router = useRouter();
-
-  // Fungsi Logout Aman
-  const handleLogout = () => {
-    document.cookie = "praketrio_auth=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-    document.cookie = "praketrio_role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-    router.push("/login");
-    router.refresh();
-  };
 
   return (
     <nav className="flex items-center justify-between px-10 py-5 border-b border-[#1E1E2E] bg-[#0A0A12]/90 backdrop-blur-md sticky top-0 z-50 animate-fade-in-up">
@@ -33,6 +24,7 @@ export default function CustomerNavbar() {
           <div className="w-8 h-8 flex items-center justify-center transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6">
             <Image src="/logo.png" alt="Praketrio" width={32} height={32} className="object-contain drop-shadow-[0_0_10px_rgba(168,85,247,0.5)]" />
           </div>
+          {/* BAGIAN INI YANG DIUBAH AGAR SERAGAM DENGAN FLEET & ADMIN */}
           <span className="text-xl font-bold tracking-widest text-white uppercase drop-shadow-md transition-colors duration-500 group-hover:text-[#C084FC]">
             Praketrio
           </span>
@@ -52,6 +44,7 @@ export default function CustomerNavbar() {
                   }`}
                   style={{ animationDelay: `${0.1 + index * 0.1}s` }}
                 >
+                  {/* Indikator Titik (Sesuai Desain Asli) */}
                   <span 
                     className={`w-2 h-2 rounded-full transition-all duration-300 ${
                       isActive 
@@ -70,7 +63,7 @@ export default function CustomerNavbar() {
       {/* BAGIAN KANAN: Profil & Keluar */}
       <div className="flex items-center gap-6">
         
-        {/* Profil Customer */}
+        {/* Profil Customer (Dipindah dari Header lama) */}
         <div className="flex items-center gap-3 group cursor-pointer">
           <div className="flex flex-col items-end">
             <span className="text-white font-bold text-sm transition-colors group-hover:text-[#C084FC]">Praba</span>
@@ -81,19 +74,18 @@ export default function CustomerNavbar() {
           </div>
         </div>
 
-        {/* Garis Pemisah */}
-        <div className="h-8 w-px bg-[#1E1E2E] hidden md:block"></div>
+          {/* Garis Pemisah */}
+          <div className="h-8 w-px bg-[#1E1E2E] hidden md:block"></div>
 
-        {/* Tombol Logout Eksekusi Langsung */}
-        <button 
-          onClick={handleLogout} 
-          className="group flex items-center justify-center gap-2 text-sm font-semibold py-2.5 px-4 rounded-xl border border-red-500/30 text-red-400 hover:bg-red-500/10 hover:border-red-500 hover:text-red-300 hover:-translate-y-0.5 hover:shadow-[0_0_15px_rgba(239,68,68,0.2)] active:scale-95 transition-all duration-300"
-        >
-          <svg className="w-4 h-4 transition-transform duration-300 group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-          </svg>
-          Keluar
-        </button>
+        {/* Tombol Keluar (Diperkecil & Disesuaikan dengan Navbar) */}
+        <Link href="/login">
+          <div className="group flex items-center justify-center gap-2 text-sm font-semibold py-2.5 px-4 rounded-xl border border-red-500/30 text-red-400 hover:bg-red-500/10 hover:border-red-500 hover:text-red-300 hover:-translate-y-0.5 hover:shadow-[0_0_15px_rgba(239,68,68,0.2)] active:scale-95 transition-all duration-300">
+            <svg className="w-4 h-4 transition-transform duration-300 group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+            </svg>
+            Keluar
+          </div>
+        </Link>
       </div>
 
     </nav>
