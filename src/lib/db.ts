@@ -8,6 +8,7 @@ const pool = new Pool({
 });
 
 export const db = {
+  // Fungsi utama untuk query biasa
   query: async (text: string, params?: unknown[]) => {
     const client = await pool.connect();
     try {
@@ -17,4 +18,10 @@ export const db = {
       client.release();
     }
   },
+  
+  // PERBAIKAN: Menambahkan fungsi connect khusus untuk transaksi (BEGIN/COMMIT)
+  // Ini akan menghilangkan error "Property 'connect' does not exist" di Vercel
+  connect: async () => {
+    return await pool.connect();
+  }
 };
