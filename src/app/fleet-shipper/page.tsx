@@ -10,7 +10,8 @@ export const metadata: Metadata = {
 };
 
 export default async function FleetSuperintendentDashboardPage() {
-  let fleetRows = [];
+  // PERBAIKAN: Menambahkan tipe : any[] agar TypeScript/Vercel tidak error
+  let fleetRows: any[] = [];
 
   try {
     // KONEKSI DATABASE NEON - MENGAMBIL SELURUH DATA CRUDS (READ)

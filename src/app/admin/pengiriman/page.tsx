@@ -17,7 +17,8 @@ export default async function PengirimanPage(props: {
   const itemsPerPage = 5; 
   const offset = (currentPage - 1) * itemsPerPage;
 
-  let pengirimanRows = [];
+  // PERBAIKAN: Menambahkan tipe : any[] agar TypeScript/Vercel tidak error
+  let pengirimanRows: any[] = [];
   let totalPages = 1;
 
   let queryClean = `%${query}%`;

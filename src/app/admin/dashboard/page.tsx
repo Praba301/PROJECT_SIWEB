@@ -7,12 +7,13 @@ export const metadata = {
 };
 
 export default async function DashboardPage() {
-  let dataPengiriman = [];
+  // PERBAIKAN 1: Menambahkan tipe : any[]
+  let dataPengiriman: any[] = [];
   let statsData = { Diproses: 0, Dimuat: 0, Berlayar: 0, Terkirim: 0 };
   let totalData = 0; 
   
   try {
-    // 1. URUTKAN BERDASARKAN ID DESC AGAR RESI TERBARU (SEPERTI RESI KE-12) PASTI MUNCUL DI DASHBOARD
+    // 1. URUTKAN BERDASARKAN ID DESC AGAR RESI TERBARU PASTI MUNCUL DI DASHBOARD
     const queryResult = await db.query(`
       SELECT 
         tp.no_resi, 
@@ -32,9 +33,11 @@ export default async function DashboardPage() {
       GROUP BY status
     `);
     
-    statsResult.rows.forEach(row => {
-      if (statsData.hasOwnProperty(row.status)) {
-        statsData[row.status as keyof typeof statsData] = Number(row.count);
+    // PERBAIKAN 2: Menggunakan (row: any) dan operator 'in'
+    statsResult.rows.forEach((row: any) => {
+      const statusKey = row.status as keyof typeof statsData;
+      if (statusKey in statsData) {
+        statsData[statusKey] = Number(row.count);
       }
     });
 
