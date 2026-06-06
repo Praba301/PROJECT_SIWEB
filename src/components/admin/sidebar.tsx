@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
 
   const menuItems = [
     { name: "Dashboard", href: "/admin/dashboard" },
@@ -13,6 +14,14 @@ export default function Sidebar() {
     { name: "Armada", href: "/admin/armada" },
     { name: "Analitik", href: "/admin/analitik" },
   ];
+
+  // Fungsi Logout Aman
+  const handleLogout = () => {
+    document.cookie = "praketrio_auth=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    document.cookie = "praketrio_role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    router.push("/login");
+    router.refresh();
+  };
 
   return (
     <nav className="w-full h-20 bg-[#0A0A12] border-b border-[#1E1E2E] flex items-center justify-between px-6 md:px-10 shrink-0 relative z-50">
@@ -32,7 +41,6 @@ export default function Sidebar() {
             priority 
           />
         </div>
-        {/* BAGIAN INI YANG DIUBAH AGAR SERAGAM DENGAN FLEET & CUSTOMER */}
         <h1 className="hidden md:block text-xl font-bold tracking-widest text-white uppercase drop-shadow-md transition-colors duration-500 group-hover:text-[#C084FC]">
           Praketrio
         </h1>
@@ -63,14 +71,17 @@ export default function Sidebar() {
         <span className="hidden lg:block text-[#6B6B80] font-bold tracking-widest uppercase text-xs border-r border-[#1E1E2E] pr-6">
           Administrator
         </span>
-        <Link href="/login">
-          <div className="group flex items-center justify-center gap-2 px-4 md:px-5 py-2 rounded-xl text-sm font-semibold bg-[#13131F] text-red-400 border border-red-500/30 hover:border-red-500 hover:bg-red-500/10 hover:text-red-300 transition-all duration-300 hover:shadow-[0_0_20px_rgba(239,68,68,0.2)] active:scale-95">
-            <svg className="w-4 h-4 transition-transform duration-300 group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-            </svg>
-            <span className="hidden md:block">Keluar</span>
-          </div>
-        </Link>
+        
+        {/* Tombol Logout Eksekusi Langsung */}
+        <button 
+          onClick={handleLogout} 
+          className="group flex items-center justify-center gap-2 px-4 md:px-5 py-2 rounded-xl text-sm font-semibold bg-[#13131F] text-red-400 border border-red-500/30 hover:border-red-500 hover:bg-red-500/10 hover:text-red-300 transition-all duration-300 hover:shadow-[0_0_20px_rgba(239,68,68,0.2)] active:scale-95"
+        >
+          <svg className="w-4 h-4 transition-transform duration-300 group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+          </svg>
+          <span className="hidden md:block">Keluar</span>
+        </button>
       </div>
       
     </nav>

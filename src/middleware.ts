@@ -8,12 +8,14 @@ export default function middleware(request: NextRequest) {
   const isAuthenticated = request.cookies.get("praketrio_auth")?.value;
   const userRole = request.cookies.get("praketrio_role")?.value;
 
-  // 1. JIKA tidak login sama sekali, langsung lempar ke /unauthorized
+  // 1. JIKA tidak login sama sekali (atau sudah terhapus karena Logout)
+  // Lebih baik lempar kembali ke halaman Login agar mereka bisa masuk lagi
   if (!isAuthenticated) {
-    return NextResponse.redirect(new URL("/unauthorized", request.url));
+    return NextResponse.redirect(new URL("/login", request.url));
   }
 
   // 2. JIKA sudah login, periksa apakah role mereka berhak mengakses halaman tersebut
+  // Jika mencoba menyusup ke area yang bukan haknya, lempar ke Unauthorized
   if (pathname.startsWith("/admin") && userRole !== "admin") {
     return NextResponse.redirect(new URL("/unauthorized", request.url));
   }

@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation'; // <-- Tambahkan ini untuk navigasi logout
 
 // KOMPONEN CUSTOM SCROLL REVEAL (Animasi Elegan)
 const ScrollRevealBox = ({ children, delay = 0 }: { children: React.ReactNode, delay?: number }) => {
@@ -37,7 +38,6 @@ const ScrollRevealBox = ({ children, delay = 0 }: { children: React.ReactNode, d
 };
 
 // ================= KORDINAT PETA ANTI-NUMPUK =================
-// Disesuaikan agar minimal left: 35% agar tidak pernah menyentuh panel UI kiri
 const safeRedCoords = [
     { top: '65%', left: '45%' }, 
     { top: '75%', left: '60%' }  
@@ -46,7 +46,7 @@ const safeRedCoords = [
 const safeBlueCoords = [
     { top: '55%', left: '75%' }, 
     { top: '58%', left: '42%' }, 
-    { top: '56%', left: '35%' }, // Digeser dari 15% ke 35% agar aman dari panel kiri
+    { top: '56%', left: '35%' }, 
     { top: '75%', left: '56%' }, 
     { top: '68%', left: '48%' }, 
     { top: '60%', left: '38%' }, 
@@ -57,14 +57,15 @@ const safeGreenCoords = [
     { top: '15%', left: '38%' }, 
     { top: '55%', left: '45%' }, 
     { top: '50%', left: '65%' }, 
-    { top: '77%', left: '55%' }, // Digeser ke 35% agar aman
+    { top: '77%', left: '55%' }, 
     { top: '10%', left: '55%' }, 
-    { top: '16%', left: '68%' }, // Digeser ke 35% agar aman
+    { top: '16%', left: '68%' }, 
     { top: '75%', left: '35%' }, 
     { top: '15%', left: '15%' }  
 ];
 
 export default function FleetClient({ dataDariDatabase }: { dataDariDatabase: any[] }) {
+  const router = useRouter(); // <-- Inisialisasi router
   const [activeTab, setActiveTab] = useState('peta');
   const [isTabChanging, setIsTabChanging] = useState(false);
   const [pageLoaded, setPageLoaded] = useState(false);
@@ -82,11 +83,22 @@ export default function FleetClient({ dataDariDatabase }: { dataDariDatabase: an
   const [peringatanSelesaiHariIni, setPeringatanSelesaiHariIni] = useState(0);
   const [dynamicShips, setDynamicShips] = useState<any[]>([]);
 
+  // =====================================================================
+  // FUNGSI LOGOUT YANG MENGHANCURKAN COOKIES
+  // =====================================================================
+  const handleLogout = () => {
+    document.cookie = "praketrio_auth=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    document.cookie = "praketrio_role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    router.push("/login");
+    router.refresh();
+  };
+
+  // KODE BARU DITAMBAHKAN DI SINI UNTUK METADATA (JUDUL TAB DINAMIS)
   useEffect(() => {
     const titles: Record<string, string> = {
       'peta': 'Radar Armada | Praketrio',
       'armada': 'Data Armada | Praketrio',
-      'analisis': 'Analisis | Praketrio',
+      'analisis': 'Analisis Operasional | Praketrio',
       'peringatan': 'Pusat Peringatan | Praketrio'
     };
     
@@ -376,9 +388,14 @@ useEffect(() => {
              <span className="text-sm font-bold text-white tracking-widest">{waktuJogja}</span>
              <span className="text-[10px] text-slate-500 font-sans">{tanggalJogja}</span>
           </div>
-          <Link href="/login" className="px-5 py-2.5 rounded-lg font-bold transition-all duration-300 text-center text-xs bg-red-950/20 border border-red-900/50 text-red-400 hover:text-white hover:bg-red-600 uppercase tracking-widest hover:shadow-[0_0_15px_rgba(220,38,38,0.4)] active:scale-95">
+          
+          {/* TOMBOL LOGOUT AMAN (Hancurkan Cookie) */}
+          <button 
+            onClick={handleLogout} 
+            className="px-5 py-2.5 rounded-lg font-bold transition-all duration-300 text-center text-xs bg-red-950/20 border border-red-900/50 text-red-400 hover:text-white hover:bg-red-600 uppercase tracking-widest hover:shadow-[0_0_15px_rgba(220,38,38,0.4)] active:scale-95"
+          >
             Keluar Sistem
-          </Link>
+          </button>
         </div>
       </div>
 
