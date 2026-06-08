@@ -57,11 +57,11 @@ const safeGreenCoords = [
     { top: '15%', left: '38%' }, 
     { top: '55%', left: '45%' }, 
     { top: '50%', left: '65%' }, 
-    { top: '30%', left: '55%' }, 
-    { top: '10%', left: '55%' }, 
+    { top: '20%', left: '55%' }, 
+    { top: '15%', left: '55%' }, 
     { top: '16%', left: '68%' }, 
     { top: '75%', left: '35%' }, 
-    { top: '15%', left: '15%' }  
+    { top: '15%', left: '25%' }  
 ];
 
 export default function FleetClient({ dataDariDatabase }: { dataDariDatabase: any[] }) {
