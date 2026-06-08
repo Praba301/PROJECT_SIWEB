@@ -47,7 +47,7 @@ const safeBlueCoords = [
     { top: '55%', left: '75%' }, 
     { top: '58%', left: '42%' }, 
     { top: '56%', left: '35%' }, 
-    { top: '75%', left: '56%' }, 
+    { top: '28%', left: '56%' }, 
     { top: '68%', left: '48%' }, 
     { top: '60%', left: '38%' }, 
     { top: '75%', left: '50%' }  
@@ -57,7 +57,7 @@ const safeGreenCoords = [
     { top: '15%', left: '38%' }, 
     { top: '55%', left: '45%' }, 
     { top: '50%', left: '65%' }, 
-    { top: '77%', left: '55%' }, 
+    { top: '30%', left: '55%' }, 
     { top: '10%', left: '55%' }, 
     { top: '16%', left: '68%' }, 
     { top: '75%', left: '35%' }, 
