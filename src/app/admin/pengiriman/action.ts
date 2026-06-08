@@ -141,10 +141,13 @@ export async function tambahResiDatabase(formData: FormData) {
       statusKargo: "Diproses", 
       deskripsi: formData.get("deskripsi") as string,
       namaKapal: formData.get("namaKapal") as string,
-      jenisKapal: (formData.get("jenisKapal") as string) || "Kapal Kargo Umum", // Menerima pilihan dinamis dari client
+      jenisKapal: (formData.get("jenisKapal") as string) || "Kapal Kargo Umum",
       kodeKapal: formData.get("kodeKapal") as string,
       kapasitas: formData.get("kapasitasMuatan") as string,
-      statusKapal: "Siap Berlayar", // Otomatis tersimpan sebagai Siap Berlayar
+      statusKapal: "Siap Berlayar",
+      // TAMBAHAN UNTUK TIPE PAKET DAN TOTAL BIAYA
+      tipePaket: formData.get("tipePaket") as string,
+      totalBiaya: Number(formData.get("totalBiaya")),
     };
 
     // 1. INSERT TABEL CUSTOMERS
@@ -155,19 +158,19 @@ export async function tambahResiDatabase(formData: FormData) {
     );
     const customerId = customerResult.rows[0].id;
 
-    // 2. INSERT TABEL TRANSAKSI_PENGIRIMAN
+    // 2. INSERT TABEL TRANSAKSI_PENGIRIMAN (ditambah kolom tipe_paket)
     const transaksiResult = await client.query(
-      `INSERT INTO transaksi_pengiriman (no_resi, customer_id, tanggal_transaksi, status, jenis_pengiriman, kota_asal, kota_tujuan)
-       VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
-      [noResiBaru, customerId, data.tanggalKirim, data.statusKargo, data.jenisPengiriman, data.kotaAsal, data.kotaTujuan]
+      `INSERT INTO transaksi_pengiriman (no_resi, customer_id, tanggal_transaksi, status, jenis_pengiriman, kota_asal, kota_tujuan, tipe_paket)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
+      [noResiBaru, customerId, data.tanggalKirim, data.statusKargo, data.jenisPengiriman, data.kotaAsal, data.kotaTujuan, data.tipePaket]
     );
     const transaksiId = transaksiResult.rows[0].id;
 
-    // 3. INSERT TABEL DETAIL_PENGIRIMAN
+    // 3. INSERT TABEL DETAIL_PENGIRIMAN (ditambah kolom total_biaya)
     await client.query(
-      `INSERT INTO detail_pengiriman (transaksi_id, berat_total, jenis_barang, harga_tarif, deskripsi, biaya)
-       VALUES ($1, $2, $3, $4, $5, $4)`,
-      [transaksiId, data.berat, data.jenisBarang, data.harga, data.deskripsi]
+      `INSERT INTO detail_pengiriman (transaksi_id, berat_total, jenis_barang, harga_tarif, deskripsi, biaya, total_biaya)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+      [transaksiId, data.berat, data.jenisBarang, data.harga, data.deskripsi, data.harga, data.totalBiaya]
     );
 
     // 4. INSERT TABEL KAPAL_PENGIRIMAN
@@ -181,7 +184,7 @@ export async function tambahResiDatabase(formData: FormData) {
 
     revalidatePath("/admin/pengiriman");
     revalidatePath("/admin/dashboard");
-    revalidatePath("/admin/armada"); // MEMBERSIHKAN CACHE HALAMAN ARMADA AGAR KAPAL BARU LANGSUNG SINKRON INSTAN
+    revalidatePath("/admin/armada");
 
     return { success: true };
   } catch (error) {
