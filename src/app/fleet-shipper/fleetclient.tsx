@@ -47,7 +47,7 @@ const safeBlueCoords = [
     { top: '55%', left: '75%' }, 
     { top: '58%', left: '42%' }, 
     { top: '56%', left: '35%' }, 
-    { top: '28%', left: '56%' }, 
+    { top: '26%', left: '56%' }, 
     { top: '68%', left: '48%' }, 
     { top: '60%', left: '38%' }, 
     { top: '75%', left: '50%' }  
