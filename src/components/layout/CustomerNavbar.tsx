@@ -2,7 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter} from "next/navigation";
+import { logoutAction } from "@/app/login/action";
+
 
 const navItems = [
   { label: "Input Barang", href: "/customer/dashboard" },
@@ -10,8 +12,15 @@ const navItems = [
   { label: "Riwayat", href: "/customer/riwayat" },
 ];
 
+
 export default function CustomerNavbar() {
   const pathname = usePathname();
+  const router = useRouter();
+
+ const handleLogout = async () => {
+    await logoutAction();
+    window.location.href = "/login";
+  };
 
   return (
     <nav className="flex items-center justify-between px-10 py-5 border-b border-[#1E1E2E] bg-[#0A0A12]/90 backdrop-blur-md sticky top-0 z-50 animate-fade-in-up">

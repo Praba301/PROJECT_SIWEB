@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
+import { logoutAction } from "@/app/login/action";
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -15,12 +16,9 @@ export default function Sidebar() {
     { name: "Analitik", href: "/admin/analitik" },
   ];
 
-  // Fungsi Logout Aman
-  const handleLogout = () => {
-    document.cookie = "praketrio_auth=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-    document.cookie = "praketrio_role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-    router.push("/login");
-    router.refresh();
+  const handleLogout = async () => {
+    await logoutAction();
+    window.location.href = "/login";
   };
 
   return (

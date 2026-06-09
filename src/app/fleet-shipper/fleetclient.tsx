@@ -2,7 +2,8 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation'; // <-- Tambahkan ini untuk navigasi logout
+import { useRouter } from 'next/navigation'; 
+import { logoutAction } from "@/app/login/action";
 
 // KOMPONEN CUSTOM SCROLL REVEAL (Animasi Elegan)
 const ScrollRevealBox = ({ children, delay = 0 }: { children: React.ReactNode, delay?: number }) => {
@@ -86,11 +87,9 @@ export default function FleetClient({ dataDariDatabase }: { dataDariDatabase: an
   // =====================================================================
   // FUNGSI LOGOUT YANG MENGHANCURKAN COOKIES
   // =====================================================================
-  const handleLogout = () => {
-    document.cookie = "praketrio_auth=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-    document.cookie = "praketrio_role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-    router.push("/login");
-    router.refresh();
+  const handleLogout = async () => {
+    await logoutAction();
+    window.location.href = "/login";
   };
 
   // KODE BARU DITAMBAHKAN DI SINI UNTUK METADATA (JUDUL TAB DINAMIS)
