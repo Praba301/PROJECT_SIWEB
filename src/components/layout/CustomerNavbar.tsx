@@ -2,8 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter} from "next/navigation";
 import { logoutAction } from "@/app/login/action";
+
 
 const navItems = [
   { label: "Input Barang", href: "/customer/dashboard" },
@@ -13,9 +14,11 @@ const navItems = [
 
 export default function CustomerNavbar() {
   const pathname = usePathname();
+  const router = useRouter();
 
-  const handleLogout = async () => {
+ const handleLogout = async () => {
     await logoutAction();
+    window.location.href = "/login";
   };
 
   return (
@@ -66,7 +69,7 @@ export default function CustomerNavbar() {
       {/* BAGIAN KANAN: Profil & Keluar */}
       <div className="flex items-center gap-6">
         
-        {/* Profil Customer */}
+        {/* Profil Customer (Dipindah dari Header lama) */}
         <div className="flex items-center gap-3 group cursor-pointer">
           <div className="flex flex-col items-end">
             <span className="text-white font-bold text-sm transition-colors group-hover:text-[#C084FC]">Praba</span>
@@ -75,7 +78,7 @@ export default function CustomerNavbar() {
           <div className="w-10 h-10 rounded-full bg-[#1E1E2E] border border-[#A855F7]/40 flex items-center justify-center text-[#A855F7] text-sm font-bold shadow-[0_0_10px_rgba(168,85,247,0.2)] transition-transform duration-300 group-hover:scale-110">
             P
           </div>
-        </div>
+        </Link>
 
         {/* Garis Pemisah */}
         <div className="h-8 w-px bg-[#1E1E2E] hidden md:block"></div>
