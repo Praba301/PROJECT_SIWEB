@@ -3,6 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState, useEffect } from "react";
+// Impor fungsi get profile dari action.ts milik halaman profil
+import { getUserProfile } from "@/app/customer/profil/action"; 
 
 const navItems = [
   { label: "Input Barang", href: "/customer/dashboard" },
@@ -12,6 +15,30 @@ const navItems = [
 
 export default function CustomerNavbar() {
   const pathname = usePathname();
+  
+  // State dinamis untuk nama dan inisial
+  const [userName, setUserName] = useState("Memuat...");
+  const [userInitial, setUserInitial] = useState("");
+
+  // Mengambil nama user dari database saat navbar dimuat
+  useEffect(() => {
+    async function fetchName() {
+      try {
+        const data = await getUserProfile() as any;
+        if (data && data.nama) {
+          setUserName(data.nama);
+          setUserInitial(data.nama.charAt(0).toUpperCase());
+        } else {
+          setUserName("Customer");
+          setUserInitial("C");
+        }
+      } catch (error) {
+        setUserName("Customer");
+        setUserInitial("C");
+      }
+    }
+    fetchName();
+  }, []);
 
   return (
     <nav className="flex items-center justify-between px-10 py-5 border-b border-[#1E1E2E] bg-[#0A0A12]/90 backdrop-blur-md sticky top-0 z-50 animate-fade-in-up">
@@ -24,7 +51,6 @@ export default function CustomerNavbar() {
           <div className="w-8 h-8 flex items-center justify-center transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6">
             <Image src="/logo.png" alt="Praketrio" width={32} height={32} className="object-contain drop-shadow-[0_0_10px_rgba(168,85,247,0.5)]" />
           </div>
-          {/* BAGIAN INI YANG DIUBAH AGAR SERAGAM DENGAN FLEET & ADMIN */}
           <span className="text-xl font-bold tracking-widest text-white uppercase drop-shadow-md transition-colors duration-500 group-hover:text-[#C084FC]">
             Praketrio
           </span>
@@ -44,7 +70,7 @@ export default function CustomerNavbar() {
                   }`}
                   style={{ animationDelay: `${0.1 + index * 0.1}s` }}
                 >
-                  {/* Indikator Titik (Sesuai Desain Asli) */}
+                  {/* Indikator Titik */}
                   <span 
                     className={`w-2 h-2 rounded-full transition-all duration-300 ${
                       isActive 
@@ -63,21 +89,23 @@ export default function CustomerNavbar() {
       {/* BAGIAN KANAN: Profil & Keluar */}
       <div className="flex items-center gap-6">
         
-        {/* Profil Customer (Dipindah dari Header lama) */}
-        <div className="flex items-center gap-3 group cursor-pointer">
+        {/* Profil Customer (Kini Dinamis!) */}
+        <Link href="/customer/profil" className="flex items-center gap-3 group cursor-pointer">
           <div className="flex flex-col items-end">
-            <span className="text-white font-bold text-sm transition-colors group-hover:text-[#C084FC]">Praba</span>
+            <span className="text-white font-bold text-sm transition-colors group-hover:text-[#C084FC] capitalize">
+              {userName}
+            </span>
             <span className="text-[#6B6B80] text-xs">Customer</span>
           </div>
           <div className="w-10 h-10 rounded-full bg-[#1E1E2E] border border-[#A855F7]/40 flex items-center justify-center text-[#A855F7] text-sm font-bold shadow-[0_0_10px_rgba(168,85,247,0.2)] transition-transform duration-300 group-hover:scale-110">
-            P
+            {userInitial}
           </div>
-        </div>
+        </Link>
 
-          {/* Garis Pemisah */}
-          <div className="h-8 w-px bg-[#1E1E2E] hidden md:block"></div>
+        {/* Garis Pemisah */}
+        <div className="h-8 w-px bg-[#1E1E2E] hidden md:block"></div>
 
-        {/* Tombol Keluar (Diperkecil & Disesuaikan dengan Navbar) */}
+        {/* Tombol Keluar */}
         <Link href="/login">
           <div className="group flex items-center justify-center gap-2 text-sm font-semibold py-2.5 px-4 rounded-xl border border-red-500/30 text-red-400 hover:bg-red-500/10 hover:border-red-500 hover:text-red-300 hover:-translate-y-0.5 hover:shadow-[0_0_15px_rgba(239,68,68,0.2)] active:scale-95 transition-all duration-300">
             <svg className="w-4 h-4 transition-transform duration-300 group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
