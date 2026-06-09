@@ -2,9 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname, useRouter} from "next/navigation";
+import { usePathname } from "next/navigation";
 import { logoutAction } from "@/app/login/action";
-
 
 const navItems = [
   { label: "Input Barang", href: "/customer/dashboard" },
@@ -14,11 +13,9 @@ const navItems = [
 
 export default function CustomerNavbar() {
   const pathname = usePathname();
-  const router = useRouter();
 
- const handleLogout = async () => {
+  const handleLogout = async () => {
     await logoutAction();
-    window.location.href = "/login";
   };
 
   return (
@@ -69,7 +66,7 @@ export default function CustomerNavbar() {
       {/* BAGIAN KANAN: Profil & Keluar */}
       <div className="flex items-center gap-6">
         
-        {/* Profil Customer (Dipindah dari Header lama) */}
+        {/* Profil Customer */}
         <div className="flex items-center gap-3 group cursor-pointer">
           <div className="flex flex-col items-end">
             <span className="text-white font-bold text-sm transition-colors group-hover:text-[#C084FC]">Praba</span>
@@ -78,7 +75,7 @@ export default function CustomerNavbar() {
           <div className="w-10 h-10 rounded-full bg-[#1E1E2E] border border-[#A855F7]/40 flex items-center justify-center text-[#A855F7] text-sm font-bold shadow-[0_0_10px_rgba(168,85,247,0.2)] transition-transform duration-300 group-hover:scale-110">
             P
           </div>
-        </Link>
+        </div>
 
         {/* Garis Pemisah */}
         <div className="h-8 w-px bg-[#1E1E2E] hidden md:block"></div>
@@ -86,7 +83,7 @@ export default function CustomerNavbar() {
         {/* Tombol Keluar (Diubah dari <Link> menjadi <button> dengan fungsi onClick) */}
         <button
           onClick={handleLogout}
-          className="group flex items-center justify-center gap-2 text-sm font-semibold py-2.5 px-4 rounded-xl border border-red-500/30 text-red-400 hover:bg-red-500/10 hover:border-red-500 hover:text-red-300 hover:-translate-y-0.5 hover:shadow-[0_0_15px_rgba(239,68,68,0.2)] active:scale-95 transition-all duration-300"
+          className="group flex items-center justify-center gap-2 text-sm font-semibold py-2.5 px-4 rounded-xl border border-red-500/30 text-red-400 hover:bg-red-500/10 hover:border-red-500 hover:text-red-300 hover:-translate-y-0.5 hover:shadow-[0_0_15px_rgba(239,68,68,0.2)] active:scale-95 transition-all duration-300 cursor-pointer"
         >
           <svg className="w-4 h-4 transition-transform duration-300 group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
