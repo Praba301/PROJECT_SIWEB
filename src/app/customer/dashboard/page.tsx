@@ -12,6 +12,20 @@ const poppins = Poppins({
 
 const HARGA_PER_KG = 25000;
 
+// Fungsi untuk mengambil data user yang login
+async function getUserFromToken() {
+  try {
+    const res = await fetch("/api/auth/me");
+    const data = await res.json();
+    if (data.success) {
+      return data.user;
+    }
+  } catch (error) {
+    console.error("Error getting user:", error);
+  }
+  return null;
+}
+
 export default function CustomerDashboard() {
   const [form, setForm] = useState({
     namaPengirim: "",
@@ -22,7 +36,7 @@ export default function CustomerDashboard() {
     berat: "",
     jenisBarang: "",
     catatan: "",
-    tipePaket: "", // REGULER, EXPRESS, VVIP
+    tipePaket: "",
   });
 
   const [errors, setErrors] = useState({
@@ -39,6 +53,19 @@ export default function CustomerDashboard() {
   const [showModal, setShowModal] = useState(false);
   const [totalBiaya, setTotalBiaya] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [user, setUser] = useState<{ id: number; nama: string; role: string } | null>(null);
+
+  // Ambil data user yang login dan isi nama pengirim otomatis
+  useEffect(() => {
+    const fetchUser = async () => {
+      const userData = await getUserFromToken();
+      if (userData) {
+        setUser(userData);
+        setForm(prev => ({ ...prev, namaPengirim: userData.nama }));
+      }
+    };
+    fetchUser();
+  }, []);
 
   // Fungsi hitung total biaya
   const hitungTotalBiaya = (berat: number, tipePaket: string) => {
@@ -51,7 +78,7 @@ export default function CustomerDashboard() {
     } else if (tipePaket === "VVIP") {
       return hargaDasar + (hargaDasar * 0.75);
     }
-    return hargaDasar; // REGULER
+    return hargaDasar;
   };
 
   // Update total biaya setiap berat atau tipePaket berubah
@@ -76,7 +103,7 @@ export default function CustomerDashboard() {
 
   const handleReset = () => {
     setForm({
-      namaPengirim: "",
+      namaPengirim: user?.nama || "",
       namaPenerima: "",
       noTelepon: "",
       kotaAsal: "",
@@ -146,7 +173,6 @@ export default function CustomerDashboard() {
     setIsLoading(true);
 
     try {
-      // Siapkan FormData untuk dikirim ke server action
       const formData = new FormData();
       formData.append("namaPengirim", form.namaPengirim);
       formData.append("namaPenerima", form.namaPenerima);
@@ -166,6 +192,7 @@ export default function CustomerDashboard() {
       formData.append("kodeKapal", "KCU-001");
       formData.append("kapasitasMuatan", "100");
       formData.append("noResiInput", "");
+      formData.append("customer_id", user?.id?.toString() || "1");
 
       const result = await tambahResiDatabase(formData);
 
@@ -196,24 +223,21 @@ export default function CustomerDashboard() {
       
       <CustomerNavbar />
 
-      {/* Custom Modal Sukses */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm transition-all duration-300">
-          <div className="bg-[#13131F] border border-[#A855F7]/50 rounded-2xl p-8 max-w-sm w-full mx-4 shadow-[0_0_40px_rgba(168,85,247,0.3)] flex flex-col items-center gap-5 opacity-0 animate-zoom-in">
-            <div className="w-16 h-16 rounded-full bg-[#A855F7]/10 border border-[#A855F7]/40 flex items-center justify-center shadow-[0_0_20px_rgba(168,85,247,0.3)] animate-pulse-glow">
+          <div className="bg-[#13131F] border border-[#A855F7]/50 rounded-2xl p-8 max-w-sm w-full mx-4 shadow-[0_0_40px_rgba(168,85,247,0.3)] flex flex-col items-center gap-5">
+            <div className="w-16 h-16 rounded-full bg-[#A855F7]/10 border border-[#A855F7]/40 flex items-center justify-center">
               <svg className="w-8 h-8 text-[#C084FC]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            <div className="text-center flex flex-col gap-2">
+            <div className="text-center">
               <h2 className="text-white font-bold text-xl">Paket Terdaftar!</h2>
-              <p className="text-[#A0A0B0] text-sm leading-relaxed">
-                Data pengirimanmu telah kami terima dan akan segera diproses oleh tim operasional.
-              </p>
+              <p className="text-[#A0A0B0] text-sm mt-2">Data pengirimanmu telah kami terima.</p>
             </div>
             <button
               onClick={() => setShowModal(false)}
-              className="w-full bg-[#A855F7] hover:bg-[#9333EA] text-white font-bold py-3.5 rounded-xl text-sm transition-all duration-300 shadow-[0_0_15px_rgba(168,85,247,0.4)] hover:shadow-[0_0_25px_rgba(168,85,247,0.6)] active:scale-95"
+              className="w-full bg-[#A855F7] hover:bg-[#9333EA] text-white font-bold py-3.5 rounded-xl text-sm"
             >
               Oke, Mengerti!
             </button>
@@ -221,241 +245,92 @@ export default function CustomerDashboard() {
         </div>
       )}
 
-      {/* Main Content */}
       <div className="flex-1 flex flex-col relative z-10">
-        
-        {/* Background Glow */}
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#A855F7]/5 blur-[150px] rounded-full pointer-events-none" />
-
         <main className="flex-1 px-10 py-12 overflow-y-auto">
-
-          {/* Title */}
-          <div className="text-center mb-10 opacity-0 animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
-            <h1 className="text-white font-bold text-3xl tracking-wide">
-              Form Input Barang
-            </h1>
-            <p className="text-[#A0A0B0] text-sm mt-2">
-              Isi kelengkapan data kargo Anda untuk mulai membuat nomor resi pelacakan.
-            </p>
+          <div className="text-center mb-10">
+            <h1 className="text-white font-bold text-3xl">Form Input Barang</h1>
+            <p className="text-[#A0A0B0] text-sm mt-2">Isi kelengkapan data kargo Anda.</p>
             <div className="w-12 h-1.5 bg-gradient-to-r from-[#A855F7] to-[#C084FC] mx-auto mt-4 rounded-full" />
           </div>
 
-          {/* Form Card */}
-          <form
-            onSubmit={handleSubmit}
-            noValidate 
-            className="bg-[#13131F] border border-[#1E1E2E] rounded-2xl p-8 md:p-10 max-w-3xl mx-auto shadow-2xl opacity-0 animate-zoom-in relative"
-            style={{ animationDelay: "0.3s" }}
-          >
-            <div className="absolute top-0 left-0 w-24 h-24 bg-gradient-to-br from-[#A855F7]/10 to-transparent rounded-tl-2xl pointer-events-none" />
-
-            <div className="relative z-10">
-              {/* Row 1: Nama Pengirim + Nama Penerima */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <div className="flex flex-col gap-2.5">
-                  <label className="text-[#C084FC] text-[11px] font-bold uppercase tracking-widest">Nama Pengirim</label>
-                  <input
-                    type="text"
-                    name="namaPengirim"
-                    value={form.namaPengirim}
-                    onChange={handleChange}
-                    placeholder="Masukkan nama pengirim"
-                    className={`bg-[#0A0A12] border rounded-xl px-4 py-3.5 text-white text-sm placeholder:text-[#6B6B80] focus:outline-none focus:ring-1 transition-all duration-300 ${
-                      errors.namaPengirim 
-                        ? "border-red-500 focus:border-red-500 focus:ring-red-500/50" 
-                        : "border-[#1E1E2E] focus:border-[#A855F7] focus:ring-[#A855F7] hover:border-[#A855F7]/50"
-                    }`}
-                  />
-                  {errors.namaPengirim && <span className="text-red-400 text-[10px] italic animate-fade-in-up mt-1">{errors.namaPengirim}</span>}
-                </div>
-                
-                <div className="flex flex-col gap-2.5">
-                  <label className="text-[#C084FC] text-[11px] font-bold uppercase tracking-widest">Nama Penerima</label>
-                  <input
-                    type="text"
-                    name="namaPenerima"
-                    value={form.namaPenerima}
-                    onChange={handleChange}
-                    placeholder="Masukkan nama penerima"
-                    className={`bg-[#0A0A12] border rounded-xl px-4 py-3.5 text-white text-sm placeholder:text-[#6B6B80] focus:outline-none focus:ring-1 transition-all duration-300 ${
-                      errors.namaPenerima 
-                        ? "border-red-500 focus:border-red-500 focus:ring-red-500/50" 
-                        : "border-[#1E1E2E] focus:border-[#A855F7] focus:ring-[#A855F7] hover:border-[#A855F7]/50"
-                    }`}
-                  />
-                  {errors.namaPenerima && <span className="text-red-400 text-[10px] italic animate-fade-in-up mt-1">{errors.namaPenerima}</span>}
-                </div>
+          <form onSubmit={handleSubmit} noValidate className="bg-[#13131F] border border-[#1E1E2E] rounded-2xl p-8 max-w-3xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              <div>
+                <label className="text-[#C084FC] text-[11px] font-bold uppercase">Nama Pengirim</label>
+                <input type="text" name="namaPengirim" value={form.namaPengirim} onChange={handleChange} placeholder="Masukkan nama pengirim" className="w-full bg-[#0A0A12] border border-[#1E1E2E] rounded-xl px-4 py-3.5 text-white" />
+                {errors.namaPengirim && <span className="text-red-400 text-[10px]">{errors.namaPengirim}</span>}
               </div>
-
-              {/* Row 2: No Telepon + Kota Asal */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <div className="flex flex-col gap-2.5">
-                  <label className="text-[#C084FC] text-[11px] font-bold uppercase tracking-widest">No Telepon</label>
-                  <input
-                    type="tel"
-                    name="noTelepon"
-                    value={form.noTelepon}
-                    onChange={handleChange}
-                    placeholder="Masukkan nomor telepon"
-                    className={`bg-[#0A0A12] border rounded-xl px-4 py-3.5 text-white text-sm placeholder:text-[#6B6B80] focus:outline-none focus:ring-1 transition-all duration-300 ${
-                      errors.noTelepon 
-                        ? "border-red-500 focus:border-red-500 focus:ring-red-500/50" 
-                        : "border-[#1E1E2E] focus:border-[#A855F7] focus:ring-[#A855F7] hover:border-[#A855F7]/50"
-                    }`}
-                  />
-                  {errors.noTelepon && <span className="text-red-400 text-[10px] italic animate-fade-in-up mt-1">{errors.noTelepon}</span>}
-                </div>
-                
-                <div className="flex flex-col gap-2.5">
-                  <label className="text-[#C084FC] text-[11px] font-bold uppercase tracking-widest">Kota Asal</label>
-                  <input
-                    type="text"
-                    name="kotaAsal"
-                    value={form.kotaAsal}
-                    onChange={handleChange}
-                    placeholder="Masukkan kota asal"
-                    className={`bg-[#0A0A12] border rounded-xl px-4 py-3.5 text-white text-sm placeholder:text-[#6B6B80] focus:outline-none focus:ring-1 transition-all duration-300 ${
-                      errors.kotaAsal 
-                        ? "border-red-500 focus:border-red-500 focus:ring-red-500/50" 
-                        : "border-[#1E1E2E] focus:border-[#A855F7] focus:ring-[#A855F7] hover:border-[#A855F7]/50"
-                    }`}
-                  />
-                  {errors.kotaAsal && <span className="text-red-400 text-[10px] italic animate-fade-in-up mt-1">{errors.kotaAsal}</span>}
-                </div>
+              <div>
+                <label className="text-[#C084FC] text-[11px] font-bold uppercase">Nama Penerima</label>
+                <input type="text" name="namaPenerima" value={form.namaPenerima} onChange={handleChange} placeholder="Masukkan nama penerima" className="w-full bg-[#0A0A12] border border-[#1E1E2E] rounded-xl px-4 py-3.5 text-white" />
+                {errors.namaPenerima && <span className="text-red-400 text-[10px]">{errors.namaPenerima}</span>}
               </div>
+            </div>
 
-              {/* Row 3: Kota Tujuan + Berat */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <div className="flex flex-col gap-2.5">
-                  <label className="text-[#C084FC] text-[11px] font-bold uppercase tracking-widest">Kota Tujuan</label>
-                  <input
-                    type="text"
-                    name="kotaTujuan"
-                    value={form.kotaTujuan}
-                    onChange={handleChange}
-                    placeholder="Masukkan kota tujuan"
-                    className={`bg-[#0A0A12] border rounded-xl px-4 py-3.5 text-white text-sm placeholder:text-[#6B6B80] focus:outline-none focus:ring-1 transition-all duration-300 ${
-                      errors.kotaTujuan 
-                        ? "border-red-500 focus:border-red-500 focus:ring-red-500/50" 
-                        : "border-[#1E1E2E] focus:border-[#A855F7] focus:ring-[#A855F7] hover:border-[#A855F7]/50"
-                    }`}
-                  />
-                  {errors.kotaTujuan && <span className="text-red-400 text-[10px] italic animate-fade-in-up mt-1">{errors.kotaTujuan}</span>}
-                </div>
-                
-                <div className="flex flex-col gap-2.5">
-                  <label className="text-[#C084FC] text-[11px] font-bold uppercase tracking-widest">Berat (kg)</label>
-                  <input
-                    type="number"
-                    name="berat"
-                    value={form.berat}
-                    onChange={handleChange}
-                    placeholder="Contoh: 150"
-                    className={`bg-[#0A0A12] border rounded-xl px-4 py-3.5 text-white text-sm placeholder:text-[#6B6B80] focus:outline-none focus:ring-1 transition-all duration-300 font-mono ${
-                      errors.berat 
-                        ? "border-red-500 focus:border-red-500 focus:ring-red-500/50" 
-                        : "border-[#1E1E2E] focus:border-[#A855F7] focus:ring-[#A855F7] hover:border-[#A855F7]/50"
-                    }`}
-                  />
-                  {errors.berat && <span className="text-red-400 text-[10px] italic animate-fade-in-up mt-1">{errors.berat}</span>}
-                </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              <div>
+                <label className="text-[#C084FC] text-[11px] font-bold uppercase">No Telepon</label>
+                <input type="tel" name="noTelepon" value={form.noTelepon} onChange={handleChange} placeholder="Masukkan nomor telepon" className="w-full bg-[#0A0A12] border border-[#1E1E2E] rounded-xl px-4 py-3.5 text-white" />
+                {errors.noTelepon && <span className="text-red-400 text-[10px]">{errors.noTelepon}</span>}
               </div>
+              <div>
+                <label className="text-[#C084FC] text-[11px] font-bold uppercase">Kota Asal</label>
+                <input type="text" name="kotaAsal" value={form.kotaAsal} onChange={handleChange} placeholder="Masukkan kota asal" className="w-full bg-[#0A0A12] border border-[#1E1E2E] rounded-xl px-4 py-3.5 text-white" />
+                {errors.kotaAsal && <span className="text-red-400 text-[10px]">{errors.kotaAsal}</span>}
+              </div>
+            </div>
 
-              {/* Row 4: Jenis Barang + Tipe Paket */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <div className="flex flex-col gap-2.5">
-                  <label className="text-[#C084FC] text-[11px] font-bold uppercase tracking-widest">Jenis Barang</label>
-                  <input
-                    type="text"
-                    name="jenisBarang"
-                    value={form.jenisBarang}
-                    onChange={handleChange}
-                    placeholder="Contoh: Elektronik / Garment"
-                    className={`bg-[#0A0A12] border rounded-xl px-4 py-3.5 text-white text-sm placeholder:text-[#6B6B80] focus:outline-none focus:ring-1 transition-all duration-300 ${
-                      errors.jenisBarang 
-                        ? "border-red-500 focus:border-red-500 focus:ring-red-500/50" 
-                        : "border-[#1E1E2E] focus:border-[#A855F7] focus:ring-[#A855F7] hover:border-[#A855F7]/50"
-                    }`}
-                  />
-                  {errors.jenisBarang && <span className="text-red-400 text-[10px] italic animate-fade-in-up mt-1">{errors.jenisBarang}</span>}
-                </div>
-                
-                <div className="flex flex-col gap-2.5">
-                  <label className="text-[#C084FC] text-[11px] font-bold uppercase tracking-widest">
-                    Tipe Paket <span className="text-red-400">*</span>
-                  </label>
-                  <select
-                    name="tipePaket"
-                    value={form.tipePaket}
-                    onChange={handleChange}
-                    className={`bg-[#0A0A12] border rounded-xl px-4 py-3.5 text-white text-sm focus:outline-none focus:ring-1 transition-all duration-300 ${
-                      errors.tipePaket 
-                        ? "border-red-500 focus:border-red-500 focus:ring-red-500/50" 
-                        : "border-[#1E1E2E] focus:border-[#A855F7] focus:ring-[#A855F7] hover:border-[#A855F7]/50"
-                    }`}
-                  >
-                    <option value="">Pilih Tipe Paket</option>
-                    <option value="REGULER">Reguler (0% tambahan)</option>
-                    <option value="EXPRESS">Express (+35%)</option>
-                    <option value="VVIP">VVIP (+75%)</option>
-                  </select>
-                  {errors.tipePaket && <span className="text-red-400 text-[10px] italic animate-fade-in-up mt-1">{errors.tipePaket}</span>}
-                </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              <div>
+                <label className="text-[#C084FC] text-[11px] font-bold uppercase">Kota Tujuan</label>
+                <input type="text" name="kotaTujuan" value={form.kotaTujuan} onChange={handleChange} placeholder="Masukkan kota tujuan" className="w-full bg-[#0A0A12] border border-[#1E1E2E] rounded-xl px-4 py-3.5 text-white" />
+                {errors.kotaTujuan && <span className="text-red-400 text-[10px]">{errors.kotaTujuan}</span>}
               </div>
+              <div>
+                <label className="text-[#C084FC] text-[11px] font-bold uppercase">Berat (kg)</label>
+                <input type="number" name="berat" value={form.berat} onChange={handleChange} placeholder="Contoh: 150" className="w-full bg-[#0A0A12] border border-[#1E1E2E] rounded-xl px-4 py-3.5 text-white" />
+                {errors.berat && <span className="text-red-400 text-[10px]">{errors.berat}</span>}
+              </div>
+            </div>
 
-              {/* Row 5: Total Biaya (Full width) */}
-              <div className="mb-6">
-                <div className="flex flex-col gap-2.5">
-                  <label className="text-[#C084FC] text-[11px] font-bold uppercase tracking-widest">Total Biaya Pengiriman</label>
-                  <div className="bg-gradient-to-r from-[#A855F7]/20 to-[#C084FC]/20 border border-[#A855F7]/30 rounded-xl px-4 py-3.5">
-                    <span className="text-2xl font-bold text-white">
-                      {totalBiaya > 0 ? formatRupiah(totalBiaya) : "Rp 0"}
-                    </span>
-                    <p className="text-[#A0A0B0] text-[10px] mt-1">
-                      *Harga dasar Rp{HARGA_PER_KG.toLocaleString()}/kg
-                    </p>
-                  </div>
-                </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              <div>
+                <label className="text-[#C084FC] text-[11px] font-bold uppercase">Jenis Barang</label>
+                <input type="text" name="jenisBarang" value={form.jenisBarang} onChange={handleChange} placeholder="Contoh: Elektronik" className="w-full bg-[#0A0A12] border border-[#1E1E2E] rounded-xl px-4 py-3.5 text-white" />
+                {errors.jenisBarang && <span className="text-red-400 text-[10px]">{errors.jenisBarang}</span>}
               </div>
+              <div>
+                <label className="text-[#C084FC] text-[11px] font-bold uppercase">Tipe Paket *</label>
+                <select name="tipePaket" value={form.tipePaket} onChange={handleChange} className="w-full bg-[#0A0A12] border border-[#1E1E2E] rounded-xl px-4 py-3.5 text-white">
+                  <option value="">Pilih Tipe Paket</option>
+                  <option value="REGULER">Reguler (0% tambahan)</option>
+                  <option value="EXPRESS">Express (+35%)</option>
+                  <option value="VVIP">VVIP (+75%)</option>
+                </select>
+                {errors.tipePaket && <span className="text-red-400 text-[10px]">{errors.tipePaket}</span>}
+              </div>
+            </div>
 
-              {/* Row 6: Catatan Tambahan */}
-              <div className="flex flex-col gap-2.5 mb-10">
-                <label className="text-[#C084FC] text-[11px] font-bold uppercase tracking-widest flex items-center gap-2">
-                  Catatan Tambahan <span className="text-[#6B6B80] normal-case tracking-normal font-normal bg-[#1E1E2E] px-2 py-0.5 rounded-full text-[10px]">Opsional</span>
-                </label>
-                <textarea
-                  name="catatan"
-                  value={form.catatan}
-                  onChange={handleChange}
-                  placeholder="Tambahkan instruksi khusus untuk penanganan paket (contoh: Jangan dibanting)"
-                  rows={3}
-                  className="bg-[#0A0A12] border border-[#1E1E2E] rounded-xl px-4 py-3.5 text-white text-sm placeholder:text-[#6B6B80] focus:outline-none focus:border-[#A855F7] focus:ring-1 focus:ring-[#A855F7] focus:shadow-[0_0_15px_rgba(168,85,247,0.15)] transition-all duration-300 hover:border-[#A855F7]/50 resize-none"
-                />
+            <div className="mb-6">
+              <label className="text-[#C084FC] text-[11px] font-bold uppercase">Total Biaya Pengiriman</label>
+              <div className="bg-gradient-to-r from-[#A855F7]/20 to-[#C084FC]/20 border border-[#A855F7]/30 rounded-xl px-4 py-3.5">
+                <span className="text-2xl font-bold text-white">{totalBiaya > 0 ? formatRupiah(totalBiaya) : "Rp 0"}</span>
+                <p className="text-[#A0A0B0] text-[10px] mt-1">*Harga dasar Rp{HARGA_PER_KG.toLocaleString()}/kg</p>
               </div>
+            </div>
 
-              {/* Buttons */}
-              <div className="flex flex-col sm:flex-row justify-end gap-4 pt-6 border-t border-[#1E1E2E]">
-                <button
-                  type="button"
-                  onClick={handleReset}
-                  disabled={isLoading}
-                  className="border border-[#1E1E2E] hover:border-[#A855F7]/50 hover:bg-[#1E1E2E] text-[#A0A0B0] hover:text-white font-bold px-8 py-3.5 rounded-xl text-sm transition-all duration-300 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Reset Form
-                </button>
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className="bg-[#A855F7] hover:bg-[#9333EA] text-white font-bold px-10 py-3.5 rounded-xl text-sm transition-all duration-300 shadow-[0_0_15px_rgba(168,85,247,0.3)] hover:shadow-[0_0_25px_rgba(168,85,247,0.5)] active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isLoading ? "Menyimpan..." : "Daftarkan Paket"}
-                  {!isLoading && (
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-                    </svg>
-                  )}
-                </button>
-              </div>
+            <div className="flex flex-col gap-2.5 mb-10">
+              <label className="text-[#C084FC] text-[11px] font-bold uppercase">Catatan Tambahan <span className="text-[#6B6B80]">(Opsional)</span></label>
+              <textarea name="catatan" value={form.catatan} onChange={handleChange} placeholder="Tambahkan instruksi khusus" rows={3} className="w-full bg-[#0A0A12] border border-[#1E1E2E] rounded-xl px-4 py-3.5 text-white resize-none" />
+            </div>
+
+            <div className="flex flex-col sm:flex-row justify-end gap-4 pt-6 border-t border-[#1E1E2E]">
+              <button type="button" onClick={handleReset} disabled={isLoading} className="border border-[#1E1E2E] hover:border-[#A855F7]/50 text-[#A0A0B0] hover:text-white font-bold px-8 py-3.5 rounded-xl">
+                Reset Form
+              </button>
+              <button type="submit" disabled={isLoading} className="bg-[#A855F7] hover:bg-[#9333EA] text-white font-bold px-10 py-3.5 rounded-xl flex items-center gap-2">
+                {isLoading ? "Menyimpan..." : "Daftarkan Paket"}
+              </button>
             </div>
           </form>
         </main>

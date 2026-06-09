@@ -185,7 +185,7 @@ export async function tambahResiDatabase(formData: FormData) {
     revalidatePath("/admin/pengiriman");
     revalidatePath("/admin/dashboard");
     revalidatePath("/admin/armada");
-
+    revalidatePath("/customer/riwayat");
     return { success: true };
   } catch (error) {
     await client.query("ROLLBACK");
