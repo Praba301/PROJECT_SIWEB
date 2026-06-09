@@ -106,3 +106,24 @@ export async function registerAction(formData: FormData) {
     return { error: `Sistem Error: ${err.message || "Gagal mendaftarkan akun."}` };
   }
 }
+
+// PERBAIKAN FINAL: Menghapus cookie di semua lini rute/path agar tidak jebol lagi
+export async function logoutAction() {
+  const cookieStore = await cookies();
+  
+  // 1. Perintah standar hapus cookie dari Next.js
+  cookieStore.delete("praketrio_auth");
+  cookieStore.delete("praketrio_role");
+
+  // 2. Paksa tiban umur cookie jadi 0 detik di rute utama (Root)
+  cookieStore.set("praketrio_auth", "", { path: "/", maxAge: 0 });
+  cookieStore.set("praketrio_role", "", { path: "/", maxAge: 0 });
+
+  // 3. Nuke/Hancurkan cookie duplikat yang bersembunyi khusus di dalam jalur /customer
+  cookieStore.set("praketrio_auth", "", { path: "/customer", maxAge: 0 });
+  cookieStore.set("praketrio_role", "", { path: "/customer", maxAge: 0 });
+  
+  // 4. Jaga-jaga untuk jalur fleet-shipper juga
+  cookieStore.set("praketrio_auth", "", { path: "/fleet-shipper", maxAge: 0 });
+  cookieStore.set("praketrio_role", "", { path: "/fleet-shipper", maxAge: 0 });
+}
