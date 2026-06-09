@@ -18,7 +18,6 @@ export default function Sidebar() {
 
   const handleLogout = async () => {
     await logoutAction();
-    window.location.href = "/login";
   };
 
   return (
