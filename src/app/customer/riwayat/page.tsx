@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Poppins } from "next/font/google";
 import CustomerNavbar from "@/components/layout/CustomerNavbar";
+import InvoiceModal from "@/components/InvoiceModal";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -52,6 +53,9 @@ export default function RiwayatPage() {
   const [riwayat, setRiwayat] = useState<RiwayatItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(true);
+  const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
+  const [showInvoice, setShowInvoice] = useState(false);
+  const [toast, setToast] = useState<{ show: boolean; message: string }>({ show: false, message: "" });
 
   useEffect(() => {
     const fetchRiwayat = async () => {
@@ -78,6 +82,42 @@ export default function RiwayatPage() {
     fetchRiwayat();
   }, []);
 
+  const showToast = (message: string) => {
+    setToast({ show: true, message });
+    setTimeout(() => setToast({ show: false, message: "" }), 3000);
+  };
+
+  // PERBAIKAN: Menggunakan API detail-paket untuk mendapatkan semua data
+  const handleViewInvoice = async (noResi: string) => {
+    try {
+      const res = await fetch(`/api/customer/detail-paket?no_resi=${noResi}`);
+      const data = await res.json();
+      if (data.success) {
+        setSelectedInvoice({
+          no_resi: data.data.no_resi,
+          tanggal: data.data.tanggal,
+          nama_pengirim: data.data.nama_pengirim || "-",
+          nama_penerima: data.data.nama_penerima || "-",
+          no_telepon: data.data.no_telepon || "-",
+          kota_asal: data.data.kota_asal,
+          kota_tujuan: data.data.kota_tujuan,
+          berat: data.data.berat,
+          jenis_barang: data.data.jenis_barang || "-",
+          tipe_paket: data.data.tipe_paket,
+          total_biaya: data.data.total_biaya,
+          catatan: data.data.catatan || "-",
+        });
+        setShowInvoice(true);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  const handleDownloadNota = () => {
+    showToast("✅ Nota berhasil diunduh!");
+  };
+
   if (isLoading) {
     return (
       <div className={`${poppins.className} flex flex-col min-h-screen bg-[#0A0A12]`}>
@@ -101,6 +141,13 @@ export default function RiwayatPage() {
     <div className={`${poppins.className} flex flex-col min-h-screen bg-[#0A0A12] relative overflow-hidden`}>
       
       <CustomerNavbar />
+
+      {/* Toast Notifikasi */}
+      {toast.show && (
+        <div className="fixed bottom-10 right-10 z-50 bg-[#22C55E] text-white px-6 py-3 rounded-xl shadow-lg animate-fade-in-up">
+          {toast.message}
+        </div>
+      )}
 
       <div className="flex-1 flex flex-col relative z-10">
         <div className="absolute top-1/2 -left-32 w-96 h-96 bg-[#A855F7]/10 blur-[150px] rounded-full pointer-events-none" />
@@ -163,7 +210,11 @@ export default function RiwayatPage() {
                   const s = statusConfig(item.status);
                   return (
                     <div key={index} className="group grid grid-cols-1 md:grid-cols-4 px-6 py-5 hover:bg-[#1A1A24] transition-colors duration-200 items-center gap-y-3 md:gap-y-0">
-                      <p className="text-white text-sm font-mono font-bold group-hover:text-[#C084FC] transition-colors">
+                      {/* No Resi - Klik untuk lihat nota */}
+                      <p 
+                        onClick={() => handleViewInvoice(item.no_resi)}
+                        className="text-[#C084FC] text-sm font-mono font-bold hover:text-[#A855F7] hover:underline transition-all duration-300 cursor-pointer"
+                      >
                         {item.no_resi}
                       </p>
                       <div className="flex items-center gap-2">
@@ -193,6 +244,14 @@ export default function RiwayatPage() {
           
         </main>
       </div>
+
+      {/* Modal Nota Resi */}
+      <InvoiceModal
+        isOpen={showInvoice}
+        onClose={() => setShowInvoice(false)}
+        data={selectedInvoice}
+        onDownload={handleDownloadNota}
+      />
     </div>
   );
 }

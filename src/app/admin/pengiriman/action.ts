@@ -108,7 +108,7 @@ export async function editResiDatabase(
 }
 
 // ======================================================
-// 3. FUNGSI TAMBAH RESI (DIPERBAIKI - TIDAK MEMBUAT CUSTOMER BARU)
+// 3. FUNGSI TAMBAH RESI (DIPERBAIKI - MENYIMPAN NAMA_PENERIMA KE TRANSAKSI)
 // ======================================================
 export async function tambahResiDatabase(formData: FormData) {
   const client = await db.connect();
@@ -152,11 +152,19 @@ export async function tambahResiDatabase(formData: FormData) {
 
     const customerIdInt = parseInt(customerId);
 
-    // INSERT ke transaksi_pengiriman (TANPA membuat customer baru)
+    // UPDATE data customer (no_telepon saja, nama_penerima disimpan di transaksi)
+    await client.query(
+      `UPDATE customers 
+       SET no_telepon = $1 
+       WHERE id = $2`,
+      [data.telepon, customerIdInt]
+    );
+
+    // INSERT ke transaksi_pengiriman (sekarang dengan kolom nama_penerima)
     const transaksiResult = await client.query(
-      `INSERT INTO transaksi_pengiriman (no_resi, customer_id, tanggal_transaksi, status, jenis_pengiriman, kota_asal, kota_tujuan, tipe_paket)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
-      [noResiBaru, customerIdInt, data.tanggalKirim, data.statusKargo, data.jenisPengiriman, data.kotaAsal, data.kotaTujuan, data.tipePaket]
+      `INSERT INTO transaksi_pengiriman (no_resi, customer_id, tanggal_transaksi, status, jenis_pengiriman, kota_asal, kota_tujuan, tipe_paket, nama_penerima)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`,
+      [noResiBaru, customerIdInt, data.tanggalKirim, data.statusKargo, data.jenisPengiriman, data.kotaAsal, data.kotaTujuan, data.tipePaket, data.penerima]
     );
     const transaksiId = transaksiResult.rows[0].id;
 
@@ -181,7 +189,7 @@ export async function tambahResiDatabase(formData: FormData) {
     revalidatePath("/admin/armada");
     revalidatePath("/customer/riwayat");
 
-    return { success: true };
+    return { success: true, no_resi: noResiBaru };
   } catch (error) {
     await client.query("ROLLBACK");
     console.error("CREATE ERROR:", error);

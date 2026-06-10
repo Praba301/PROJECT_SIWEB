@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Poppins } from "next/font/google";
 import CustomerNavbar from "@/components/layout/CustomerNavbar";
 import { tambahResiDatabase } from "@/app/admin/pengiriman/action";
+import InvoiceModal from "@/components/InvoiceModal";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -71,6 +72,8 @@ export default function CustomerDashboard() {
   const [totalBiaya, setTotalBiaya] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [user, setUser] = useState<{ id: number; nama: string; role: string } | null>(null);
+  const [invoiceData, setInvoiceData] = useState<any>(null);
+  const [showInvoice, setShowInvoice] = useState(false);
 
   // Ambil data user yang login dan isi nama pengirim otomatis
   useEffect(() => {
@@ -236,11 +239,27 @@ export default function CustomerDashboard() {
       formData.append("kapasitasMuatan", "100");
       formData.append("noResiInput", "");
       formData.append("customer_id", customerId.toString());
+      
 
       const result = await tambahResiDatabase(formData);
 
       if (result.success) {
-        setShowModal(true);
+        // Simpan data untuk ditampilkan di modal nota
+        setInvoiceData({
+          no_resi: result.no_resi,
+          tanggal: new Date().toISOString().split("T")[0],
+          nama_pengirim: form.namaPengirim,
+          nama_penerima: form.namaPenerima,
+          no_telepon: form.noTelepon,
+          kota_asal: form.kotaAsal,
+          kota_tujuan: form.kotaTujuan,
+          berat: parseFloat(form.berat),
+          jenis_barang: form.jenisBarang,
+          tipe_paket: form.tipePaket === "REGULER" ? "Reguler" : form.tipePaket === "EXPRESS" ? "Express" : "VVIP",
+          total_biaya: totalBiaya,
+          catatan: form.catatan,
+        });
+        setShowInvoice(true);
         handleReset();
       } else {
         alert("Gagal menyimpan data: " + (result.error || "Terjadi kesalahan"));
@@ -420,6 +439,13 @@ export default function CustomerDashboard() {
           </form>
         </main>
       </div>
+
+      {/* Modal Nota Resi */}
+      <InvoiceModal
+        isOpen={showInvoice}
+        onClose={() => setShowInvoice(false)}
+        data={invoiceData}
+      />
     </div>
   );
 }
