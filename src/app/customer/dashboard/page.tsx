@@ -173,6 +173,17 @@ export default function CustomerDashboard() {
     setIsLoading(true);
 
     try {
+      // Ambil customer_id yang benar dari database
+      const customerRes = await fetch(`/api/customer/by-user?user_id=${user?.id}`);
+      const customerData = await customerRes.json();
+      const customerId = customerData.customer_id;
+
+      if (!customerId) {
+        alert("Customer ID tidak ditemukan");
+        setIsLoading(false);
+        return;
+      }
+
       const formData = new FormData();
       formData.append("namaPengirim", form.namaPengirim);
       formData.append("namaPenerima", form.namaPenerima);
@@ -192,7 +203,7 @@ export default function CustomerDashboard() {
       formData.append("kodeKapal", "KCU-001");
       formData.append("kapasitasMuatan", "100");
       formData.append("noResiInput", "");
-      formData.append("customer_id", user?.id?.toString() || "1");
+      formData.append("customer_id", customerId.toString());
 
       const result = await tambahResiDatabase(formData);
 
@@ -315,7 +326,7 @@ export default function CustomerDashboard() {
               <label className="text-[#C084FC] text-[11px] font-bold uppercase">Total Biaya Pengiriman</label>
               <div className="bg-gradient-to-r from-[#A855F7]/20 to-[#C084FC]/20 border border-[#A855F7]/30 rounded-xl px-4 py-3.5">
                 <span className="text-2xl font-bold text-white">{totalBiaya > 0 ? formatRupiah(totalBiaya) : "Rp 0"}</span>
-                <p className="text-[#A0A0B0] text-[10px] mt-1">*Harga dasar Rp{HARGA_PER_KG.toLocaleString()}/kg</p>
+                <p className="text-[#A0A0B0] text-[10px] mt-1">*Harga dasar Rp{HARGA_PER_KG.toLocaleString('id-ID')}/kg</p>
               </div>
             </div>
 

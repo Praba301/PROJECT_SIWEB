@@ -9,79 +9,52 @@ const poppins = Poppins({
   weight: ["400", "500", "600", "700"],
 });
 
-// Data sinkron dengan riwayat/page.tsx
-const dataRiwayat = [
-  {
-    noResi: "SWB-20240001",
-    rute: "Surabaya → Makassar",
-    tanggal: "18 Apr 2026",
-    estTiba: "22 Apr 2026",
-    status: "Dalam perjalanan",
-    activeStep: 2,
-  },
-  {
-    noResi: "SWB-20240002",
-    rute: "Jakarta → Balikpapan",
-    tanggal: "18 Apr 2026",
-    estTiba: "23 Apr 2026",
-    status: "Dimuat ke kapal",
-    activeStep: 1,
-  },
-  {
-    noResi: "SWB-20240003",
-    rute: "Makassar → Sorong",
-    tanggal: "10 Apr 2026",
-    estTiba: "14 Apr 2026",
-    status: "Terkirim",
-    activeStep: 4,
-  },
-  {
-    noResi: "SWB-20240004",
-    rute: "Surabaya → Kupang",
-    tanggal: "11 Apr 2026",
-    estTiba: "15 Apr 2026",
-    status: "Terkirim",
-    activeStep: 4,
-  },
-  {
-    noResi: "SWB-20240005",
-    rute: "Surabaya → Makassar",
-    tanggal: "13 Apr 2026",
-    estTiba: "17 Apr 2026",
-    status: "Terkirim",
-    activeStep: 4,
-  },
-];
-
 const statusSteps = [
-  { label: "Paket Diterima" },
-  { label: "Dimuat ke Kapal" },
-  { label: "Dalam Perjalanan" },
-  { label: "Tiba di Pelabuhan" },
+  { label: "Diproses" },
+  { label: "Dimuat" },
+  { label: "Berlayar" },
   { label: "Terkirim" },
 ];
 
 const statusConfig = (status: string) => {
-  if (status === "Terkirim")
+  if (status === "Terkirim" || status === "Delivered")
     return { color: "text-[#22C55E]", bg: "bg-[#22C55E]/10", border: "border-[#22C55E]/30", dot: "bg-[#22C55E]" };
-  if (status === "Dalam perjalanan")
+  if (status === "Berlayar" || status === "Dalam perjalanan" || status === "In Transit")
     return { color: "text-[#60A5FA]", bg: "bg-[#3B82F6]/10", border: "border-[#3B82F6]/30", dot: "bg-[#60A5FA]" };
-  if (status === "Dimuat ke kapal")
+  if (status === "Dimuat" || status === "Dimuat ke kapal" || status === "Loading")
     return { color: "text-[#FCD34D]", bg: "bg-[#F59E0B]/10", border: "border-[#F59E0B]/30", dot: "bg-[#FCD34D]" };
   return { color: "text-white", bg: "bg-white/10", border: "border-white/20", dot: "bg-white" };
 };
 
+const getActiveStep = (status: string) => {
+  switch (status) {
+    case "Diproses":
+      return 0;
+    case "Dimuat":
+    case "Dimuat ke kapal":
+    case "Loading":
+      return 1;
+    case "Berlayar":
+    case "Dalam perjalanan":
+    case "In Transit":
+      return 2;
+    case "Terkirim":
+    case "Delivered":
+      return 3;
+    default:
+      return 0;
+  }
+};
+
 export default function LacakPaket() {
   const [noResi, setNoResi] = useState("");
-  const [hasil, setHasil] = useState<(typeof dataRiwayat)[0] | null>(null);
+  const [hasil, setHasil] = useState<any>(null);
   const [sudahCari, setSudahCari] = useState(false);
   const [animateProgress, setAnimateProgress] = useState(false);
-  
-  // State baru untuk Error Handling
+  const [isLoading, setIsLoading] = useState(false);
   const [errorResi, setErrorResi] = useState("");
 
-  const handleLacak = () => {
-    // Error Handling: Cek apakah input kosong
+  const handleLacak = async () => {
     if (!noResi.trim()) {
       setErrorResi("Nomor resi pengiriman wajib diisi.");
       setSudahCari(false);
@@ -89,15 +62,26 @@ export default function LacakPaket() {
       return;
     }
 
+    setIsLoading(true);
     setSudahCari(true);
-    setAnimateProgress(false); 
-    const found = dataRiwayat.find(
-      (item) => item.noResi.toLowerCase() === noResi.trim().toLowerCase()
-    );
-    setHasil(found ?? null);
+    setAnimateProgress(false);
+    setErrorResi("");
 
-    if (found) {
-      setTimeout(() => setAnimateProgress(true), 100);
+    try {
+      const response = await fetch(`/api/customer/lacak?no_resi=${noResi.trim().toUpperCase()}`);
+      const data = await response.json();
+
+      if (data.success) {
+        setHasil(data.data);
+        setTimeout(() => setAnimateProgress(true), 100);
+      } else {
+        setHasil(null);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      setHasil(null);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -142,7 +126,7 @@ export default function LacakPaket() {
                     value={noResi}
                     onChange={(e) => {
                       setNoResi(e.target.value);
-                      setErrorResi(""); // Hapus error saat user mulai mengetik
+                      setErrorResi("");
                       setSudahCari(false);
                       setHasil(null);
                     }}
@@ -155,14 +139,14 @@ export default function LacakPaket() {
                     }`}
                   />
                 </div>
-                {/* Pesan Error Muncul Di Sini */}
                 {errorResi && <span className="text-red-400 text-[10px] italic animate-fade-in-up px-1">{errorResi}</span>}
               </div>
               <button
                 onClick={handleLacak}
-                className="bg-[#A855F7] hover:bg-[#9333EA] text-white font-bold px-10 py-3.5 rounded-xl text-sm transition-all duration-300 shadow-[0_0_15px_rgba(168,85,247,0.3)] hover:shadow-[0_0_25px_rgba(168,85,247,0.5)] active:scale-95 flex items-center justify-center gap-2 w-full sm:w-auto"
+                disabled={isLoading}
+                className="bg-[#A855F7] hover:bg-[#9333EA] text-white font-bold px-10 py-3.5 rounded-xl text-sm transition-all duration-300 shadow-[0_0_15px_rgba(168,85,247,0.3)] hover:shadow-[0_0_25px_rgba(168,85,247,0.5)] active:scale-95 flex items-center justify-center w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Lacak
+                {isLoading ? "Memuat..." : "Lacak"}
               </button>
             </div>
           </div>
@@ -174,15 +158,15 @@ export default function LacakPaket() {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="group bg-[#0A0A12] border border-[#1E1E2E] hover:border-[#A855F7]/50 rounded-xl p-4 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_5px_15px_rgba(168,85,247,0.1)]">
                     <p className="text-[#6B6B80] text-[10px] uppercase tracking-widest mb-1.5 font-bold group-hover:text-[#A0A0B0] transition-colors">Resi</p>
-                    <p className="text-[#C084FC] text-sm font-mono font-bold">{hasil.noResi}</p>
+                    <p className="text-[#C084FC] text-sm font-mono font-bold">{hasil.no_resi}</p>
                   </div>
                   <div className="group bg-[#0A0A12] border border-[#1E1E2E] hover:border-[#A855F7]/50 rounded-xl p-4 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_5px_15px_rgba(168,85,247,0.1)]">
                     <p className="text-[#6B6B80] text-[10px] uppercase tracking-widest mb-1.5 font-bold group-hover:text-[#A0A0B0] transition-colors">Rute</p>
                     <p className="text-white text-sm font-semibold">{hasil.rute}</p>
                   </div>
                   <div className="group bg-[#0A0A12] border border-[#1E1E2E] hover:border-[#22C55E]/50 rounded-xl p-4 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_5px_15px_rgba(34,197,94,0.1)]">
-                    <p className="text-[#6B6B80] text-[10px] uppercase tracking-widest mb-1.5 font-bold group-hover:text-[#A0A0B0] transition-colors">EST. Tiba</p>
-                    <p className="text-[#22C55E] text-sm font-bold">{hasil.estTiba}</p>
+                    <p className="text-[#6B6B80] text-[10px] uppercase tracking-widest mb-1.5 font-bold group-hover:text-[#A0A0B0] transition-colors">Tanggal Input</p>
+                    <p className="text-[#22C55E] text-sm font-bold">{hasil.tanggal}</p>
                   </div>
                   <div className="group bg-[#0A0A12] border border-[#1E1E2E] rounded-xl p-4 shadow-sm transition-all duration-300 hover:-translate-y-1">
                     <p className="text-[#6B6B80] text-[10px] uppercase tracking-widest mb-1.5 font-bold">Status</p>
@@ -213,20 +197,21 @@ export default function LacakPaket() {
                     <div
                       className="absolute top-4 left-6 md:left-12 h-1.5 bg-gradient-to-r from-[#A855F7] to-[#C084FC] z-0 rounded-full transition-all duration-1000 ease-out shadow-[0_0_10px_rgba(168,85,247,0.5)]"
                       style={{
-                        width: animateProgress ? `calc(${(hasil.activeStep / (statusSteps.length - 1)) * 100}% - 3rem)` : "0%",
+                        width: animateProgress ? `calc(${(getActiveStep(hasil.status) / (statusSteps.length - 1)) * 100}% - 3rem)` : "0%",
                       }}
                     />
 
                     {statusSteps.map((step, index) => {
-                      const isDone = index <= hasil.activeStep;
-                      const isActive = index === hasil.activeStep;
+                      const activeStep = getActiveStep(hasil.status);
+                      const isDone = index <= activeStep;
+                      const isActive = index === activeStep;
                       return (
                         <div
                           key={step.label}
                           className="relative z-10 flex flex-col items-center gap-3 flex-1"
                         >
                           <div
-                            className={`w-9 h-9 rounded-full border-[3px] flex items-center justify-center text-sm font-bold transition-all duration-700 delay-${index * 100} ${
+                            className={`w-9 h-9 rounded-full border-[3px] flex items-center justify-center text-sm font-bold transition-all duration-700 ${
                               isDone
                                 ? "bg-[#A855F7] border-[#C084FC] text-white shadow-[0_0_15px_rgba(168,85,247,0.6)]"
                                 : "bg-[#0A0A12] border-[#1E1E2E] text-transparent"
