@@ -1,30 +1,69 @@
 "use client";
 import { useState, useEffect } from "react";
 
+// ==========================================
+// MASTER DATA: 10 Armada Resmi Sistem
+// ==========================================
+const armadaStandar = [
+  { name: "KM Nusantara", type: "Kapal Kargo Umum", maxKg: 10000, kode: "VSL-001" },
+  { name: "KM Bahtera Jaya", type: "Kapal Kargo Umum", maxKg: 10000, kode: "VSL-002" },
+  { name: "KM Garuda", type: "Kapal Kargo Umum", maxKg: 10000, kode: "VSL-003" },
+  { name: "KM Tujuh Laut", type: "Kapal Kargo Umum", maxKg: 10000, kode: "VSL-004" },
+  { name: "KM Bintang Samudra", type: "Kapal Kargo Umum", maxKg: 10000, kode: "VSL-005" },
+  { name: "KM Kilat Express", type: "Kapal Ro-Ro Cepat", maxKg: 12000, kode: "VSL-006" },
+  { name: "KM Cepat Jaya", type: "Kapal Ro-Ro Cepat", maxKg: 12000, kode: "VSL-007" },
+  { name: "KM Angin Ribut", type: "Kapal Ro-Ro Cepat", maxKg: 12000, kode: "VSL-008" },
+  { name: "KM Royal VIP", type: "Kapal Kargo Khusus VIP", maxKg: 15000, kode: "VSL-009" },
+  { name: "KM Sultan Laut", type: "Kapal Kargo Khusus VIP", maxKg: 15000, kode: "VSL-010" }
+];
+
 export default function ArmadaClient({ dataDariDatabase }: { dataDariDatabase: any[] }) {
   const [selectedShip, setSelectedShip] = useState<any>(null);
   const [animateProgress, setAnimateProgress] = useState(false);
 
-  // Mapping data dari hasil JOIN database terbaru
-  const armadaData = dataDariDatabase.map((dbShip, index) => {
-    const colors = [
-      "from-[#A855F7] to-[#C084FC]",
-      "from-[#3B82F6] to-[#60A5FA]",
-      "from-[#F59E0B] to-[#FCD34D]",
-      "from-[#22C55E] to-[#4ADE80]"
-    ];
+  const colors = [
+    "from-[#A855F7] to-[#C084FC]",
+    "from-[#3B82F6] to-[#60A5FA]",
+    "from-[#F59E0B] to-[#FCD34D]",
+    "from-[#22C55E] to-[#4ADE80]"
+  ];
+
+  // ==========================================
+  // LOGIKA PENGGABUNGAN DATA (GROUPING)
+  // ==========================================
+  const armadaData = armadaStandar.map((baseShip, index) => {
+    // 1. Cari semua transaksi kargo yang dimuat ke kapal ini dan BELUM terkirim
+    const transaksiAktif = dataDariDatabase.filter(row => 
+      (row.nama_kapal === baseShip.name) && (row.status_kargo !== "Terkirim")
+    );
+
+    // 2. Hitung akumulasi total berat dari seluruh resi yang ada di kapal ini
+    const totalBerat = transaksiAktif.reduce((sum, row) => sum + (Number(row.berat_total) || 0), 0);
+    const persentase = baseShip.maxKg > 0 ? Math.min(Math.round((totalBerat / baseShip.maxKg) * 100), 100) : 0;
+
+    // 3. Ambil data rute & status dari transaksi yang paling baru diinput
+    const transaksiTerbaru = transaksiAktif[0];
+
+    // 4. Kalkulasi ulang status kapal secara real-time
+    let statusKapal = "Tersedia (Siap Muat)";
+    if (persentase >= 100) statusKapal = "Penuh Mutlak";
+    else if (persentase >= 80) statusKapal = "Hampir Penuh";
+    else if (persentase > 0) statusKapal = "Beroperasi (Sebagian Terisi)";
+    else statusKapal = "Kosong (0% Terisi)";
 
     return {
-      id: dbShip.id,
-      name: dbShip.nama_kapal || "Kapal Tidak Diketahui",
-      type: dbShip.jenis_kapal || "Kapal Kargo Umum",
-      kode: dbShip.kode_kapal || `VSL-00${index + 1}`,
-      route: (dbShip.kota_asal && dbShip.kota_tujuan) ? `${dbShip.kota_asal} ➔ ${dbShip.kota_tujuan}` : "Menunggu Rute",
-      muatan: dbShip.kapasitas_muatan ? parseInt(dbShip.kapasitas_muatan) : (45 + (index * 5 > 50 ? 20 : index * 5)),
-      statusKapal: dbShip.status_kapal || "Siap Berlayar",
-      statusKargo: dbShip.status_kargo || "Diproses",
-      jenisBarang: dbShip.jenis_barang || "General Cargo",
-      beratTotal: dbShip.berat_total ? `${dbShip.berat_total} KG` : "0 KG",
+      id: index + 1,
+      name: baseShip.name,
+      type: baseShip.type,
+      kode: baseShip.kode,
+      route: (transaksiTerbaru && transaksiTerbaru.kota_asal && transaksiTerbaru.kota_tujuan) 
+             ? `${transaksiTerbaru.kota_asal} ➔ ${transaksiTerbaru.kota_tujuan}` 
+             : "Menunggu Rute",
+      muatan: persentase,
+      statusKapal: statusKapal,
+      statusKargo: transaksiTerbaru ? transaksiTerbaru.status_kargo : "-",
+      jenisBarang: transaksiTerbaru ? transaksiTerbaru.jenis_barang : "-",
+      beratTotal: `${totalBerat.toLocaleString("id-ID")} / ${baseShip.maxKg.toLocaleString("id-ID")} KG`,
       barColor: colors[index % colors.length]
     };
   });
@@ -74,8 +113,14 @@ export default function ArmadaClient({ dataDariDatabase }: { dataDariDatabase: a
                     {ship.route}
                   </p>
                 </div>
-                <span className="px-3 py-1.5 rounded-md text-xs font-bold tracking-wide shadow-sm flex items-center gap-2 bg-[#3B82F6]/10 text-[#60A5FA] border border-[#3B82F6]/20">
-                  <span className="w-2 h-2 rounded-full bg-[#60A5FA] animate-pulse-glow" />
+                <span className={`px-3 py-1.5 rounded-md text-xs font-bold tracking-wide shadow-sm flex items-center gap-2 border ${
+                  ship.muatan >= 100 ? 'bg-red-500/10 text-red-400 border-red-500/20' : 
+                  ship.muatan > 0 ? 'bg-[#3B82F6]/10 text-[#60A5FA] border-[#3B82F6]/20' : 
+                  'bg-green-500/10 text-green-400 border-green-500/20'
+                }`}>
+                  <span className={`w-2 h-2 rounded-full animate-pulse-glow ${
+                    ship.muatan >= 100 ? 'bg-red-400' : ship.muatan > 0 ? 'bg-[#60A5FA]' : 'bg-green-400'
+                  }`} />
                   {ship.statusKapal}
                 </span>
               </div>
@@ -87,7 +132,9 @@ export default function ArmadaClient({ dataDariDatabase }: { dataDariDatabase: a
                 </div>
                 <div className="w-full h-2.5 bg-[#1E1E2E] rounded-full overflow-hidden">
                   <div 
-                    className={`h-full rounded-full bg-gradient-to-r ${ship.barColor} transition-all duration-1000 ease-out`} 
+                    className={`h-full rounded-full bg-gradient-to-r ${
+                      ship.muatan >= 100 ? 'from-red-500 to-rose-400' : ship.barColor
+                    } transition-all duration-1000 ease-out`} 
                     style={{ width: `${ship.muatan}%` }}
                   ></div>
                 </div>
@@ -143,12 +190,11 @@ export default function ArmadaClient({ dataDariDatabase }: { dataDariDatabase: a
                 </div>
               </div>
               
-              {/* Grid diubah menjadi 2 Kolom agar Kotak jauh lebih lebar */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
                 
                 {/* 1. Rute Pelayaran */}
                 <div className="bg-[#0A0A12] p-4 rounded-xl border border-[#1E1E2E]">
-                  <p className="text-[11px] uppercase tracking-wider text-[#6B6B80] mb-2">Rute Pelayaran</p>
+                  <p className="text-[11px] uppercase tracking-wider text-[#6B6B80] mb-2">Rute Pelayaran Aktif</p>
                   <p className="text-white font-semibold flex items-start gap-2 text-sm">
                     <svg className="w-4 h-4 text-[#A855F7] shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> 
                     <span className="whitespace-normal leading-relaxed">{selectedShip.route}</span>
@@ -157,36 +203,40 @@ export default function ArmadaClient({ dataDariDatabase }: { dataDariDatabase: a
                 
                 {/* 2. Kargo & Berat */}
                 <div className="bg-[#0A0A12] p-4 rounded-xl border border-[#1E1E2E]">
-                  <p className="text-[11px] uppercase tracking-wider text-[#6B6B80] mb-2">Kargo & Berat</p>
+                  <p className="text-[11px] uppercase tracking-wider text-[#6B6B80] mb-2">Total Kargo (Dalam Kapal)</p>
                   <p className="text-white font-semibold flex items-start gap-2 text-sm">
                     <svg className="w-4 h-4 text-[#3B82F6] shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
                     <span className="whitespace-normal leading-relaxed">{selectedShip.jenisBarang} • {selectedShip.beratTotal}</span>
                   </p>
                 </div>
                 
-                {/* 3. Status Operasional (Kapal & Kargo) */}
+                {/* 3. Status Operasional */}
                 <div className="bg-[#0A0A12] p-4 rounded-xl border border-[#1E1E2E] flex flex-col justify-center">
                   <p className="text-[11px] uppercase tracking-wider text-[#6B6B80] mb-2">Status Operasional</p>
                   <p className="text-white font-semibold flex flex-col gap-1.5 text-xs">
                     <span className="flex items-center gap-2">
                       <span className="w-2 h-2 rounded-full bg-[#3B82F6] animate-pulse" /> 
-                      <span className="text-[#A0A0B0]">Kapal:</span> {selectedShip.statusKapal}
+                      <span className="text-[#A0A0B0]">Kesiapan:</span> {selectedShip.statusKapal}
                     </span>
                     <span className="flex items-center gap-2">
                       <span className="w-2 h-2 rounded-full bg-[#A855F7]" /> 
-                      <span className="text-[#A0A0B0]">Kargo:</span> {selectedShip.statusKargo}
+                      <span className="text-[#A0A0B0]">Pengiriman:</span> {selectedShip.statusKargo}
                     </span>
                   </p>
                 </div>
 
                 {/* 4. Kapasitas Muatan */}
                 <div className="bg-[#0A0A12] p-4 rounded-xl border border-[#1E1E2E] flex flex-col justify-center">
-                  <p className="text-[11px] uppercase tracking-wider text-[#6B6B80] mb-2">Kapasitas Muatan</p>
+                  <p className="text-[11px] uppercase tracking-wider text-[#6B6B80] mb-2">Kapasitas Maksimal</p>
                   <div className="flex items-center gap-3">
-                    <p className="text-white font-bold">{selectedShip.muatan}%</p>
+                    <p className={`font-bold ${selectedShip.muatan >= 100 ? 'text-red-400' : 'text-white'}`}>
+                      {selectedShip.muatan}%
+                    </p>
                     <div className="flex-1 h-1.5 bg-[#1E1E2E] rounded-full overflow-hidden">
                       <div 
-                        className="h-full bg-gradient-to-r from-[#A855F7] to-[#C084FC] rounded-full transition-all duration-1000 ease-out" 
+                        className={`h-full rounded-full transition-all duration-1000 ease-out ${
+                          selectedShip.muatan >= 100 ? 'bg-red-500' : 'bg-gradient-to-r ' + selectedShip.barColor
+                        }`} 
                         style={{ width: animateProgress ? `${selectedShip.muatan}%` : '0%' }}
                       />
                     </div>
