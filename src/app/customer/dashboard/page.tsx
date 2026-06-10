@@ -12,6 +12,23 @@ const poppins = Poppins({
 
 const HARGA_PER_KG = 25000;
 
+// Data untuk combobox
+const daftarKota = [
+  "Jakarta",
+  "Surabaya",
+  "Semarang",
+  "Makassar",
+  "Medan",
+];
+
+const daftarJenisBarang = [
+  "Barang Umum",
+  "Peralatan Rumah Tangga",
+  "Peralatan Elektronik",
+  "Kendaraan Bermotor & Sepeda",
+  "Bahan Bangunan",
+];
+
 // Fungsi untuk mengambil data user yang login
 async function getUserFromToken() {
   try {
@@ -94,6 +111,16 @@ export default function CustomerDashboard() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
+    
+    // Reset error kotaTujuan jika kota asal diubah
+    if (name === "kotaAsal" && errors.kotaTujuan === "Kota asal dan kota tujuan tidak boleh sama.") {
+      setErrors(prev => ({ ...prev, kotaTujuan: "" }));
+    }
+    // Reset error kotaTujuan jika kota tujuan diubah
+    if (name === "kotaTujuan" && errors.kotaTujuan === "Kota asal dan kota tujuan tidak boleh sama.") {
+      setErrors(prev => ({ ...prev, kotaTujuan: "" }));
+    }
+    
     setForm({ ...form, [name]: value });
     
     if (errors[name as keyof typeof errors]) {
@@ -150,6 +177,11 @@ export default function CustomerDashboard() {
     }
     if (!form.kotaTujuan.trim()) {
       newErrors.kotaTujuan = "Kota tujuan pengiriman wajib diisi.";
+      isValid = false;
+    }
+    // Validasi kota asal dan tujuan tidak boleh sama
+    if (form.kotaAsal && form.kotaTujuan && form.kotaAsal === form.kotaTujuan) {
+      newErrors.kotaTujuan = "Kota asal dan kota tujuan tidak boleh sama.";
       isValid = false;
     }
     if (!form.berat || parseFloat(form.berat) <= 0) {
@@ -286,7 +318,21 @@ export default function CustomerDashboard() {
               </div>
               <div>
                 <label className="text-[#C084FC] text-[11px] font-bold uppercase">Kota Asal</label>
-                <input type="text" name="kotaAsal" value={form.kotaAsal} onChange={handleChange} placeholder="Masukkan kota asal" className="w-full bg-[#0A0A12] border border-[#1E1E2E] rounded-xl px-4 py-3.5 text-white" />
+                <select
+                  name="kotaAsal"
+                  value={form.kotaAsal}
+                  onChange={handleChange}
+                  className={`w-full bg-[#0A0A12] border rounded-xl px-4 py-3.5 text-white text-sm focus:outline-none focus:ring-1 transition-all duration-300 ${
+                    errors.kotaAsal 
+                      ? "border-red-500 focus:border-red-500 focus:ring-red-500/50" 
+                      : "border-[#1E1E2E] focus:border-[#A855F7] focus:ring-[#A855F7] hover:border-[#A855F7]/50"
+                  }`}
+                >
+                  <option value="">Pilih Kota Asal</option>
+                  {daftarKota.map((kota) => (
+                    <option key={kota} value={kota}>{kota}</option>
+                  ))}
+                </select>
                 {errors.kotaAsal && <span className="text-red-400 text-[10px]">{errors.kotaAsal}</span>}
               </div>
             </div>
@@ -294,7 +340,21 @@ export default function CustomerDashboard() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <div>
                 <label className="text-[#C084FC] text-[11px] font-bold uppercase">Kota Tujuan</label>
-                <input type="text" name="kotaTujuan" value={form.kotaTujuan} onChange={handleChange} placeholder="Masukkan kota tujuan" className="w-full bg-[#0A0A12] border border-[#1E1E2E] rounded-xl px-4 py-3.5 text-white" />
+                <select
+                  name="kotaTujuan"
+                  value={form.kotaTujuan}
+                  onChange={handleChange}
+                  className={`w-full bg-[#0A0A12] border rounded-xl px-4 py-3.5 text-white text-sm focus:outline-none focus:ring-1 transition-all duration-300 ${
+                    errors.kotaTujuan 
+                      ? "border-red-500 focus:border-red-500 focus:ring-red-500/50" 
+                      : "border-[#1E1E2E] focus:border-[#A855F7] focus:ring-[#A855F7] hover:border-[#A855F7]/50"
+                  }`}
+                >
+                  <option value="">Pilih Kota Tujuan</option>
+                  {daftarKota.map((kota) => (
+                    <option key={kota} value={kota}>{kota}</option>
+                  ))}
+                </select>
                 {errors.kotaTujuan && <span className="text-red-400 text-[10px]">{errors.kotaTujuan}</span>}
               </div>
               <div>
@@ -307,7 +367,21 @@ export default function CustomerDashboard() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <div>
                 <label className="text-[#C084FC] text-[11px] font-bold uppercase">Jenis Barang</label>
-                <input type="text" name="jenisBarang" value={form.jenisBarang} onChange={handleChange} placeholder="Contoh: Elektronik" className="w-full bg-[#0A0A12] border border-[#1E1E2E] rounded-xl px-4 py-3.5 text-white" />
+                <select
+                  name="jenisBarang"
+                  value={form.jenisBarang}
+                  onChange={handleChange}
+                  className={`w-full bg-[#0A0A12] border rounded-xl px-4 py-3.5 text-white text-sm focus:outline-none focus:ring-1 transition-all duration-300 ${
+                    errors.jenisBarang 
+                      ? "border-red-500 focus:border-red-500 focus:ring-red-500/50" 
+                      : "border-[#1E1E2E] focus:border-[#A855F7] focus:ring-[#A855F7] hover:border-[#A855F7]/50"
+                  }`}
+                >
+                  <option value="">Pilih Jenis Barang</option>
+                  {daftarJenisBarang.map((jenis) => (
+                    <option key={jenis} value={jenis}>{jenis}</option>
+                  ))}
+                </select>
                 {errors.jenisBarang && <span className="text-red-400 text-[10px]">{errors.jenisBarang}</span>}
               </div>
               <div>
