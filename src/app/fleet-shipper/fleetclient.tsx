@@ -66,7 +66,7 @@ const safeGreenCoords = [
 ];
 
 export default function FleetClient({ dataDariDatabase }: { dataDariDatabase: any[] }) {
-  const router = useRouter(); // <-- Inisialisasi router
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState('peta');
   const [isTabChanging, setIsTabChanging] = useState(false);
   const [pageLoaded, setPageLoaded] = useState(false);
@@ -89,15 +89,13 @@ export default function FleetClient({ dataDariDatabase }: { dataDariDatabase: an
   // =====================================================================
   const handleLogout = async () => {
     await logoutAction();
-    window.location.href = "/login";
   };
 
-  // KODE BARU DITAMBAHKAN DI SINI UNTUK METADATA (JUDUL TAB DINAMIS)
   useEffect(() => {
     const titles: Record<string, string> = {
       'peta': 'Radar Armada | Praketrio',
       'armada': 'Data Armada | Praketrio',
-      'analisis': 'Analisis Operasional | Praketrio',
+      'analitik': 'Analitik Operasional | Praketrio',
       'peringatan': 'Pusat Peringatan | Praketrio'
     };
     
@@ -189,39 +187,39 @@ export default function FleetClient({ dataDariDatabase }: { dataDariDatabase: an
   const alertShips = dynamicShips.filter(s => s.isTrouble);
 
   // ================= INIT SHIPS =================
-useEffect(() => {
-  setDynamicShips(shipsData);
-}, [dataDariDatabase]);
+  useEffect(() => {
+    setDynamicShips(shipsData);
+  }, [dataDariDatabase]);
 
-// ================= GERAK REALTIME =================
-useEffect(() => {
-  if (dynamicShips.length === 0) return;
+  // ================= GERAK REALTIME =================
+  useEffect(() => {
+    if (dynamicShips.length === 0) return;
 
-  const interval = setInterval(() => {
-    setDynamicShips(prevShips =>
-      prevShips.map(ship => {
-        const moveAmount = ship.isTrouble ? 0.38: 0.55;
-        let currentTop = parseFloat(ship.top);
-        let currentLeft = parseFloat(ship.left);
+    const interval = setInterval(() => {
+      setDynamicShips(prevShips =>
+        prevShips.map(ship => {
+          const moveAmount = ship.isTrouble ? 0.38: 0.55;
+          let currentTop = parseFloat(ship.top);
+          let currentLeft = parseFloat(ship.left);
 
-        currentTop += (Math.random() - 0.5) * moveAmount;
-        currentLeft += (Math.random() - 0.5) * moveAmount;
+          currentTop += (Math.random() - 0.5) * moveAmount;
+          currentLeft += (Math.random() - 0.5) * moveAmount;
 
-        // PEMBATASAN AREA PETA (Batas Kiri diubah ke 32 agar kapal tidak masuk ke UI kiri)
-        currentTop = Math.max(10, Math.min(85, currentTop));
-        currentLeft = Math.max(32, Math.min(90, currentLeft));
+          // PEMBATASAN AREA PETA (Batas Kiri diubah ke 32 agar kapal tidak masuk ke UI kiri)
+          currentTop = Math.max(10, Math.min(85, currentTop));
+          currentLeft = Math.max(32, Math.min(90, currentLeft));
 
-        return {
-          ...ship,
-          top: `${currentTop}%`,
-          left: `${currentLeft}%`
-        };
-      })
-    );
-  }, 200);
+          return {
+            ...ship,
+            top: `${currentTop}%`,
+            left: `${currentLeft}%`
+          };
+        })
+      );
+    }, 200);
 
-  return () => clearInterval(interval);
-}, [dynamicShips.length]);
+    return () => clearInterval(interval);
+  }, [dynamicShips.length]);
 
   // 2. LOG KAPAL REAL-TIME
   const logs = dynamicShips.map((ship, idx) => {
@@ -274,7 +272,33 @@ useEffect(() => {
     setPeringatanSelesaiHariIni(prev => prev + 1);
   };
 
-  const handleDownloadPDF = () => alert("Mengunduh Laporan Operasional...");
+  // =====================================================================
+  // FUNGSI UNDUH LAPORAN CSV (REAL BERDASARKAN DATABASE)
+  // =====================================================================
+  const handleDownloadCSV = () => {
+    if (dynamicShips.length === 0) {
+      alert("Data armada masih kosong, belum bisa diunduh.");
+      return;
+    }
+
+    // Header CSV
+    const headers = "No Resi,Nama Kapal,Kota Asal,Kota Tujuan,Status Operasional,Kecepatan (Knots),Berat\n";
+    
+    // Konversi Data
+    const csvRows = dynamicShips.map(ship => 
+      `${ship.resi},${ship.name},${ship.port1},${ship.port2},${ship.statusKargo},${ship.speed},${ship.berat}`
+    ).join("\n");
+
+    const csvContent = "data:text/csv;charset=utf-8," + headers + csvRows;
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `Laporan_Analitik_Fleet_${new Date().getTime()}.csv`);
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   return (
     <div className={`min-h-screen bg-[#0A0A12] text-white font-sans relative overflow-x-hidden selection:bg-[#A855F7]/30 transition-opacity duration-1000 ${pageLoaded ? 'opacity-100' : 'opacity-0'}`}>
@@ -370,7 +394,7 @@ useEffect(() => {
 
       <div className="border-b border-[#1E1E2E] flex justify-between items-center pl-8 pr-6 py-0 bg-[#13131F] sticky top-[81px] z-30 shadow-md">
         <div className="flex gap-8 text-sm font-bold tracking-widest h-full">
-          {['PETA', 'ARMADA', 'ANALISIS', 'PERINGATAN'].map((tab) => (
+          {['PETA', 'ARMADA', 'ANALITIK', 'PERINGATAN'].map((tab) => (
             <button 
               key={tab}
               onClick={() => handleTabChange(tab.toLowerCase())}
@@ -445,14 +469,13 @@ useEffect(() => {
                           <div className="absolute inset-0 rounded-full animate-ping opacity-40" style={{ backgroundColor: ship.color }} />
                       )}
                   </div>
-                  {/* Nama kapal selalu tampil. Hover efek memberikan penekanan */}
                   <div className={`mt-2 bg-[#0A0A12]/90 backdrop-blur-md border px-2.5 py-1 text-[9px] rounded-md font-bold font-sans whitespace-nowrap shadow-xl transition-all duration-300 ${selectedShip?.id === ship.id ? 'scale-110 border-white text-white' : 'border-[#1E1E2E] text-slate-300 group-hover/ship:border-slate-500 group-hover/ship:text-white group-hover/ship:-translate-y-1'}`}>
                       {ship.name}
                   </div>
                 </div>
               ))}
 
-              {/* PANEL KANAN: DETAIL KAPAL (MUNCUL JIKA DIKLIK) */}
+              {/* PANEL KANAN: DETAIL KAPAL */}
               {selectedShip && (
                   <div className="absolute top-0 right-0 h-full w-[350px] bg-[#0A0A12]/95 border-l border-[#1E1E2E] backdrop-blur-xl p-8 shadow-2xl z-50 animate-in slide-in-from-right duration-500 flex flex-col overflow-y-auto">
                       <div className="flex justify-between items-center mb-6 shrink-0">
@@ -607,8 +630,8 @@ useEffect(() => {
           </div>
         )}
 
-        {/* ================= TAB 3: ANALISIS ================= */}
-        {activeTab === 'analisis' && (
+        {/* ================= TAB 3: ANALITIK (NAMA BARU & DIAGRAM BATANG) ================= */}
+        {activeTab === 'analitik' && (
           <div className="space-y-8 w-full max-w-7xl mx-auto font-sans">
             <ScrollRevealBox delay={100}>
                 <div className="flex justify-between items-center bg-[#13131F] p-6 rounded-2xl border border-[#1E1E2E] shadow-lg transition-colors duration-500 hover:border-slate-800">
@@ -616,7 +639,11 @@ useEffect(() => {
                         <h2 className="text-2xl font-bold text-white tracking-tight">Ringkasan Eksekutif Operasional</h2>
                         <p className="text-sm text-[#A0A0B0] mt-1">Kompilasi metrik utama performa armada saat ini</p>
                     </div>
-                    <button onClick={() => alert("Laporan diunduh")} className="bg-[#1A1A24] border border-[#1E1E2E] hover:border-purple-500/50 text-slate-300 hover:text-white px-6 py-3 rounded-xl text-xs font-bold transition-all duration-300 uppercase tracking-widest shadow-lg hover:-translate-y-1 hover:shadow-[0_5px_20px_rgba(168,85,247,0.2)] active:scale-95">
+                    {/* TOMBOL UNDUH CSV YANG BERFUNGSI */}
+                    <button 
+                      onClick={handleDownloadCSV} 
+                      className="bg-[#1A1A24] border border-[#1E1E2E] hover:border-purple-500/50 text-slate-300 hover:text-white px-6 py-3 rounded-xl text-xs font-bold transition-all duration-300 uppercase tracking-widest shadow-lg hover:-translate-y-1 hover:shadow-[0_5px_20px_rgba(168,85,247,0.2)] active:scale-95"
+                    >
                         Unduh Data Laporan
                     </button>
                 </div>
@@ -643,30 +670,35 @@ useEffect(() => {
 
             <ScrollRevealBox delay={400}>
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 font-sans">
-                    <div className="lg:col-span-2 bg-[#13131F] border border-[#1E1E2E] p-8 rounded-2xl shadow-lg transition-colors duration-500 hover:border-slate-800">
+                    <div className="lg:col-span-2 bg-[#13131F] border border-[#1E1E2E] p-8 rounded-2xl shadow-lg transition-colors duration-500 hover:border-slate-800 flex flex-col">
                         <h3 className="text-sm font-bold tracking-widest text-slate-300 uppercase border-b border-[#1E1E2E] pb-4">Distribusi Status Operasional (Visual Radar)</h3>
-                        <div className="space-y-6 pt-6 font-sans">
-                            {[
-                                { label: 'Dalam Pelayaran Normal (HIJAU)', count: dynamicShips.filter(s => s.statusKargo === "BERLAYAR").length, color: 'bg-[#10B981]' },
-                                { label: 'Pengiriman Selesai / Pelabuhan (BIRU)', count: dynamicShips.filter(s => s.statusKargo === "SELESAI").length, color: 'bg-[#3B82F6]' },
-                                { label: 'Gangguan Laut / Trouble (MERAH)', count: alertShips.length, color: 'bg-[#EF4444]' },
-                            ].map((item, i) => {
-                                const percentage = dynamicShips.length > 0 ? Math.round((item.count / dynamicShips.length) * 100) : 0;
-                                return (
-                                    <div key={i} className="group cursor-default">
-                                        <div className="flex justify-between text-xs mb-2 items-center">
-                                            <span className="font-bold text-[#A0A0B0] tracking-widest uppercase transition-colors group-hover:text-white">{item.label}</span>
-                                            <div className="flex items-baseline gap-2">
-                                                <span className="text-white font-bold text-lg font-sans">{item.count}</span>
-                                                <span className={`font-bold ml-2 font-sans ${item.color.replace('bg-','text-')}`}>{percentage}%</span>
-                                            </div>
-                                        </div>
-                                        <div className="w-full bg-[#0A0A12] h-2 rounded-full overflow-hidden border border-[#1E1E2E] shadow-inner">
-                                            <div className={`${item.color} h-full rounded-full transition-all duration-1000 ease-out shadow-[0_0_10px_rgba(0,0,0,0.5)]`} style={{ width: `${percentage}%` }}></div>
-                                        </div>
-                                    </div>
-                                );
-                            })}
+                        
+                        {/* CHART BAR VERTIKAL KEREN PENGGANTI BAR HORIZONTAL LAMA */}
+                        <div className="flex-1 mt-8 mb-4">
+                           <div className="flex justify-around items-end h-64 border-b border-l border-[#1E1E2E] p-4 relative w-full">
+                               {/* Garis Latar Y-Axis */}
+                               <div className="absolute top-0 left-0 w-full border-t border-[#1E1E2E]/50 border-dashed"></div>
+                               <div className="absolute top-1/3 left-0 w-full border-t border-[#1E1E2E]/50 border-dashed"></div>
+                               <div className="absolute top-2/3 left-0 w-full border-t border-[#1E1E2E]/50 border-dashed"></div>
+
+                               {[
+                                   { label: 'BERLAYAR', count: dynamicShips.filter(s => s.statusKargo === "BERLAYAR").length, color: 'bg-[#10B981]', shadow: 'shadow-[0_0_20px_#10B981]' },
+                                   { label: 'SELESAI', count: dynamicShips.filter(s => s.statusKargo === "SELESAI").length, color: 'bg-[#3B82F6]', shadow: 'shadow-[0_0_20px_#3B82F6]' },
+                                   { label: 'GANGGUAN', count: alertShips.length, color: 'bg-[#EF4444]', shadow: 'shadow-[0_0_20px_#EF4444]' },
+                               ].map((item, i) => {
+                                   const percentage = dynamicShips.length > 0 ? Math.round((item.count / dynamicShips.length) * 100) : 0;
+                                   return (
+                                       <div key={i} className="flex flex-col items-center group w-1/4 z-10 h-full justify-end">
+                                           <span className="text-white font-bold text-lg mb-2 opacity-50 group-hover:opacity-100 transition-opacity translate-y-2 group-hover:-translate-y-1">{item.count}</span>
+                                           <div className="w-full bg-[#0A0A12] rounded-t-lg overflow-hidden border border-[#1E1E2E] flex items-end relative" style={{ height: `${Math.max(percentage, 5)}%` }}>
+                                                {/* Batang Chart dengan Animasi */}
+                                                <div className={`w-full ${item.color} rounded-t-lg transition-all duration-1000 ease-out opacity-80 group-hover:opacity-100 group-hover:${item.shadow} h-full`}></div>
+                                           </div>
+                                           <span className="text-[10px] text-[#A0A0B0] font-bold tracking-widest mt-4 group-hover:text-white transition-colors">{item.label} ({percentage}%)</span>
+                                       </div>
+                                   )
+                               })}
+                           </div>
                         </div>
                     </div>
                     
