@@ -17,14 +17,12 @@ export default async function PengirimanPage(props: {
   const itemsPerPage = 5; 
   const offset = (currentPage - 1) * itemsPerPage;
 
-  // PERBAIKAN: Menambahkan tipe : any[] agar TypeScript/Vercel tidak error
   let pengirimanRows: any[] = [];
   let totalPages = 1;
 
   let queryClean = `%${query}%`;
 
   try {
-    // Menghitung total data dengan 4 kriteria pencarian menggunakan LEFT JOIN agar sinkron
     const countResult = await db.query(`
       SELECT COUNT(*)
       FROM transaksi_pengiriman tp
@@ -32,27 +30,34 @@ export default async function PengirimanPage(props: {
       LEFT JOIN detail_pengiriman dp ON tp.id = dp.transaksi_id
       WHERE tp.no_resi ILIKE $1 
          OR c.nama_customer ILIKE $1
-         OR c.nama_penerima ILIKE $1
+         OR tp.nama_penerima ILIKE $1
          OR dp.jenis_barang ILIKE $1
     `, [queryClean]);
     
     const totalItems = Number(countResult.rows[0]?.count || 0);
     totalPages = Math.ceil(totalItems / itemsPerPage) || 1; 
 
-    // MENAMPILKAN DATA DENGAN ID DESC AGAR DATA TERBARU MUNCUL DI HALAMAN 1 PALING ATAS
+    // PERBAIKAN: Menambahkan kota_asal, kota_tujuan, telepon, penerima, dan nama_kapal
     const result = await db.query(`
       SELECT 
         tp.no_resi, 
-        c.nama_customer, 
+        c.nama_customer AS pengirim, 
+        tp.nama_penerima AS penerima,
+        dp.telepon_pengirim,
+        dp.telepon_penerima,
+        tp.kota_asal,
+        tp.kota_tujuan,
         dp.berat_total,
         tp.tanggal_transaksi,
-        tp.status
+        tp.status,
+        kp.nama_kapal AS nama_kapal
       FROM transaksi_pengiriman tp
       LEFT JOIN customers c ON tp.customer_id = c.id
       LEFT JOIN detail_pengiriman dp ON tp.id = dp.transaksi_id
+      LEFT JOIN kapal_pengiriman kp ON tp.id = kp.transaksi_id
       WHERE tp.no_resi ILIKE $1 
          OR c.nama_customer ILIKE $1
-         OR c.nama_penerima ILIKE $1
+         OR tp.nama_penerima ILIKE $1
          OR dp.jenis_barang ILIKE $1
       ORDER BY tp.id DESC
       LIMIT $2 OFFSET $3
@@ -66,7 +71,6 @@ export default async function PengirimanPage(props: {
     console.error("Gagal memuat data transaksi pengiriman:", error);
   }
 
-  // Desain Skeleton (Kerangka Kotak-kotak Abu-abu Berkedip)
   const SkeletonTable = () => (
     <div className="space-y-8 pb-10">
       <div className="flex justify-between items-center">
@@ -106,5 +110,5 @@ export default async function PengirimanPage(props: {
         currentPage={currentPage} 
       />
     </Suspense>
-  );
+  ); 
 }

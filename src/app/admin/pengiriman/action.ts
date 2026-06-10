@@ -38,19 +38,20 @@ export async function hapusResiDatabase(resi: string) {
     revalidatePath("/admin/pengiriman");
     revalidatePath("/admin/dashboard");
     revalidatePath("/admin/armada");
+    revalidatePath("/admin/analitik");
 
     return { success: true };
   } catch (error) {
     await client.query("ROLLBACK");
     console.error("DELETE ERROR:", error);
-    return { success: false };
+    return { success: false, error: (error as Error).message };
   } finally {
     client.release();
   }
 }
 
 // ======================================================
-// 2. FUNGSI EDIT RESI
+// 2. FUNGSI EDIT RESI (ANTI DATA BENTROK / NGIKUT MASSAL)
 // ======================================================
 export async function editResiDatabase(
   resi: string,
@@ -76,10 +77,39 @@ export async function editResiDatabase(
     const transaksiId = getData.rows[0].id;
     const customerId = getData.rows[0].customer_id;
 
-    await client.query(
-      `UPDATE customers SET nama_customer = $1 WHERE id = $2`,
-      [namaPengirim, customerId]
+    const countTx = await client.query(
+      "SELECT COUNT(*) FROM transaksi_pengiriman WHERE customer_id = $1",
+      [customerId]
     );
+    const isShared = Number(countTx.rows[0].count || 0) > 1;
+
+    if (isShared) {
+      let newCustId;
+      try {
+        const newCustRes = await client.query(
+          `INSERT INTO customers (nama_customer, no_telepon) VALUES ($1, $2) RETURNING id`,
+          [namaPengirim, "-"]
+        );
+        newCustId = newCustRes.rows[0].id;
+      } catch (e) {
+        const maxCustResult = await client.query("SELECT MAX(id) FROM customers");
+        newCustId = Number(maxCustResult.rows[0].max || 0) + 1;
+        await client.query(
+          `INSERT INTO customers (id, nama_customer, no_telepon) VALUES ($1, $2, $3)`,
+          [newCustId, namaPengirim, "-"]
+        );
+      }
+
+      await client.query(
+        `UPDATE transaksi_pengiriman SET customer_id = $1 WHERE id = $2`,
+        [newCustId, transaksiId]
+      );
+    } else {
+      await client.query(
+        `UPDATE customers SET nama_customer = $1 WHERE id = $2`,
+        [namaPengirim, customerId]
+      );
+    }
 
     await client.query(
       `UPDATE detail_pengiriman SET berat_total = $1 WHERE transaksi_id = $2`,
@@ -96,19 +126,20 @@ export async function editResiDatabase(
     revalidatePath("/admin/pengiriman");
     revalidatePath("/admin/dashboard");
     revalidatePath("/admin/armada");
+    revalidatePath("/admin/analitik");
 
     return { success: true };
   } catch (error) {
     await client.query("ROLLBACK");
     console.error("EDIT ERROR:", error);
-    return { success: false };
+    return { success: false, error: (error as Error).message };
   } finally {
     client.release();
   }
 }
 
 // ======================================================
-// 3. FUNGSI TAMBAH RESI (DIPERBAIKI - MENYIMPAN NAMA_PENERIMA KE TRANSAKSI)
+// 3. FUNGSI TAMBAH RESI (KEMBALI KE AUTO-INCREMENT CERDAS)
 // ======================================================
 export async function tambahResiDatabase(formData: FormData) {
   const client = await db.connect();
@@ -116,23 +147,25 @@ export async function tambahResiDatabase(formData: FormData) {
   try {
     await client.query("BEGIN");
 
-    // Ambil customer_id dari form (dikirim dari dashboard)
-    const customerId = formData.get("customer_id") as string;
+    // KEMBALI KE LOGIKA CERDAS TRISTO: Ambil nomor resi terakhir dari DB agar anti-bentrok duplikat
+    const lastResiQuery = await client.query("SELECT no_resi FROM transaksi_pengiriman ORDER BY id DESC LIMIT 1");
+    let nomorBerikutnya = 1;
     
-    if (!customerId) {
-      throw new Error("customer_id tidak ditemukan. Silakan login terlebih dahulu.");
+    if (lastResiQuery.rows.length > 0) {
+      const lastResi = lastResiQuery.rows[0].no_resi; 
+      const lastNum = parseInt(lastResi.replace("SWB-2024", ""), 10);
+      if (!isNaN(lastNum)) {
+        nomorBerikutnya = lastNum + 1;
+      }
     }
-
-    // Hitung nomor resi berikutnya
-    const countResult = await client.query("SELECT COUNT(*) FROM transaksi_pengiriman");
-    const nomorBerikutnya = Number(countResult.rows[0].count || 0) + 1;
     const noResiBaru = `SWB-2024${String(nomorBerikutnya).padStart(4, "0")}`;
 
     const data = {
       tanggalKirim: formData.get("tanggalKirim") as string,
       pengirim: formData.get("namaPengirim") as string,
       penerima: formData.get("namaPenerima") as string,
-      telepon: formData.get("noTelepon") as string,
+      teleponPengirim: (formData.get("noTeleponPengirim") as string) || (formData.get("noTelepon") as string) || "-",
+      teleponPenerima: (formData.get("noTeleponPenerima") as string) || (formData.get("noTelepon") as string) || "-",
       kotaAsal: formData.get("kotaAsal") as string,
       kotaTujuan: formData.get("kotaTujuan") as string,
       jenisBarang: formData.get("jenisBarang") as string,
@@ -140,27 +173,45 @@ export async function tambahResiDatabase(formData: FormData) {
       harga: Number(formData.get("hargaTarif")),
       jenisPengiriman: formData.get("jenisPengiriman") as string,
       statusKargo: "Diproses",
-      deskripsi: formData.get("deskripsi") as string,
+      deskripsi: (formData.get("deskripsi") as string) || "",
       namaKapal: formData.get("namaKapal") as string,
       jenisKapal: (formData.get("jenisKapal") as string) || "Kapal Kargo Umum",
-      kodeKapal: formData.get("kodeKapal") as string,
-      kapasitas: formData.get("kapasitasMuatan") as string,
-      statusKapal: "Siap Berlayar",
-      tipePaket: formData.get("tipePaket") as string,
-      totalBiaya: Number(formData.get("totalBiaya")),
+      kodeKapal: (formData.get("kodeKapal") as string) || `IMO-${Math.floor(1000000 + Math.random() * 9000000)}`,
+      kapasitas: (formData.get("kapasitasMuatan") as string) || "100%",
+      statusKapal: (formData.get("statusKapal") as string) || "Siap Berlayar",
+      tipePaket: (formData.get("tipePaket") as string) || (formData.get("jenisPengiriman") as string),
+      totalBiaya: Number(formData.get("totalBiaya")) || Number(formData.get("hargaTarif")),
     };
 
-    const customerIdInt = parseInt(customerId);
+    let customerIdInt: number;
+    const customerIdFromForm = formData.get("customer_id") as string;
 
-    // UPDATE data customer (no_telepon saja, nama_penerima disimpan di transaksi)
-    await client.query(
-      `UPDATE customers 
-       SET no_telepon = $1 
-       WHERE id = $2`,
-      [data.telepon, customerIdInt]
-    );
+    if (customerIdFromForm && customerIdFromForm !== "" && customerIdFromForm !== "null" && customerIdFromForm !== "undefined") {
+      customerIdInt = parseInt(customerIdFromForm);
+      await client.query(
+        `UPDATE customers SET no_telepon = $1 WHERE id = $2`,
+        [data.teleponPengirim, customerIdInt]
+      );
+    } else {
+      try {
+        const newCustomerResult = await client.query(
+          `INSERT INTO customers (nama_customer, no_telepon) VALUES ($1, $2) RETURNING id`,
+          [data.pengirim, data.teleponPengirim]
+        );
+        customerIdInt = newCustomerResult.rows[0].id;
+      } catch (err) {
+        const maxCustResult = await client.query("SELECT MAX(id) FROM customers");
+        const nextCustId = Number(maxCustResult.rows[0].max || 0) + 1;
 
-    // INSERT ke transaksi_pengiriman (sekarang dengan kolom nama_penerima)
+        await client.query(
+          `INSERT INTO customers (id, nama_customer, no_telepon) VALUES ($1, $2, $3)`,
+          [nextCustId, data.pengirim, data.teleponPengirim]
+        );
+        customerIdInt = nextCustId;
+      }
+    }
+
+    // INSERT ke transaksi_pengiriman
     const transaksiResult = await client.query(
       `INSERT INTO transaksi_pengiriman (no_resi, customer_id, tanggal_transaksi, status, jenis_pengiriman, kota_asal, kota_tujuan, tipe_paket, nama_penerima)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`,
@@ -168,12 +219,36 @@ export async function tambahResiDatabase(formData: FormData) {
     );
     const transaksiId = transaksiResult.rows[0].id;
 
-    // INSERT ke detail_pengiriman
-    await client.query(
-      `INSERT INTO detail_pengiriman (transaksi_id, berat_total, jenis_barang, harga_tarif, deskripsi, biaya, total_biaya)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-      [transaksiId, data.berat, data.jenisBarang, data.harga, data.deskripsi, data.harga, data.totalBiaya]
-    );
+    // INSERT ke detail_pengiriman dengan penanganan dinamis struktur kolom temanmu
+    try {
+      await client.query(
+        `INSERT INTO detail_pengiriman (transaksi_id, berat_total, jenis_barang, harga_tarif, deskripsi, biaya, total_biaya, telepon_pengirim, telepon_penerima)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+        [transaksiId, data.berat, data.jenisBarang, data.harga, data.deskripsi, data.harga, data.totalBiaya, data.teleponPengirim, data.teleponPenerima]
+      );
+    } catch (err1) {
+      try {
+        await client.query(
+          `INSERT INTO detail_pengiriman (transaksi_id, berat_total, jenis_barang, harga_tarif, deskripsi, total_biaya, telepon_pengirim, telepon_penerima)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+          [transaksiId, data.berat, data.jenisBarang, data.harga, data.deskripsi, data.totalBiaya, data.teleponPengirim, data.teleponPenerima]
+        );
+      } catch (err2) {
+        try {
+          await client.query(
+            `INSERT INTO detail_pengiriman (transaksi_id, berat_total, jenis_barang, harga_tarif, deskripsi, total_biaya)
+             VALUES ($1, $2, $3, $4, $5, $6)`,
+            [transaksiId, data.berat, data.jenisBarang, data.harga, data.deskripsi, data.totalBiaya]
+          );
+        } catch (err3) {
+          await client.query(
+            `INSERT INTO detail_pengiriman (transaksi_id, berat_total, jenis_barang, harga_tarif, deskripsi, biaya, total_biaya)
+             VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+            [transaksiId, data.berat, data.jenisBarang, data.harga, data.deskripsi, data.harga, data.totalBiaya]
+          );
+        }
+      }
+    }
 
     // INSERT ke kapal_pengiriman
     await client.query(
@@ -187,13 +262,14 @@ export async function tambahResiDatabase(formData: FormData) {
     revalidatePath("/admin/pengiriman");
     revalidatePath("/admin/dashboard");
     revalidatePath("/admin/armada");
+    revalidatePath("/admin/analitik");
     revalidatePath("/customer/riwayat");
 
     return { success: true, no_resi: noResiBaru };
   } catch (error) {
     await client.query("ROLLBACK");
     console.error("CREATE ERROR:", error);
-    return { success: false, error: "Database Error: " + (error as Error).message };
+    return { success: false, error: (error as Error).message };
   } finally {
     client.release();
   }
