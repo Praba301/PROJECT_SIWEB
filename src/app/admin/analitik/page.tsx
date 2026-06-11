@@ -9,7 +9,7 @@ export default async function AnalitikPage() {
   let armadaRows: any[] = [];
   let customerRows: any[] = [];
   
-  // 1. Tarik Data Armada (Pasti ada 10)
+  // 1. Tarik Data Armada 
   try {
     const res = await db.query("SELECT * FROM armada");
     armadaRows = res.rows;
@@ -20,7 +20,7 @@ export default async function AnalitikPage() {
     } catch (err) { }
   }
 
-  // 2. Tarik Data Customer (Pasti ada 29)
+  // 2. Tarik Data Customer 
   try {
     const res = await db.query("SELECT * FROM customers");
     customerRows = res.rows;

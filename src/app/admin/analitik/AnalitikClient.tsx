@@ -7,6 +7,22 @@ interface AnalitikClientProps {
   customerRows: any[];
 }
 
+// =====================================================================
+// MASTER DATA: 10 Armada Resmi Sistem (Sesuai Form Tambah Resi)
+// =====================================================================
+const armadaStandar = [
+  { name: "KM Nusantara", type: "Kapal Kargo Umum", kode: "VSL-001" },
+  { name: "KM Bahtera Jaya", type: "Kapal Kargo Umum", kode: "VSL-002" },
+  { name: "KM Garuda", type: "Kapal Kargo Umum", kode: "VSL-003" },
+  { name: "KM Tujuh Laut", type: "Kapal Kargo Umum", kode: "VSL-004" },
+  { name: "KM Bintang Samudra", type: "Kapal Kargo Umum", kode: "VSL-005" },
+  { name: "KM Kilat Express", type: "Kapal Ro-Ro Cepat", kode: "VSL-006" },
+  { name: "KM Cepat Jaya", type: "Kapal Ro-Ro Cepat", kode: "VSL-007" },
+  { name: "KM Angin Ribut", type: "Kapal Ro-Ro Cepat", kode: "VSL-008" },
+  { name: "KM Royal VIP", type: "Kapal Kargo Khusus VIP", kode: "VSL-009" },
+  { name: "KM Sultan Laut", type: "Kapal Kargo Khusus VIP", kode: "VSL-010" }
+];
+
 export default function AnalitikClient({ armadaRows, customerRows }: AnalitikClientProps) {
   const [pageLoaded, setPageLoaded] = useState(false);
 
@@ -15,17 +31,34 @@ export default function AnalitikClient({ armadaRows, customerRows }: AnalitikCli
   }, []);
 
   // =====================================================================
-  // 1. DATA PASTI DARI DATABASE (TIDAK AKAN KOSONG)
+  // 1. DATA CUSTOMER & GENERATE DIREKTORI 10 ARMADA SINKRON
   // =====================================================================
-  
   const totalCustomer = customerRows.length;
-  const totalKapal = armadaRows.length;
 
-  // Menghitung Kapal yang Siap Beroperasi (Status Aktif / Tidak Rusak)
-  const armadaSiap = armadaRows.filter(k => {
-     const status = (k.status || "Aktif").toLowerCase();
+  // Memetakan 10 kapal standar dan mencocokkan status terbarunya dari DB
+  const daftarKapal = armadaStandar.map((baseShip) => {
+    const transaksiTerkait = armadaRows.filter(row => 
+      row.nama_kapal === baseShip.name || row.kapal === baseShip.name
+    );
+    // Mengambil transaksi terbaru yang melibatkan kapal ini
+    const transaksiTerbaru = transaksiTerkait[0]; 
+
+    return {
+      id: baseShip.kode,
+      nama: baseShip.name,
+      tipe: baseShip.type,
+      status: transaksiTerbaru?.status_kapal || "Siap Berlayar",
+    };
+  });
+
+  const totalKapal = daftarKapal.length; // Hasilnya akan selalu pas 10 unit
+
+  // Menghitung Kapal yang Siap Beroperasi (Berdasarkan Status Riil dari 10 Kapal Resmi)
+  const armadaSiap = daftarKapal.filter(k => {
+     const status = (k.status || "Siap Berlayar").toLowerCase();
      return !status.includes("rusak") && !status.includes("perbaikan") && !status.includes("maintenance");
   }).length;
+  
   const persentaseSiap = totalKapal > 0 ? Math.round((armadaSiap / totalKapal) * 100) : 0;
 
   // =====================================================================
@@ -42,7 +75,6 @@ export default function AnalitikClient({ armadaRows, customerRows }: AnalitikCli
 
   let hasValidDates = false;
   
-  // Mencoba membaca tanggal daftar dari database
   customerRows.forEach(c => {
     const d = new Date(c.created_at || c.tanggal_daftar || c.created);
     if (!isNaN(d.getTime())) {
@@ -54,48 +86,30 @@ export default function AnalitikClient({ armadaRows, customerRows }: AnalitikCli
     }
   });
 
-  // JIKA DATABASE TIDAK PUNYA KOLOM TANGGAL: 
-  // Pecah total pelanggan (29 akun) ke dalam 6 bulan secara otomatis agar grafik terlihat cantik saat demo
   if (!hasValidDates && totalCustomer > 0) {
     chartData[0].value = Math.floor(totalCustomer * 0.15); // Jan
     chartData[1].value = Math.floor(totalCustomer * 0.10); // Feb
     chartData[2].value = Math.floor(totalCustomer * 0.20); // Mar
     chartData[3].value = Math.floor(totalCustomer * 0.25); // Apr
     chartData[4].value = Math.floor(totalCustomer * 0.10); // Mei
-    // Sisa pelanggan dimasukkan ke bulan Juni agar totalnya pas persis dengan jumlah di kotak atas
     const sumTelahDibagi = chartData[0].value + chartData[1].value + chartData[2].value + chartData[3].value + chartData[4].value;
     chartData[5].value = totalCustomer - sumTelahDibagi; // Jun
   }
 
-  // Menentukan skala maksimal grafik agar bar tertinggi tidak menabrak atap (minimal 5)
   const maxChartValue = Math.max(...chartData.map(d => d.value), 5); 
 
   // =====================================================================
-  // 3. DAFTAR ARMADA RAPI
-  // =====================================================================
-  const daftarKapal = armadaRows.map((k, i) => {
-    return {
-      id: k.kode_kapal || k.id || `VSL-00${i+1}`,
-      nama: k.nama_kapal || k.nama || `Armada Laut ${i+1}`,
-      status: k.status || "Aktif",
-      tipe: k.jenis_kapal || k.tipe || k.kategori || "Kargo Umum",
-    }
-  });
-
-  // =====================================================================
-  // 4. FUNGSI UNDUH LAPORAN KONSOLIDASI (KOMPREHENSIF CAKUP SEMUA DATA)
+  // 3. FUNGSI UNDUH LAPORAN KONSOLIDASI (OTOMATIS IKUT SINKRON)
   // =====================================================================
   const handleDownloadCSV = () => {
     let csvContent = "data:text/csv;charset=utf-8,";
     
-    // BAGIAN 1: RINGKASAN EKSEKUTIF
     csvContent += "=== LAPORAN RINGKASAN EKSEKUTIF OPERASIONAL ===\n";
     csvContent += "METRIK UTAMA,TOTAL DATA\n";
     csvContent += `Total Pengguna Terdaftar,${totalCustomer} Akun\n`;
     csvContent += `Total Aset Armada Terdata,${totalKapal} Unit\n`;
     csvContent += `Tingkat Kesiapan Operasional Armada,${persentaseSiap}%\n\n`;
 
-    // BAGIAN 2: TREN DATA BULANAN
     csvContent += "=== TREN PERTUMBUHAN PENDAFTARAN PENGGUNA (SEMESTER 1) ===\n";
     csvContent += "Bulan,Jumlah Akun Baru\n";
     chartData.forEach(row => {
@@ -103,7 +117,6 @@ export default function AnalitikClient({ armadaRows, customerRows }: AnalitikCli
     });
     csvContent += "\n";
 
-    // BAGIAN 3: DIREKTORI KAPAL
     csvContent += "=== DIREKTORI DATA INVENTARIS ARMADA KAPAL ===\n";
     csvContent += "ID Kapal,Nama Lambung Kapal,Kategori / Spesifikasi,Status\n";
     daftarKapal.forEach(kapal => {
@@ -195,7 +208,6 @@ export default function AnalitikClient({ armadaRows, customerRows }: AnalitikCli
           </div>
           
           <div className="flex-1 mt-4 mb-2 flex flex-col justify-end relative pl-10 pb-8">
-              
               {/* Sumbu Y */}
               <div className="absolute left-0 top-0 h-full flex flex-col justify-between text-[10px] text-[#6B6B80] font-bold pb-8">
                   <span>{maxChartValue}</span>
@@ -220,7 +232,6 @@ export default function AnalitikClient({ armadaRows, customerRows }: AnalitikCli
                       
                       return (
                           <div key={i} className="flex flex-col items-center group w-1/6 h-full justify-end cursor-pointer relative">
-                              
                               {/* Tooltip Hover */}
                               <div className="absolute opacity-0 group-hover:opacity-100 transition-opacity bg-[#0A0A12] border border-[#1E1E2E] p-4 rounded-xl mb-4 pointer-events-none z-50 transform -translate-y-4 group-hover:-translate-y-6 shadow-2xl min-w-[150px] text-center"
                                    style={{ bottom: `${finalHeight}%` }}>
@@ -265,7 +276,7 @@ export default function AnalitikClient({ armadaRows, customerRows }: AnalitikCli
                 </div>
               ) : (
                 daftarKapal.map((kapal, i) => {
-                  const isMaintenance = kapal.status.toLowerCase().includes("rusak") || kapal.status.toLowerCase().includes("perbaikan");
+                  const isMaintenance = kapal.status.toLowerCase().includes("rusak") || kapal.status.toLowerCase().includes("perbaikan") || kapal.status.toLowerCase().includes("overload");
                   const indicatorColor = isMaintenance ? "bg-red-500 shadow-[0_0_8px_#EF4444]" : "bg-green-500 shadow-[0_0_8px_#22C55E]";
 
                   return (
