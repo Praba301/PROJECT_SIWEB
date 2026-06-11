@@ -37,8 +37,7 @@ export default function AboutSection() {
           </h2>
           <p className="text-[#A0A0B0] text-base leading-relaxed mb-10 max-w-lg">
             Praketrio berdiri sejak 2011 sebagai mitra logistik laut terpercaya
-            di Indonesia. Kami menghubungkan lebih dari 34 kota pelabuhan dari
-            Sabang hingga Merauke dengan armada modern, sistem tracking
+            di Indonesia. Kami menghubungkan lebih dari 5 kota pelabuhan dengan armada modern, sistem tracking
             realtime, dan tim operasional berpengalaman.
           </p>
 

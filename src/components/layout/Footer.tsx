@@ -35,8 +35,8 @@ export default function Footer() {
 
             {/* Kolom 3 */}
             <p className="text-[#A0A0B0] text-base leading-relaxed">
-              Dengan armada lebih dari 150+ kapal dan
-              jaringan yang menjangkau 34 kota tujuan, kami memastikan setiap paket tiba tepat waktu
+              Dengan armada lebih dari 8+ kapal dan
+              jaringan yang menjangkau 5 kota tujuan, kami memastikan setiap paket tiba tepat waktu
               dengan tingkat keberhasilan pengiriman 97.6% karena kepercayaan Anda adalah
               prioritas utama kami.
             </p>

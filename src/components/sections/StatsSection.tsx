@@ -1,6 +1,6 @@
 const stats = [
-  { value: "150+", label: "Armada Kapal" },
-  { value: "34", label: "Kota Tujuan" },
+  { value: "8+", label: "Armada Kapal" },
+  { value: "5", label: "Kota Tujuan" },
   { value: "97.6%", label: "On-Time" },
   { value: "12K+", label: "Pengiriman/Bulan" },
 ];
