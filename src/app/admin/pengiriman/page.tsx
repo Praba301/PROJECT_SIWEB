@@ -23,21 +23,25 @@ export default async function PengirimanPage(props: {
   let queryClean = `%${query}%`;
 
   try {
+    // PERBAIKAN 1: Tambahkan tp.status != 'Dihapus' di perhitungan halaman
     const countResult = await db.query(`
       SELECT COUNT(*)
       FROM transaksi_pengiriman tp
       LEFT JOIN customers c ON tp.customer_id = c.id
       LEFT JOIN detail_pengiriman dp ON tp.id = dp.transaksi_id
-      WHERE tp.no_resi ILIKE $1 
-         OR c.nama_customer ILIKE $1
-         OR tp.nama_penerima ILIKE $1
-         OR dp.jenis_barang ILIKE $1
+      WHERE tp.status != 'Dihapus'
+        AND (
+           tp.no_resi ILIKE $1 
+           OR c.nama_customer ILIKE $1
+           OR tp.nama_penerima ILIKE $1
+           OR dp.jenis_barang ILIKE $1
+        )
     `, [queryClean]);
     
     const totalItems = Number(countResult.rows[0]?.count || 0);
     totalPages = Math.ceil(totalItems / itemsPerPage) || 1; 
 
-    // PERBAIKAN: Menambahkan kota_asal, kota_tujuan, telepon, penerima, dan nama_kapal
+    // PERBAIKAN 2: Tambahkan tp.status != 'Dihapus' saat menarik data tabel Admin
     const result = await db.query(`
       SELECT 
         tp.no_resi, 
@@ -55,10 +59,13 @@ export default async function PengirimanPage(props: {
       LEFT JOIN customers c ON tp.customer_id = c.id
       LEFT JOIN detail_pengiriman dp ON tp.id = dp.transaksi_id
       LEFT JOIN kapal_pengiriman kp ON tp.id = kp.transaksi_id
-      WHERE tp.no_resi ILIKE $1 
-         OR c.nama_customer ILIKE $1
-         OR tp.nama_penerima ILIKE $1
-         OR dp.jenis_barang ILIKE $1
+      WHERE tp.status != 'Dihapus'
+        AND (
+           tp.no_resi ILIKE $1 
+           OR c.nama_customer ILIKE $1
+           OR tp.nama_penerima ILIKE $1
+           OR dp.jenis_barang ILIKE $1
+        )
       ORDER BY tp.id DESC
       LIMIT $2 OFFSET $3
     `, [queryClean, itemsPerPage, offset]);

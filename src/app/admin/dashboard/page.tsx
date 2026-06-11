@@ -13,7 +13,7 @@ export default async function DashboardPage() {
   let totalData = 0; 
   
   try {
-    // 1. URUTKAN BERDASARKAN ID DESC AGAR RESI TERBARU PASTI MUNCUL DI DASHBOARD
+    // 1. FILTER DAFTAR TERKINI: Tarik resi terbaru tapi sembunyikan yang sudah 'Dihapus'
     const queryResult = await db.query(`
       SELECT 
         tp.no_resi, 
@@ -22,14 +22,16 @@ export default async function DashboardPage() {
         COALESCE(k.nama_kapal, 'MV Nusantara Logistik') as nama_kapal
       FROM transaksi_pengiriman tp
       LEFT JOIN kapal_pengiriman k ON tp.id = k.transaksi_id
+      WHERE tp.status != 'Dihapus'
       ORDER BY tp.id DESC LIMIT 5
     `);
     dataPengiriman = queryResult.rows;
 
-    // 2. Agregasi status
+    // 2. FILTER STATUS: Agregasi jumlah kargo (Diproses, Berlayar, dll) tanpa menghitung yang 'Dihapus'
     const statsResult = await db.query(`
       SELECT status, COUNT(*) as count 
       FROM transaksi_pengiriman 
+      WHERE status != 'Dihapus'
       GROUP BY status
     `);
     
@@ -41,8 +43,12 @@ export default async function DashboardPage() {
       }
     });
 
-    // 3. AMBIL TOTAL REAL
-    const countResult = await db.query(`SELECT COUNT(*) as total FROM transaksi_pengiriman`);
+    // 3. FILTER TOTAL REAL: Hitung total pengiriman aktif (bersih dari resi sampah)
+    const countResult = await db.query(`
+      SELECT COUNT(*) as total 
+      FROM transaksi_pengiriman 
+      WHERE status != 'Dihapus'
+    `);
     totalData = Number(countResult.rows[0].total);
 
   } catch (error) {
