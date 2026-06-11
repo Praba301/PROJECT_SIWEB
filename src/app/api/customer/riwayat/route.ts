@@ -13,8 +13,9 @@ export async function GET() {
       );
     }
 
+    // Ambil data customer utama berdasarkan user_id yang sedang login
     const customerResult = await db.query(
-      "SELECT id FROM customers WHERE user_id = $1",
+      "SELECT id, nama_customer, no_telepon FROM customers WHERE user_id = $1",
       [user.id]
     );
 
@@ -26,7 +27,14 @@ export async function GET() {
     }
 
     const customerId = customerResult.rows[0].id;
+    // Ambil nama dari database, atau fallback ke nama dari session login
+    const customerName = customerResult.rows[0].nama_customer || user.nama;
 
+    // KUNCI PERBAIKAN: 
+    // Tarik resi jika memenuhi salah satu syarat ini:
+    // 1. Dibuat langsung oleh akun ini (customer_id = $1)
+    // 2. Admin mengetik namanya sebagai Pengirim (c.nama_customer ILIKE $2)
+    // 3. Admin mengetik namanya sebagai Penerima (tp.nama_penerima ILIKE $2)
     const result = await db.query(
       `SELECT 
         tp.no_resi,
@@ -37,9 +45,12 @@ export async function GET() {
         COALESCE(dp.total_biaya, 0) as total_biaya
       FROM transaksi_pengiriman tp
       LEFT JOIN detail_pengiriman dp ON tp.id = dp.transaksi_id
-      WHERE tp.customer_id = $1
+      LEFT JOIN customers c ON tp.customer_id = c.id
+      WHERE tp.customer_id = $1 
+         OR c.nama_customer ILIKE $2
+         OR tp.nama_penerima ILIKE $2
       ORDER BY tp.id DESC`,
-      [customerId]
+      [customerId, customerName]
     );
 
     return NextResponse.json({

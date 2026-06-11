@@ -83,18 +83,18 @@ export default function CustomerNavbar() {
       {/* BAGIAN KANAN: Profil & Keluar */}
       <div className="flex items-center gap-6">
         
-        {/* Profil Customer */}
-        <div className="flex items-center gap-3 group cursor-pointer">
+        {/* Profil Customer (SEKARANG BISA DIKLIK) */}
+        <Link href="/customer/profil" className="flex items-center gap-3 group cursor-pointer hover:bg-[#1A1A24] px-3 py-2 rounded-xl transition-all">
           <div className="flex flex-col items-end">
             <span className="text-white font-bold text-sm transition-colors group-hover:text-[#C084FC]">
               {userName || "Customer"}
             </span>
             <span className="text-[#6B6B80] text-xs">Customer</span>
           </div>
-          <div className="w-10 h-10 rounded-full bg-[#1E1E2E] border border-[#A855F7]/40 flex items-center justify-center text-[#A855F7] text-sm font-bold shadow-[0_0_10px_rgba(168,85,247,0.2)] transition-transform duration-300 group-hover:scale-110">
+          <div className="w-10 h-10 rounded-full bg-[#1E1E2E] border border-[#A855F7]/40 flex items-center justify-center text-[#A855F7] text-sm font-bold shadow-[0_0_10px_rgba(168,85,247,0.2)] transition-transform duration-300 group-hover:scale-110 group-hover:border-[#C084FC]">
             {userName ? userName.charAt(0).toUpperCase() : "C"}
           </div>
-        </div>
+        </Link>
 
         {/* Garis Pemisah */}
         <div className="h-8 w-px bg-[#1E1E2E] hidden md:block"></div>
