@@ -4,7 +4,7 @@ import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 
 // ======================================================
-// 1. FUNGSI HAPUS RESI (DIPERBAIKI: TIDAK MENGHAPUS CUSTOMER)
+// 1. FUNGSI HAPUS RESI (SOFT DELETE - RIWAYAT AMAN)
 // ======================================================
 export async function hapusResiDatabase(resi: string) {
   const client = await db.connect();
@@ -24,12 +24,16 @@ export async function hapusResiDatabase(resi: string) {
 
     const transaksiId = transaksi.rows[0].id;
 
-    // Hapus data dari tabel relasi logistiknya saja
+    // 1. Lepaskan resi dari kapal agar kapasitas muatannya kembali lega
     await client.query(`DELETE FROM kapal_pengiriman WHERE transaksi_id = $1`, [transaksiId]);
-    await client.query(`DELETE FROM detail_pengiriman WHERE transaksi_id = $1`, [transaksiId]);
-    await client.query(`DELETE FROM transaksi_pengiriman WHERE id = $1`, [transaksiId]);
 
-    // DIUBAH: Blok kode penghapusan dari tabel customers resmi dibuang
+    // 2. SOFT DELETE: Ubah status menjadi 'Dihapus'
+    // Kita TIDAK lagi menghapus data dari detail_pengiriman dan transaksi_pengiriman
+    // Sehingga nota/invoice dan riwayatnya tetap utuh di sisi Customer
+    await client.query(
+      `UPDATE transaksi_pengiriman SET status = 'Dihapus' WHERE id = $1`,
+      [transaksiId]
+    );
 
     await client.query("COMMIT");
 
