@@ -202,7 +202,7 @@ export default function PengirimanClient({
     if (asal === tujuan) {
       errors.kotaTujuan = "Kota tujuan tidak boleh sama dengan kota asal pengiriman!";
       hasError = true;
-      triggerPopup("Rute Pengiriman Gagal", "Kota Asal dan Kota Tujuan tidak boleh sama! Sistem logistik laut tidak melayani pengiriman antar-pelabuhan di kota yang sama.", "error");
+      triggerPopup("Rute Pengiriman Gagal", "Kota Asal and Kota Tujuan tidak boleh sama! Sistem logistik laut tidak melayani pengiriman antar-pelabuhan di kota yang sama.", "error");
       setFormErrors(errors);
       return;
     }
@@ -225,7 +225,6 @@ export default function PengirimanClient({
       triggerPopup("Resi Berhasil Dibuat", `Manifes disimpan. Kapasitas ${kapalTerpilih} kini terisi ${loadPercentage.toFixed(1)}%.`, "success");
       router.refresh();
     } else {
-      // PERBAIKAN POP-UP: Menampilkan pesan eror asli dari database Neon agar transparan
       triggerPopup("Gagal Menambahkan", result.error || "Terjadi error internal data structure pada database.", "error");
     }
   };
@@ -254,7 +253,6 @@ export default function PengirimanClient({
       "Terkirim": "bg-[#22C55E]/10 text-[#4ADE80] border border-[#22C55E]/20"
     };
     const currentStatus = row.status || "Diproses";
-    const dateObj = new Date(row.tanggal_transaksi);
     return {
       resi: row.no_resi,
       pengirim: row.pengirim || "Tidak Tersedia",
@@ -265,7 +263,6 @@ export default function PengirimanClient({
       kotaTujuan: row.kota_tujuan || "-",
       beratAsli: row.berat_total,
       beratTampil: `${row.berat_total} KG`,
-      eta: isNaN(dateObj.getTime()) ? "TBA" : `${dateObj.getDate() + 3} ${dateObj.toLocaleString('id-ID', { month: 'short' })}`,
       status: currentStatus,
       badge: badgeColors[currentStatus] || badgeColors["Diproses"],
       namaKapal: row.nama_kapal || "Belum Ditentukan" 
@@ -386,7 +383,7 @@ export default function PengirimanClient({
                           <svg className="w-4 h-4 text-[#A855F7]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
                           <div className="text-slate-300 font-medium">{item.kotaTujuan}</div>
                         </div>
-                        <div className="text-xs text-slate-500 mt-1">Est. Tiba: {item.eta}</div>
+                        {/* DIUBAH: Baris div teks "Est. Tiba" resmi dihapus total dari sini */}
                       </td>
 
                       <td className="p-4 text-slate-400 font-sans">{item.beratTampil}</td>

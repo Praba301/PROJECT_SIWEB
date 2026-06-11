@@ -62,10 +62,13 @@ export default function LacakPaket() {
       return;
     }
 
+    // PERBAIKAN: Hanya set isLoading dan reset error saat awal request
     setIsLoading(true);
-    setSudahCari(true);
     setAnimateProgress(false);
     setErrorResi("");
+    
+    // Jangan ubah setSudahCari menjadi true di sini agar "Resi tidak ditemukan" tidak kedip
+    setSudahCari(false); 
 
     try {
       const response = await fetch(`/api/customer/lacak?no_resi=${noResi.trim().toUpperCase()}`);
@@ -81,6 +84,8 @@ export default function LacakPaket() {
       console.error("Error:", error);
       setHasil(null);
     } finally {
+      // PERBAIKAN: Baru setSudahCari menjadi true setelah proses fetch selesai
+      setSudahCari(true);
       setIsLoading(false);
     }
   };
@@ -152,7 +157,15 @@ export default function LacakPaket() {
           </div>
 
           <div className="bg-[#13131F] border border-[#1E1E2E] rounded-2xl p-6 md:p-10 max-w-3xl mx-auto min-h-64 shadow-xl relative opacity-0 animate-fade-in-up flex flex-col justify-center" style={{ animationDelay: "0.4s" }}>
-            {hasil ? (
+            {/* PERBAIKAN: Tambahkan Kondisi Loading di sini */}
+            {isLoading ? (
+              <div className="flex flex-col items-center justify-center gap-4">
+                <div className="w-16 h-16 rounded-full bg-[#A855F7]/10 border border-[#A855F7]/30 flex items-center justify-center">
+                  <div className="w-6 h-6 border-2 border-[#C084FC] border-t-transparent rounded-full animate-spin"></div>
+                </div>
+                <p className="text-[#A0A0B0] text-sm font-medium animate-pulse">Mencari paket di database...</p>
+              </div>
+            ) : hasil ? (
               <div className="flex flex-col gap-8 opacity-0 animate-zoom-in">
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

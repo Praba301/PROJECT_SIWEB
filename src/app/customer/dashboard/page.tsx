@@ -48,7 +48,8 @@ export default function CustomerDashboard() {
   const [form, setForm] = useState({
     namaPengirim: "",
     namaPenerima: "",
-    noTelepon: "",
+    noTeleponPengirim: "", 
+    noTeleponPenerima: "", 
     kotaAsal: "",
     kotaTujuan: "",
     berat: "",
@@ -60,7 +61,8 @@ export default function CustomerDashboard() {
   const [errors, setErrors] = useState({
     namaPengirim: "",
     namaPenerima: "",
-    noTelepon: "",
+    noTeleponPengirim: "", 
+    noTeleponPenerima: "", 
     kotaAsal: "",
     kotaTujuan: "",
     berat: "",
@@ -135,7 +137,8 @@ export default function CustomerDashboard() {
     setForm({
       namaPengirim: user?.nama || "",
       namaPenerima: "",
-      noTelepon: "",
+      noTeleponPengirim: "", 
+      noTeleponPenerima: "", 
       kotaAsal: "",
       kotaTujuan: "",
       berat: "",
@@ -146,7 +149,8 @@ export default function CustomerDashboard() {
     setErrors({
       namaPengirim: "",
       namaPenerima: "",
-      noTelepon: "",
+      noTeleponPengirim: "", 
+      noTeleponPenerima: "", 
       kotaAsal: "",
       kotaTujuan: "",
       berat: "",
@@ -170,8 +174,12 @@ export default function CustomerDashboard() {
       newErrors.namaPenerima = "Nama penerima wajib diisi.";
       isValid = false;
     }
-    if (!form.noTelepon.trim()) {
-      newErrors.noTelepon = "Nomor telepon wajib diisi.";
+    if (!form.noTeleponPengirim.trim()) {
+      newErrors.noTeleponPengirim = "Nomor telepon pengirim wajib diisi.";
+      isValid = false;
+    }
+    if (!form.noTeleponPenerima.trim()) {
+      newErrors.noTeleponPenerima = "Nomor telepon penerima wajib diisi.";
       isValid = false;
     }
     if (!form.kotaAsal.trim()) {
@@ -219,10 +227,36 @@ export default function CustomerDashboard() {
         return;
       }
 
+      const kumpulanKapalSistem = {
+        REGULER: [
+          { nama: "KM Nusantara", tipe: "Kapal Kargo Umum", kode: "VSL-001" },
+          { nama: "KM Bahtera Jaya", tipe: "Kapal Kargo Umum", kode: "VSL-002" },
+          { nama: "KM Garuda", tipe: "Kapal Kargo Umum", kode: "VSL-003" },
+          { nama: "KM Tujuh Laut", tipe: "Kapal Kargo Umum", kode: "VSL-004" },
+          { nama: "KM Bintang Samudra", tipe: "Kapal Kargo Umum", kode: "VSL-005" },
+        ],
+        EXPRESS: [
+          { nama: "KM Kilat Express", tipe: "Kapal Ro-Ro Cepat", kode: "VSL-006" },
+          { nama: "KM Cepat Jaya", tipe: "Kapal Ro-Ro Cepat", kode: "VSL-007" },
+          { nama: "KM Angin Ribut", tipe: "Kapal Ro-Ro Cepat", kode: "VSL-008" },
+        ],
+        VVIP: [
+          { nama: "KM Royal VIP", tipe: "Kapal Kargo Khusus VIP", kode: "VSL-009" },
+          { nama: "KM Sultan Laut", tipe: "Kapal Kargo Khusus VIP", kode: "VSL-010" },
+        ],
+      };
+
+      const pilihanKelompok = kumpulanKapalSistem[form.tipePaket as keyof typeof kumpulanKapalSistem] || kumpulanKapalSistem.REGULER;
+      const kapalTerpilih = pilihanKelompok[Math.floor(Math.random() * pilihanKelompok.length)];
+
       const formData = new FormData();
       formData.append("namaPengirim", form.namaPengirim);
       formData.append("namaPenerima", form.namaPenerima);
-      formData.append("noTelepon", form.noTelepon);
+      
+      formData.append("noTeleponPengirim", form.noTeleponPengirim);
+      formData.append("noTeleponPenerima", form.noTeleponPenerima); 
+      formData.append("noTelepon", form.noTeleponPengirim);
+
       formData.append("kotaAsal", form.kotaAsal);
       formData.append("kotaTujuan", form.kotaTujuan);
       formData.append("beratTotal", form.berat);
@@ -232,11 +266,15 @@ export default function CustomerDashboard() {
       formData.append("totalBiaya", totalBiaya.toString());
       formData.append("tanggalKirim", new Date().toISOString().split("T")[0]);
       formData.append("hargaTarif", (parseFloat(form.berat) * HARGA_PER_KG).toString());
-      formData.append("jenisPengiriman", form.tipePaket === "EXPRESS" ? "Ekspres" : "Reguler");
-      formData.append("namaKapal", "Kapal Kargo Umum");
-      formData.append("jenisKapal", "Kapal Kargo Umum");
-      formData.append("kodeKapal", "KCU-001");
-      formData.append("kapasitasMuatan", "100");
+      
+      formData.append("jenisPengiriman", form.tipePaket === "EXPRESS" ? "Cepat" : form.tipePaket === "VVIP" ? "VIP" : "Biasa");
+      
+      formData.append("namaKapal", kapalTerpilih.nama);
+      formData.append("jenisKapal", kapalTerpilih.tipe);
+      formData.append("kodeKapal", kapalTerpilih.kode);
+      formData.append("kapasitasMuatan", "Beroperasi (Sebagian Terisi)");
+      formData.append("statusKapal", "Beroperasi (Sebagian Terisi)");
+      
       formData.append("noResiInput", "");
       formData.append("customer_id", customerId.toString());
       
@@ -244,13 +282,14 @@ export default function CustomerDashboard() {
       const result = await tambahResiDatabase(formData);
 
       if (result.success) {
-        // Simpan data untuk ditampilkan di modal nota
+        // PERBAIKAN: Menambahkan no_telepon_penerima ke dalam objek setInvoiceData
         setInvoiceData({
           no_resi: result.no_resi,
           tanggal: new Date().toISOString().split("T")[0],
           nama_pengirim: form.namaPengirim,
           nama_penerima: form.namaPenerima,
-          no_telepon: form.noTelepon,
+          no_telepon: form.noTeleponPengirim,
+          no_telepon_penerima: form.noTeleponPenerima, // <--- Ini yang sebelumnya terlewat
           kota_asal: form.kotaAsal,
           kota_tujuan: form.kotaTujuan,
           berat: parseFloat(form.berat),
@@ -331,10 +370,18 @@ export default function CustomerDashboard() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <div>
-                <label className="text-[#C084FC] text-[11px] font-bold uppercase">No Telepon</label>
-                <input type="tel" name="noTelepon" value={form.noTelepon} onChange={handleChange} placeholder="Masukkan nomor telepon" className="w-full bg-[#0A0A12] border border-[#1E1E2E] rounded-xl px-4 py-3.5 text-white" />
-                {errors.noTelepon && <span className="text-red-400 text-[10px]">{errors.noTelepon}</span>}
+                <label className="text-[#C084FC] text-[11px] font-bold uppercase">No. Telp Pengirim</label>
+                <input type="tel" name="noTeleponPengirim" value={form.noTeleponPengirim} onChange={handleChange} placeholder="Masukkan nomor telepon pengirim" className="w-full bg-[#0A0A12] border border-[#1E1E2E] rounded-xl px-4 py-3.5 text-white" />
+                {errors.noTeleponPengirim && <span className="text-red-400 text-[10px]">{errors.noTeleponPengirim}</span>}
               </div>
+              <div>
+                <label className="text-[#C084FC] text-[11px] font-bold uppercase">No. Telp Penerima</label>
+                <input type="tel" name="noTeleponPenerima" value={form.noTeleponPenerima} onChange={handleChange} placeholder="Masukkan nomor telepon penerima" className="w-full bg-[#0A0A12] border border-[#1E1E2E] rounded-xl px-4 py-3.5 text-white" />
+                {errors.noTeleponPenerima && <span className="text-red-400 text-[10px]">{errors.noTeleponPenerima}</span>}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <div>
                 <label className="text-[#C084FC] text-[11px] font-bold uppercase">Kota Asal</label>
                 <select
@@ -354,9 +401,6 @@ export default function CustomerDashboard() {
                 </select>
                 {errors.kotaAsal && <span className="text-red-400 text-[10px]">{errors.kotaAsal}</span>}
               </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <div>
                 <label className="text-[#C084FC] text-[11px] font-bold uppercase">Kota Tujuan</label>
                 <select
@@ -376,14 +420,14 @@ export default function CustomerDashboard() {
                 </select>
                 {errors.kotaTujuan && <span className="text-red-400 text-[10px]">{errors.kotaTujuan}</span>}
               </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <div>
                 <label className="text-[#C084FC] text-[11px] font-bold uppercase">Berat (kg)</label>
                 <input type="number" name="berat" value={form.berat} onChange={handleChange} placeholder="Contoh: 150" className="w-full bg-[#0A0A12] border border-[#1E1E2E] rounded-xl px-4 py-3.5 text-white" />
                 {errors.berat && <span className="text-red-400 text-[10px]">{errors.berat}</span>}
               </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <div>
                 <label className="text-[#C084FC] text-[11px] font-bold uppercase">Jenis Barang</label>
                 <select
@@ -403,6 +447,9 @@ export default function CustomerDashboard() {
                 </select>
                 {errors.jenisBarang && <span className="text-red-400 text-[10px]">{errors.jenisBarang}</span>}
               </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <div>
                 <label className="text-[#C084FC] text-[11px] font-bold uppercase">Tipe Paket *</label>
                 <select name="tipePaket" value={form.tipePaket} onChange={handleChange} className="w-full bg-[#0A0A12] border border-[#1E1E2E] rounded-xl px-4 py-3.5 text-white">
@@ -413,6 +460,7 @@ export default function CustomerDashboard() {
                 </select>
                 {errors.tipePaket && <span className="text-red-400 text-[10px]">{errors.tipePaket}</span>}
               </div>
+              <div />
             </div>
 
             <div className="mb-6">
