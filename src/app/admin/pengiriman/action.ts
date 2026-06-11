@@ -4,7 +4,7 @@ import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 
 // ======================================================
-// 1. FUNGSI HAPUS RESI
+// 1. FUNGSI HAPUS RESI (DIPERBAIKI: TIDAK MENGHAPUS CUSTOMER)
 // ======================================================
 export async function hapusResiDatabase(resi: string) {
   const client = await db.connect();
@@ -13,7 +13,7 @@ export async function hapusResiDatabase(resi: string) {
     await client.query("BEGIN");
 
     const transaksi = await client.query(
-      `SELECT id, customer_id FROM transaksi_pengiriman WHERE no_resi = $1`,
+      `SELECT id FROM transaksi_pengiriman WHERE no_resi = $1`,
       [resi]
     );
 
@@ -23,15 +23,13 @@ export async function hapusResiDatabase(resi: string) {
     }
 
     const transaksiId = transaksi.rows[0].id;
-    const customerId = transaksi.rows[0].customer_id;
 
+    // Hapus data dari tabel relasi logistiknya saja
     await client.query(`DELETE FROM kapal_pengiriman WHERE transaksi_id = $1`, [transaksiId]);
     await client.query(`DELETE FROM detail_pengiriman WHERE transaksi_id = $1`, [transaksiId]);
     await client.query(`DELETE FROM transaksi_pengiriman WHERE id = $1`, [transaksiId]);
 
-    if (customerId) {
-      await client.query(`DELETE FROM customers WHERE id = $1`, [customerId]);
-    }
+    // DIUBAH: Blok kode penghapusan dari tabel customers resmi dibuang
 
     await client.query("COMMIT");
 
@@ -39,6 +37,7 @@ export async function hapusResiDatabase(resi: string) {
     revalidatePath("/admin/dashboard");
     revalidatePath("/admin/armada");
     revalidatePath("/admin/analitik");
+    revalidatePath("/customer/riwayat");
 
     return { success: true };
   } catch (error) {
